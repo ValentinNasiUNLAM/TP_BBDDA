@@ -8,7 +8,31 @@ USE Com2900G07
 GO
 --DROP DATABASE Com2900G07
 
-CREATE TABLE Categorias(
+--ESQUEMAS
+
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'tabla')
+BEGIN
+    EXEC('CREATE SCHEMA tabla')
+END
+
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'spInsercion')
+BEGIN
+    EXEC('CREATE SCHEMA spInsercion')
+END
+
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'spActualizacion')
+BEGIN
+    EXEC('CREATE SCHEMA spActualizacion')
+END
+
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'spEliminacion')
+BEGIN
+    EXEC('CREATE SCHEMA spEliminacion')
+END
+
+--TABLAS
+
+CREATE TABLE tabla.Categorias(
 	id_categoria INT PRIMARY KEY IDENTITY(1,1),
 	nombre_categoria VARCHAR(15),
 	edad_min TINYINT,
@@ -20,7 +44,7 @@ CREATE TABLE Categorias(
 )
 GO
 
-CREATE TABLE PrestadoresSalud(
+CREATE TABLE tabla.PrestadoresSalud(
 	id_socio_prestador_salud INT PRIMARY KEY IDENTITY(1,1),
 	tipo TINYINT,
 	nombre VARCHAR(50),
@@ -28,7 +52,7 @@ CREATE TABLE PrestadoresSalud(
 )
 GO
 
-CREATE TABLE Administradores(
+CREATE TABLE tabla.Administradores(
 	id_admin INT PRIMARY KEY IDENTITY(1,1),
 	nombre VARCHAR(30),
 	apellido VARCHAR(30),
@@ -45,7 +69,7 @@ CREATE TABLE Administradores(
 )
 GO
 
-CREATE TABLE MediosPago(
+CREATE TABLE tabla.MediosPago(
 	id_medio_pago INT PRIMARY KEY IDENTITY(1,1),
 	nombre VARCHAR(50),
 	descripcion VARCHAR(50),
@@ -53,7 +77,7 @@ CREATE TABLE MediosPago(
 )
 GO
 
-CREATE TABLE Deportes(
+CREATE TABLE tabla.Deportes(
 	id_deporte INT PRIMARY KEY IDENTITY(1,1),
 	nombre VARCHAR(50),
 	precio INT,
@@ -63,7 +87,7 @@ CREATE TABLE Deportes(
 )
 GO
 
-CREATE TABLE Invitados(
+CREATE TABLE tabla.Invitados(
 	id_invitado INT PRIMARY KEY IDENTITY(1,1),
 	dni INT UNIQUE,
 	nombre VARCHAR(30),
@@ -73,28 +97,28 @@ CREATE TABLE Invitados(
 )
 GO
 
-CREATE TABLE Clases(
+CREATE TABLE tabla.Clases(
 	id_clase INT PRIMARY KEY IDENTITY(1,1),
 	id_deporte INT NOT NULL,
 	--CONSTRAINTS
-	CONSTRAINT fk_id_deporte_clase FOREIGN KEY (id_deporte) REFERENCES Deportes(id_deporte)
+	CONSTRAINT fk_id_deporte_clase FOREIGN KEY (id_deporte) REFERENCES tabla.Deportes(id_deporte)
 )
 GO
 
-CREATE TABLE Turnos(
+CREATE TABLE tabla.Turnos(
 	id_turno INT PRIMARY KEY IDENTITY(1,1),
 	id_clase INT NOT NULL,
 	dia TINYINT,
 	hora_inicio TIME,
 	hora_fin TIME,
 	--CONSTRAINTS
-	CONSTRAINT fk_id_clase_turno FOREIGN KEY (id_clase) REFERENCES Clases(id_clase),
+	CONSTRAINT fk_id_clase_turno FOREIGN KEY (id_clase) REFERENCES tabla.Clases(id_clase),
 	CONSTRAINT chk_dia_turno CHECK (dia >= 1 AND dia <=7),
 	CONSTRAINT chk_rango_horas_turno CHECK (hora_fin > hora_inicio)
 )
 GO
 
-CREATE TABLE Socios(
+CREATE TABLE tabla.Socios(
 	id_socio INT PRIMARY KEY IDENTITY(1,1),
 	dni INT UNIQUE,
 	nombre VARCHAR(30),
@@ -113,33 +137,33 @@ CREATE TABLE Socios(
 		CHARINDEX('@', email) > 1 AND 
 		CHARINDEX('.', email, CHARINDEX('@', email)) > CHARINDEX('@', email) + 1),
 	CONSTRAINT chk_fecha_nacimiento_no_futuro_socio CHECK (fecha_nacimiento <= CAST(GETDATE() AS DATE)),
-	CONSTRAINT fk_prestador_socio FOREIGN KEY (id_socio_prestador_salud) REFERENCES PrestadoresSalud(id_socio_prestador_salud),
-	CONSTRAINT fk_tutor_socio FOREIGN KEY (id_tutor) REFERENCES Socios(id_socio),
-	CONSTRAINT fk_grupo_familiar_socio FOREIGN KEY (id_grupo_familiar) REFERENCES Socios(id_socio)
+	CONSTRAINT fk_prestador_socio FOREIGN KEY (id_socio_prestador_salud) REFERENCES tabla.PrestadoresSalud(id_socio_prestador_salud),
+	CONSTRAINT fk_tutor_socio FOREIGN KEY (id_tutor) REFERENCES tabla.Socios(id_socio),
+	CONSTRAINT fk_grupo_familiar_socio FOREIGN KEY (id_grupo_familiar) REFERENCES tabla.Socios(id_socio)
 )
 GO
 
-CREATE TABLE Cuotas(
+CREATE TABLE tabla.Cuotas(
 	id_cuota INT PRIMARY KEY IDENTITY(1,1),
 	id_categoria INT NOT NULL,
 	id_socio INT NOT NULL,
 	--CONSTRAINTS
-	CONSTRAINT fk_id_categoria_cuota FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categoria),
-	CONSTRAINT fk_id_socio_cuota FOREIGN KEY (id_socio) REFERENCES Socios(id_socio)
+	CONSTRAINT fk_id_categoria_cuota FOREIGN KEY (id_categoria) REFERENCES tabla.Categorias(id_categoria),
+	CONSTRAINT fk_id_socio_cuota FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio)
 )
 GO
 
-CREATE TABLE Actividades(
+CREATE TABLE tabla.Actividades(
 	id_actividad INT PRIMARY KEY IDENTITY(1,1),
 	id_socio INT NOT NULL,
 	id_deporte INT NOT NULL,
 	 --CONSTRAINT
-	CONSTRAINT fk_id_socio_actividad FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
-	CONSTRAINT fk_id_deporte_actividad FOREIGN KEY (id_deporte) REFERENCES Deportes(id_deporte)
+	CONSTRAINT fk_id_socio_actividad FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
+	CONSTRAINT fk_id_deporte_actividad FOREIGN KEY (id_deporte) REFERENCES tabla.Deportes(id_deporte)
 )
 GO
 
-CREATE TABLE ActividadesExtra(
+CREATE TABLE tabla.ActividadesExtra(
 	id_actividad_extra INT PRIMARY KEY IDENTITY(1,1),
 	id_socio INT NOT NULL,
 	id_invitado INT NOT NULL,
@@ -150,15 +174,15 @@ CREATE TABLE ActividadesExtra(
 	monto_invitado INT NULL,
 	lluvia BIT NULL,
 	 --CONSTRAINTS
-	CONSTRAINT fk_id_socio_actividadextra FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
-	CONSTRAINT fk_id_invitado_actividadextra FOREIGN KEY (id_invitado) REFERENCES Invitados(id_invitado),
+	CONSTRAINT fk_id_socio_actividadextra FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
+	CONSTRAINT fk_id_invitado_actividadextra FOREIGN KEY (id_invitado) REFERENCES tabla.Invitados(id_invitado),
 	CONSTRAINT chk_tipo_activado_actividadextra CHECK ( tipo_actividad >= 1 AND tipo_actividad <=5),
 	CONSTRAINT chk_monto_actividadextra CHECK (monto > 0),
 	CONSTRAINT chk_fecha_reserva CHECK (fecha_reserva < CAST(GETDATE() AS DATETIME))
 )
 GO
 
-CREATE TABLE FacturasARCA(
+CREATE TABLE tabla.FacturasARCA(
 	numero_factura INT PRIMARY KEY IDENTITY (1,1),
 	id_socio INT NOT NULL,
 	fecha_creacion DATETIME,
@@ -169,7 +193,7 @@ CREATE TABLE FacturasARCA(
 	segundo_vencimiento DATE,
 	recargo INT,
 	--CONSTRAINTS
-	CONSTRAINT fk_id_socio_facturaarca FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
+	CONSTRAINT fk_id_socio_facturaarca FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
 	CONSTRAINT chk_tipo_facturaarca CHECK ( tipo = 'A' OR tipo = 'B' OR tipo = 'C' ),
 	CONSTRAINT chk_monto_facturaarca CHECK (total > 0),
 	CONSTRAINT chk_segundo_vencimiento_facturaarca CHECK ( segundo_vencimiento > primer_vencimiento),
@@ -178,7 +202,7 @@ CREATE TABLE FacturasARCA(
 )
 GO
 
-CREATE TABLE CargosSocio(
+CREATE TABLE tabla.CargosSocio(
 	id_cargo_socio INT PRIMARY KEY IDENTITY (1,1),
 	numero_factura INT NOT NULL,
 	fecha_creacion DATETIME,
@@ -197,25 +221,25 @@ CREATE TABLE CargosSocio(
 		id_actividad_extra IS NOT NULL OR
 		id_cuota IS NOT NULL
 	),
-	CONSTRAINT fk_id_actividad_cargosocio FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad),
-	CONSTRAINT fk_id_actividadesextra_cargosocio FOREIGN KEY (id_actividad_extra) REFERENCES ActividadesExtra(id_actividad_extra),
-	CONSTRAINT fk_id_cuota_cargosocio FOREIGN KEY (id_cuota) REFERENCES Cuotas(id_cuota),
-	CONSTRAINT fk_numero_factura_cargosocio FOREIGN KEY (numero_factura) REFERENCES FacturasARCA(numero_factura)
+	CONSTRAINT fk_id_actividad_cargosocio FOREIGN KEY (id_actividad) REFERENCES tabla.Actividades(id_actividad),
+	CONSTRAINT fk_id_actividadesextra_cargosocio FOREIGN KEY (id_actividad_extra) REFERENCES tabla.ActividadesExtra(id_actividad_extra),
+	CONSTRAINT fk_id_cuota_cargosocio FOREIGN KEY (id_cuota) REFERENCES tabla.Cuotas(id_cuota),
+	CONSTRAINT fk_numero_factura_cargosocio FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura)
 )
 GO
 
-CREATE TABLE Morosidades(
+CREATE TABLE tabla.Morosidades(
 	id_morosidad INT PRIMARY KEY IDENTITY(1,1),
 	numero_factura INT NOT NULL,
 	monto_total INT,
 	fecha_pago DATETIME,
 	--CONSTRAINTS
-	CONSTRAINT fk_numero_factura_morosidad FOREIGN KEY (numero_factura) REFERENCES FacturasARCA(numero_factura),
+	CONSTRAINT fk_numero_factura_morosidad FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura),
 	CONSTRAINT chk_monto_total_morosidad CHECK (monto_total > 0)
 )
 GO
 
-CREATE TABLE CuentasSocios(
+CREATE TABLE tabla.CuentasSocios(
 	id_cuenta INT PRIMARY KEY IDENTITY(1,1),
 	id_socio INT NOT NULL UNIQUE,
 	contrasena VARCHAR(30),
@@ -225,14 +249,14 @@ CREATE TABLE CuentasSocios(
 	fecha_vigencia_contrasena DATETIME,
 	estado_cuenta BIT,
 	--CONSTRAINTS
-	CONSTRAINT fk_id_socio_cuenta_socio FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
+	CONSTRAINT fk_id_socio_cuenta_socio FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
 	CONSTRAINT chk_rol_cuenta_socio CHECK (rol >=0 AND rol <=5),
 	CONSTRAINT chk_contrasena_no_vacia_cuenta_socio CHECK (LEN(contrasena) > 0),
 	CONSTRAINT chk_fecha_vigencia_contrasena_cuenta_socio CHECK (fecha_vigencia_contrasena > CAST(GETDATE() AS DATETIME))
 )
 GO
 
-CREATE TABLE Pagos(
+CREATE TABLE tabla.Pagos(
 	id_pago INT PRIMARY KEY IDENTITY(1,1),
 	numero_factura INT NOT NULL,
 	id_medio_pago INT NOT NULL,
@@ -241,13 +265,13 @@ CREATE TABLE Pagos(
 	reembolso INT,
 	tipo_movimiento TINYINT,
 	--CONSTRAINTS
-	CONSTRAINT fk_id_medio_pago_pago FOREIGN KEY (id_medio_pago) REFERENCES MediosPago(id_medio_pago),
-	CONSTRAINT fk_numero_factura_pago FOREIGN KEY (numero_factura) REFERENCES FacturasARCA(numero_factura),
+	CONSTRAINT fk_id_medio_pago_pago FOREIGN KEY (id_medio_pago) REFERENCES tabla.MediosPago(id_medio_pago),
+	CONSTRAINT fk_numero_factura_pago FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura),
 	CONSTRAINT chk_fecha_pago CHECK (fecha <= CAST(GETDATE() AS DATETIME))
 )
 GO
 
-CREATE TABLE Reembolsos(
+CREATE TABLE tabla.Reembolsos(
 	id_reembolso INT PRIMARY KEY IDENTITY(1,1),
 	id_pago INT NOT NULL,
 	id_cuenta INT NOT NULL,
@@ -256,23 +280,23 @@ CREATE TABLE Reembolsos(
 	fecha DATETIME,
 	monto INT,
 	--CONSTRAINTS
-	CONSTRAINT fk_id_pago_reembolso FOREIGN KEY (id_pago) REFERENCES Pagos(id_pago),
-	CONSTRAINT fk_id_cuenta_socio_reembolso FOREIGN KEY (id_cuenta) REFERENCES CuentasSocios(id_cuenta),
-	CONSTRAINT fk_id_admin_reembolso FOREIGN KEY (id_admin) REFERENCES Administradores(id_admin),
+	CONSTRAINT fk_id_pago_reembolso FOREIGN KEY (id_pago) REFERENCES tabla.Pagos(id_pago),
+	CONSTRAINT fk_id_cuenta_socio_reembolso FOREIGN KEY (id_cuenta) REFERENCES tabla.CuentasSocios(id_cuenta),
+	CONSTRAINT fk_id_admin_reembolso FOREIGN KEY (id_admin) REFERENCES tabla.Administradores(id_admin),
 	CONSTRAINT chk_fecha_reembolso CHECK (fecha <= CAST(GETDATE() AS DATETIME)),
 	CONSTRAINT chk_monto_reembolso CHECK (monto > 0)
 )
 GO
 
-CREATE TABLE AsistenciasClase(
+CREATE TABLE tabla.AsistenciasClase(
 	id_asistencia INT PRIMARY KEY IDENTITY(1,1),
 	id_socio INT NOT NULL,
 	id_clase INT NOT NULL,
 	presente BIT,
 	fecha DATETIME,
 	--CONSTRAINTS
-	CONSTRAINT fk_id_socio_asistencia_clase FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
-	CONSTRAINT fk_id_clase_asistencia_clase FOREIGN KEY (id_clase) REFERENCES Clases(id_clase),
+	CONSTRAINT fk_id_socio_asistencia_clase FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
+	CONSTRAINT fk_id_clase_asistencia_clase FOREIGN KEY (id_clase) REFERENCES tabla.Clases(id_clase),
 	CONSTRAINT chk_fecha_asistencia_clase CHECK (fecha <= CAST(GETDATE() AS DATETIME))
 )
 GO
@@ -281,7 +305,7 @@ GO
 
 --STORED PROCEDURES INSERCION 
 
-CREATE PROCEDURE CrearCategoria 
+CREATE PROCEDURE spInsercion.CrearCategoria 
 	@nombre_categoria VARCHAR(15),
 	@edad_min TINYINT,
 	@edad_max TINYINT,
@@ -290,14 +314,14 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO Categorias(nombre_categoria, edad_min, edad_max, precio_mensual)
+	INSERT INTO tabla.Categorias(nombre_categoria, edad_min, edad_max, precio_mensual)
 	VALUES(@nombre_categoria, @edad_min, @edad_max, @precio_mensual)
 
 	SELECT SCOPE_IDENTITY()
 END;
 GO
 
-CREATE PROCEDURE CrearPrestadorSalud
+CREATE PROCEDURE spInsercion.CrearPrestadorSalud
 	@tipo TINYINT,
 	@nombre VARCHAR(50),
 	@telefono INT
@@ -305,14 +329,14 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO PrestadoresSalud(tipo, nombre, telefono)
+	INSERT INTO tabla.PrestadoresSalud(tipo, nombre, telefono)
 	VALUES(@tipo, @nombre, @telefono)
 
 	SELECT SCOPE_IDENTITY()
 END;
 GO
 
-CREATE PROCEDURE CrearAdministrador
+CREATE PROCEDURE spInsercion.CrearAdministrador
 	@nombre VARCHAR(30),
 	@apellido VARCHAR(30),
 	@dni INT,
@@ -322,42 +346,42 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO Administradores(nombre, apellido, dni, email, rol)
+	INSERT INTO tabla.Administradores(nombre, apellido, dni, email, rol)
 	VALUES(@nombre, @apellido, @dni, @email, @rol)
 
 	SELECT SCOPE_IDENTITY()
 END;
 GO
 
-CREATE PROCEDURE CrearMedioPago
+CREATE PROCEDURE spInsercion.CrearMedioPago
 	@nombre VARCHAR(50),
 	@descripcion VARCHAR(50)
 AS 
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO MediosPago(nombre, descripcion)
+	INSERT INTO tabla.MediosPago(nombre, descripcion)
 	VALUES(@nombre, @descripcion)
 
 	SELECT SCOPE_IDENTITY()
 END;
 GO
 
-CREATE PROCEDURE CrearDeporte
+CREATE PROCEDURE spInsercion.CrearDeporte
 	@nombre VARCHAR(50),
 	@precio INT
 AS 
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO Deportes(nombre, precio)
+	INSERT INTO tabla.Deportes(nombre, precio)
 	VALUES(@nombre, @precio)
 
 	SELECT SCOPE_IDENTITY()
 END;
 GO
 
-CREATE PROCEDURE CrearInvitado
+CREATE PROCEDURE spInsercion.CrearInvitado
 	@dni INT ,
 	@nombre VARCHAR(30),
 	@apellido VARCHAR(30)
@@ -365,28 +389,28 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO Invitados(dni, nombre, apellido)
+	INSERT INTO tabla.Invitados(dni, nombre, apellido)
 	VALUES(@dni, @nombre, @apellido)
 
 	SELECT SCOPE_IDENTITY()
 END;
 GO
 
-CREATE PROCEDURE CrearClase
+CREATE PROCEDURE spInsercion.CrearClase
 	@id_clase INT,
 	@id_deporte INT
 AS 
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO Clases(id_clase, id_deporte)
+	INSERT INTO tabla.Clases(id_clase, id_deporte)
 	VALUES(@id_clase, @id_deporte)
 
 	SELECT SCOPE_IDENTITY()
 END;
 GO
 
-CREATE PROCEDURE CrearTurno
+CREATE PROCEDURE spInsercion.CrearTurno
 	@id_clase INT,
 	@dia TINYINT,
 	@hora_inicio TIME,
@@ -395,14 +419,14 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO Turnos(id_clase, dia, hora_inicio, hora_fin)
+	INSERT INTO tabla.Turnos(id_clase, dia, hora_inicio, hora_fin)
 	VALUES(@id_clase, @dia, @hora_inicio, @hora_fin)
 
 	SELECT SCOPE_IDENTITY()
 END;
 GO
 
-CREATE PROCEDURE CrearSocio
+CREATE PROCEDURE spInsercion.CrearSocio
     @dni INT,
     @nombre VARCHAR(30),
     @apellido VARCHAR(30),
@@ -417,7 +441,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO Socios(dni, nombre, apellido, email, fecha_nacimiento, telefono, 
+    INSERT INTO tabla.Socios(dni, nombre, apellido, email, fecha_nacimiento, telefono, 
 		telefono_emergencia, id_socio_prestador_salud, id_tutor,
 		id_grupo_familiar)
     VALUES(@dni, @nombre, @apellido, @email, @fecha_nacimiento, @telefono,
@@ -428,35 +452,35 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE CrearCuota
+CREATE PROCEDURE spInsercion.CrearCuota
 	@id_socio INT,
 	@id_categoria INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO Cuotas(id_socio, id_categoria)
+    INSERT INTO tabla.Cuotas(id_socio, id_categoria)
     VALUES(@id_socio, @id_categoria);
         
     SELECT SCOPE_IDENTITY();
 END;
 GO
 
-CREATE PROCEDURE CrearActividad
+CREATE PROCEDURE spInsercion.CrearActividad
 	@id_socio INT,
 	@id_deporte INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO Actividades(id_socio, id_deporte)
+    INSERT INTO tabla.Actividades(id_socio, id_deporte)
     VALUES(@id_socio, @id_deporte);
         
     SELECT SCOPE_IDENTITY();
 END;
 GO
 
-CREATE PROCEDURE CrearActividadExtra
+CREATE PROCEDURE spInsercion.CrearActividadExtra
 	@id_socio INT,
 	@id_invitado INT,
 	@tipo_actividad TINYINT,
@@ -469,7 +493,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
+    INSERT INTO tabla.ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
 		fecha_reserva, monto, monto_invitado, lluvia)
     VALUES(@id_socio, @id_invitado, @tipo_actividad, @fecha, @fecha_reserva, 
 		@monto, @monto_invitado, @lluvia);
@@ -478,7 +502,7 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE CrearFacturaARCA
+CREATE PROCEDURE spInsercion.CrearFacturaARCA
 	@id_socio INT,
 	@fecha_creacion DATETIME,
 	@descripcion VARCHAR(200),
@@ -491,7 +515,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO FacturasARCA(id_socio, fecha_creacion, descripcion, tipo, total, 
+    INSERT INTO tabla.FacturasARCA(id_socio, fecha_creacion, descripcion, tipo, total, 
 		primer_vencimiento, segundo_vencimiento, recargo)
     VALUES(@id_socio, @fecha_creacion, @descripcion, @tipo, @total, 
 		@primer_vencimiento, @segundo_vencimiento, @recargo);
@@ -500,7 +524,7 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE CrearCargoSocio
+CREATE PROCEDURE spInsercion.CrearCargoSocio
 	@numero_factura INT,
 	@fecha_creacion DATETIME,
 	@descripcion VARCHAR(200),
@@ -513,7 +537,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO CargosSocio(numero_factura, fecha_creacion, descripcion, monto_descuento,
+    INSERT INTO tabla.CargosSocio(numero_factura, fecha_creacion, descripcion, monto_descuento,
 		monto_total, id_actividad, id_actividad_extra, id_cuota)
     VALUES(@numero_factura, @fecha_creacion, @descripcion, @monto_descuento,
 		@monto_total, @id_actividad, @id_actividad_extra, @id_cuota);
@@ -522,7 +546,7 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE CrearMorosidad
+CREATE PROCEDURE spInsercion.CrearMorosidad
 	@numero_factura INT,
 	@monto_total INT,
 	@fecha_pago DATETIME
@@ -530,14 +554,14 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO Morosidades(numero_factura, monto_total, fecha_pago)
+    INSERT INTO tabla.Morosidades(numero_factura, monto_total, fecha_pago)
     VALUES(@numero_factura, @monto_total, @fecha_pago);
         
     SELECT SCOPE_IDENTITY();
 END;
 GO
 
-CREATE PROCEDURE CrearCuentaSocio
+CREATE PROCEDURE spInsercion.CrearCuentaSocio
 	@id_socio INT,
 	@contrasena VARCHAR(30),
 	@usuario VARCHAR(30),
@@ -549,7 +573,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO CuentasSocios(id_socio, contrasena, usuario, rol, saldo, 
+    INSERT INTO tabla.CuentasSocios(id_socio, contrasena, usuario, rol, saldo, 
 		fecha_vigencia_contrasena, estado_cuenta)
     VALUES(@id_socio, @contrasena, @usuario, @rol, @saldo, 
 		@fecha_vigencia_contrasena, @estado_cuenta);
@@ -558,7 +582,7 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE CrearPago
+CREATE PROCEDURE spInsercion.CrearPago
 	@numero_factura INT,
 	@id_medio_pago INT,
 	@fecha DATETIME,
@@ -569,14 +593,14 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO Pagos(numero_factura, id_medio_pago, fecha, total, reembolso, tipo_movimiento)
+    INSERT INTO tabla.Pagos(numero_factura, id_medio_pago, fecha, total, reembolso, tipo_movimiento)
     VALUES(@numero_factura, @id_medio_pago, @fecha, @total, @reembolso, @tipo_movimiento);
         
     SELECT SCOPE_IDENTITY();
 END;
 GO
 
-CREATE PROCEDURE CrearReembolso
+CREATE PROCEDURE spInsercion.CrearReembolso
 	@id_pago INT,
 	@id_cuenta INT,
 	@id_admin INT,
@@ -587,14 +611,14 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO Reembolsos(id_pago, id_cuenta, id_admin, motivo, fecha, monto)
+    INSERT INTO tabla.Reembolsos(id_pago, id_cuenta, id_admin, motivo, fecha, monto)
     VALUES(@id_pago, @id_cuenta, @id_admin, @motivo, @fecha, @monto);
         
     SELECT SCOPE_IDENTITY();
 END;
 GO
 
-CREATE PROCEDURE CrearAsistenciaClase
+CREATE PROCEDURE spInsercion.CrearAsistenciaClase
 	@id_socio INT,
 	@id_clase INT,
 	@presente BIT,
@@ -603,7 +627,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO AsistenciasClase(id_socio, id_clase, presente, fecha)
+    INSERT INTO tabla.AsistenciasClase(id_socio, id_clase, presente, fecha)
     VALUES(@id_socio, @id_clase, @presente, @fecha);
         
     SELECT SCOPE_IDENTITY();
