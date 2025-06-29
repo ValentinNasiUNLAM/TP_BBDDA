@@ -25,9 +25,9 @@ BEGIN
     EXEC('CREATE SCHEMA spActualizacion')
 END
 
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'spBorrado')
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'spEliminacion')
 BEGIN
-    EXEC('CREATE SCHEMA spBorrado')
+    EXEC('CREATE SCHEMA spEliminacion')
 END
 
 --TABLAS
@@ -1229,7 +1229,7 @@ GO
 
 --STORES PROCEDURES ELIMINACION LOGICO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoSocio
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarSocio
 	@dni INT,
 	@estado BIT
 AS
@@ -1247,7 +1247,7 @@ BEGIN
 		ELSE
 		UPDATE tabla.Socios
 		SET
-			estado=ISNULL(@estado, estado)
+			estado= ISNULL(@estado, estado)
 		WHERE
 			id_socio = @id_socio;
 		UPDATE tabla.CuentasSocios --------------------------------------------- AVERIFICAR ---------------------------------------
@@ -1260,7 +1260,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoAdministradores
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarAdministradores
 	@dni INT,
 	@estado BIT
 AS
@@ -1286,7 +1286,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoDeporte
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarDeporte
 	@id_deporte INT,
 	@estado BIT
 AS
@@ -1310,7 +1310,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoMediosPago
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarMediosPago
 	@id_medio_pago INT,
 	@habilitado BIT
 AS
@@ -1334,7 +1334,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoCuentaSocio
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarCuentaSocio
 	@dni INT,
 	@estado_cuenta BIT
 AS
@@ -1366,9 +1366,9 @@ END
 GO
 
 
--------------------------------------------- BORRADO FISCO -----------------------------------
+-------------------------------------------- eliminar FISCO -----------------------------------
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoInvitado
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarInvitado
 	@dni INT
 AS
 BEGIN
@@ -1391,7 +1391,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoTurnos
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarTurnos
 	@id_turno INT
 AS
 BEGIN
@@ -1413,7 +1413,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoClases
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarClases
 	@id_clase INT
 AS
 BEGIN
@@ -1435,7 +1435,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoCategorias
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarCategorias
 	@id_categoria INT
 AS
 BEGIN
@@ -1457,7 +1457,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borradoPrestadoresSalud
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarPrestadoresSalud
 	@id_prestador_salud INT
 AS
 BEGIN
@@ -1479,7 +1479,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spBorrado.borrarAsistenciaClase
+CREATE OR ALTER PROCEDURE spEliminacion.borrarAsistenciaClase
     @id_asistencia INT
 AS
 BEGIN
@@ -1493,3 +1493,4 @@ BEGIN
     WHERE id_asistencia = @id_asistencia;
 END
 GO
+
