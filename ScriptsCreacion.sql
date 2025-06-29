@@ -63,6 +63,7 @@ BEGIN
 		tipo TINYINT,
 		nombre VARCHAR(50),
 		telefono INT,
+		estado BIT DEFAULT(1),
 		--CONSTRAINT
 		CONSTRAINT chk_nombre_prestador CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
 		CONSTRAINT chk_tipo_prestador_salud CHECK (tipo BETWEEN 1 AND 3)
@@ -107,6 +108,8 @@ BEGIN
 		nombre VARCHAR(50),
 		descripcion VARCHAR(50),
 		habilitado BIT DEFAULT(1),
+		--CONSTRAINT
+		CONSTRAINT chk_nombre_mediopago CHECK (LEN(LTRIM(RTRIM(nombre))) > 0)
 	)
 END
 GO
@@ -123,6 +126,7 @@ BEGIN
 		precio INT,
 		estado BIT DEFAULT(1),
 		--CONSTRAINTS
+		CONSTRAINT chk_nombre_deporte CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
 		CONSTRAINT chk_precio_deporte CHECK (precio > 0)
 	)
 END
@@ -139,6 +143,7 @@ BEGIN
 		dni INT UNIQUE,
 		nombre VARCHAR(30),
 		apellido VARCHAR(30),
+		estado BIT DEFAULT(1),
 		--CONSTRAINTS
 		CONSTRAINT chk_dni_invitado CHECK (dni > 3000000 AND dni < 99999999)
 	)
@@ -312,7 +317,7 @@ BEGIN
 		descripcion VARCHAR(200),
 		monto_descuento INT NULL,
 		monto_total INT,
-		id_actividad INT NULL,
+		id_deporte INT NULL,
 		id_actividad_extra INT NULL,
 		id_cuota INT NULL,
 		--CONSTRAINTS
@@ -320,11 +325,11 @@ BEGIN
 		CONSTRAINT chk_descuento_cargosocio CHECK (monto_descuento >= 0),
 		CONSTRAINT chk_monto_cargosocio CHECK (monto_total >= 0),
 		CONSTRAINT chk_al_menos_un_item_cargosocio CHECK (
-			id_actividad IS NOT NULL OR
+			id_deporte IS NOT NULL OR
 			id_actividad_extra IS NOT NULL OR
 			id_cuota IS NOT NULL
 		),
-		CONSTRAINT fk_id_actividad_cargosocio FOREIGN KEY (id_actividad) REFERENCES tabla.Actividades(id_actividad),
+		CONSTRAINT fk_id_deporte_cargosocio FOREIGN KEY (id_deporte) REFERENCES tabla.Deportes(id_deporte),
 		CONSTRAINT fk_id_actividadesextra_cargosocio FOREIGN KEY (id_actividad_extra) REFERENCES tabla.ActividadesExtra(id_actividad_extra),
 		CONSTRAINT fk_id_cuota_cargosocio FOREIGN KEY (id_cuota) REFERENCES tabla.Cuotas(id_cuota),
 		CONSTRAINT fk_numero_factura_cargosocio FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura)
@@ -616,15 +621,15 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearCargoSocio
 	@descripcion VARCHAR(200),
 	@monto_descuento INT = NULL,
 	@monto_total INT,
-	@id_actividad INT = NULL,
+	@id_deporte INT = NULL,
 	@id_actividad_extra INT = NULL,
 	@id_cuota INT = NULL
 AS
 BEGIN
     INSERT INTO tabla.CargosSocio(numero_factura, fecha_creacion, descripcion, monto_descuento,
-		monto_total, id_actividad, id_actividad_extra, id_cuota)
+		monto_total, id_deporte, id_actividad_extra, id_cuota)
     VALUES(@numero_factura, @fecha_creacion, @descripcion, @monto_descuento,
-		@monto_total, @id_actividad, @id_actividad_extra, @id_cuota);
+		@monto_total, @id_deporte, @id_actividad_extra, @id_cuota);
 END;
 GO
 
@@ -726,7 +731,8 @@ CREATE or ALTER PROCEDURE spActualizacion.actualizarPrestadorSalud
 	@id_prestador_salud INT,
 	@tipo TINYINT,
 	@nombre VARCHAR(50),
-	@telefono INT
+	@telefono INT,
+	@estado BIT = 1
 AS
 BEGIN
 	IF @id_prestador_salud IS NOT NULL
@@ -738,7 +744,7 @@ BEGIN
 		ELSE
 		BEGIN
 			UPDATE tabla.PrestadoresSalud
-			SET tipo = @tipo, nombre = @nombre, telefono = @telefono
+			SET tipo = @tipo, nombre = @nombre, telefono = @telefono, estado = @estado
 			WHERE id_prestador_salud = @id_prestador_salud;
 		END
 	END	
@@ -775,7 +781,7 @@ CREATE or ALTER PROCEDURE spActualizacion.actualizarMedioPago
 	@id_medio_pago INT,
 	@nombre VARCHAR(50),
 	@descripcion VARCHAR(50),
-	@habilitado BIT
+	@habilitado BIT = 1 
 AS
 BEGIN
 	IF @id_medio_pago IS NOT NULL
@@ -1182,7 +1188,8 @@ BEGIN
     END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.Invitados
+		UPDATE tabla.CuentasSocios
+		SET estado = 0
 		WHERE @id_invitado = @id_invitado;
 	END
 END
@@ -1230,7 +1237,8 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.Categorias
+		UPDATE tabla.Categorias
+		SET estado = 0
 		WHERE id_categoria = @id_categoria;
 	END
 END
@@ -1246,13 +1254,14 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.PrestadoresSalud
+		UPDATE tabla.PrestadoresSalud
+		SET estado = 0
 		WHERE id_prestador_salud = @id_prestador_salud;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.borrarAsistenciaClase
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarAsistenciaClase
     @id_asistencia INT
 AS
 BEGIN
