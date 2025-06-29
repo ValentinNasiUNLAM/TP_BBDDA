@@ -45,6 +45,7 @@ BEGIN
 		edad_max TINYINT,
 		precio_mensual INT,
 		--CONSTRAINTS
+		CONSTRAINT chk_nombre_categoria CHECK (LEN(LTRIM(RTRIM(nombre_categoria))) > 0),
 		CONSTRAINT chk_rango_edades_categoria CHECK (edad_min <= edad_max),
 		CONSTRAINT chk_precio_mensual_categoria CHECK (precio_mensual >= 0)
 	)
@@ -62,6 +63,9 @@ BEGIN
 		tipo TINYINT,
 		nombre VARCHAR(50),
 		telefono INT,
+		--CONSTRAINT
+		CONSTRAINT chk_nombre_prestador CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
+		CONSTRAINT chk_tipo_prestador_salud CHECK (tipo BETWEEN 1 AND 3)
 	)
 END
 GO
@@ -76,7 +80,7 @@ BEGIN
 		id_admin INT PRIMARY KEY IDENTITY(1,1),
 		nombre VARCHAR(30),
 		apellido VARCHAR(30),
-		dni INT UNIQUE,
+		dni INT NOT NULL UNIQUE,
 		email VARCHAR(30) UNIQUE,
 		rol TINYINT,
 		estado BIT DEFAULT(1),
@@ -86,6 +90,8 @@ BEGIN
 			CHARINDEX('@', email) > 1 AND 
 			CHARINDEX('.', email, CHARINDEX('@', email)) > CHARINDEX('@', email) + 1
 		),
+		CONSTRAINT chk_nombre_admin CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
+		CONSTRAINT chk_apellido_admin CHECK (LEN(LTRIM(RTRIM(apellido))) > 0)
 	)
 END
 GO
@@ -381,7 +387,6 @@ BEGIN
 		fecha DATETIME,
 		total INT,
 		reembolso INT,
-		tipo_movimiento TINYINT,
 		--CONSTRAINTS
 		CONSTRAINT fk_id_medio_pago_pago FOREIGN KEY (id_medio_pago) REFERENCES tabla.MediosPago(id_medio_pago),
 		CONSTRAINT fk_numero_factura_pago FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura),
@@ -657,11 +662,10 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearPago
 	@fecha DATETIME,
 	@total INT,
 	@reembolso INT,
-	@tipo_movimiento TINYINT
 AS
 BEGIN
-    INSERT INTO tabla.Pagos(numero_factura, id_medio_pago, fecha, total, reembolso, tipo_movimiento)
-    VALUES(@numero_factura, @id_medio_pago, @fecha, @total, @reembolso, @tipo_movimiento);
+    INSERT INTO tabla.Pagos(numero_factura, id_medio_pago, fecha, total, reembolso)
+    VALUES(@numero_factura, @id_medio_pago, @fecha, @total, @reembolso);
 END;
 GO
 
