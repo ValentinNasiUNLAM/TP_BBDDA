@@ -146,7 +146,9 @@ BEGIN
 		apellido VARCHAR(30),
 		estado BIT DEFAULT(1),
 		--CONSTRAINTS
-		CONSTRAINT chk_dni_invitado CHECK (dni > 3000000 AND dni < 99999999)
+		CONSTRAINT chk_dni_invitado CHECK (dni > 3000000 AND dni < 99999999),
+		CONSTRAINT chk_nombre_invitado CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
+		CONSTRAINT chk_apellido_invitado CHECK (LEN(LTRIM(RTRIM(apellido))) > 0)
 	)
 END
 GO
@@ -517,12 +519,11 @@ END;
 GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearClase
-	@id_clase INT,
 	@id_deporte INT
 AS 
 BEGIN
-	INSERT INTO tabla.Clases(id_clase, id_deporte)
-	VALUES(@id_clase, @id_deporte)
+	INSERT INTO tabla.Clases(id_deporte)
+	VALUES(@id_deporte)
 END;
 GO
 
@@ -828,7 +829,8 @@ GO
 CREATE or ALTER PROCEDURE spActualizacion.actualizarInvitado
 	@dni INT,
 	@nombre VARCHAR(30),
-	@apellido VARCHAR(30)
+	@apellido VARCHAR(30),
+	@estado BIT = 1
 AS
 BEGIN
 	DECLARE @id_invitado INT;
@@ -842,7 +844,7 @@ BEGIN
 		ELSE
 		BEGIN
 			UPDATE tabla.Invitados
-			SET nombre = @nombre, apellido = @apellido
+			SET nombre = @nombre, apellido = @apellido, estado = @estado
 			WHERE id_invitado = @id_invitado;
 		END
 	END
@@ -958,7 +960,7 @@ BEGIN
 	DECLARE @id_socio INT;
 	IF @dni IS NOT NULL
 	BEGIN
-		SELECT @id_socio = id_socio FROM tabla.Socio WHERE dni = @dni;
+		SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
 		IF @id_socio IS NULL
 		BEGIN
 			RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
@@ -1190,8 +1192,8 @@ BEGIN
     END
 	ELSE
 	BEGIN
-		UPDATE tabla.CuentasSocios
-		SET estado_cuenta = 0
+		UPDATE tabla.Invitados
+		SET estado = 0
 		WHERE @id_invitado = @id_invitado;
 	END
 END
