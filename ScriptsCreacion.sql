@@ -661,7 +661,7 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearPago
 	@id_medio_pago INT,
 	@fecha DATETIME,
 	@total INT,
-	@reembolso INT,
+	@reembolso INT
 AS
 BEGIN
     INSERT INTO tabla.Pagos(numero_factura, id_medio_pago, fecha, total, reembolso)
@@ -749,7 +749,7 @@ CREATE or ALTER PROCEDURE spActualizacion.actualizarAdministrador
 	@dni INT,
 	@email VARCHAR(30) ,
 	@rol TINYINT,
-	@estado BIT
+	@estado BIT = 1
 AS
 BEGIN
 	DECLARE @id_admin INT;
@@ -1242,7 +1242,7 @@ AS
 BEGIN
 	IF NOT EXISTS(SELECT 1 FROM tabla.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
 	BEGIN
-		RAISERROR('Error: No existe una Clase con el ID (%d)',16,1,@id_prestador_salud);
+		RAISERROR('Error: No existe un Prastador de Salud con el ID (%d)',16,1,@id_prestador_salud);
 	END
 	ELSE
 	BEGIN
