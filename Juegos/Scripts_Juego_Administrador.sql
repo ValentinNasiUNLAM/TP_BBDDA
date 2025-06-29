@@ -2,6 +2,7 @@
 -- Se crean los TESTS para la insercion, actualizacion y eliminacion de Administradores
 USE TP_BBDDA
 GO
+DECLARE @id INT;
 --INSERCION
 --TEST 1.1: Resultado esperado: ID, nombre, apellido, dni, email, 1, 1
 SELECT * FROM tabla.Administradores
@@ -12,7 +13,7 @@ EXEC spInsercion.CrearAdministrador
     @email = 'hsimpson@sol.com'
     @rol = 2
 GO
-SELECT * FROM tabla.Administradores WHERE dni = 44555666
+SELECT @id = id_admin, * FROM tabla.Administradores WHERE dni = 44555666
 GO
 --TEST 1.2: Error nombre y apellido vacio
 SELECT * FROM tabla.Administradores
@@ -23,7 +24,7 @@ EXEC spInsercion.CrearAdministrador
     @email = 'hsimpson@sol.com'
     @rol = 2
 GO
-SELECT * FROM tabla.Administradores WHERE dni = 44555666
+SELECT * FROM tabla.Administradores WHERE id_socio = @id
 GO
 --TEST 1.3: Error email
 SELECT * FROM tabla.Administradores
@@ -46,5 +47,51 @@ EXEC spInsercion.CrearAdministrador
     @rol = 2
 GO
 SELECT * FROM tabla.Administradores WHERE dni = 99999999
+GO
+--TEST 1.5: DNI duplicado
+SELECT * FROM tabla.Administradores
+EXEC spInsercion.CrearAdministrador
+    @nombre = 'Homero',
+    @apellido = 'Flanders',
+    @dni = 44555666,
+    @email = 'hsimpson@sol.com'
+    @rol = 2
+GO
+SELECT * FROM tabla.Administradores WHERE dni = 44555666
+GO
+
+--ACTUALIZACION
+--TEST 2.1: Actualizacion de Homero Simpson a Homero Flanders
+SELECT * FROM tabla.Administradores WHERE dni = 44555666
+EXEC spActualizacion.actualizarAdministrador
+    @dni = 44555666,
+    @email = 'hflanders@sol.com',
+    @rol = 2
+GO
+SELECT * FROM tabla.Administradores WHERE dni = 44555666
+GO
+--TEST 2.2: Activar Socio
+SELECT * FROM tabla.Administradores WHERE dni = 44555666
+EXEC spActualizacion.actualizarAdministrador
+    @dni = 44555666
+    @estado = 1
+GO
+SELECT * FROM tabla.Administradores WHERE dni = 44555666
+GO
+
+--ELIMINACION
+--TEST 3.1: Desactivar Administrador
+SELECT * FROM tabla.Administradores WHERE dni = 44555666
+EXEC spEliminacion.eliminarAdministrador
+    @dni = 44555666
+GO
+SELECT * FROM tabla.Administradores WHERE dni = 44555666
+GO
+--TEST 3.2: ERROR ID INVALIDO
+SELECT * FROM tabla.Administradores
+EXEC spEliminacion.eliminarAdministrador
+    @dni = 99999999
+GO
+SELECT * FROM tabla.Administradores WHERE dni = 44555666
 GO
 
