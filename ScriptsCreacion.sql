@@ -535,7 +535,7 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearSocio
     @fecha_nacimiento DATE,
     @telefono INT,
     @telefono_emergencia INT,
-    @id_socio_prestador_salud INT,
+    @id_prestador_salud INT,
     @id_tutor INT = NULL,
     @id_grupo_familiar INT = NULL
 AS
@@ -544,7 +544,7 @@ BEGIN
 		telefono_emergencia, id_prestador_salud, id_tutor,
 		id_grupo_familiar)
     VALUES(@dni, @nombre, @apellido, @email, @fecha_nacimiento, @telefono,
-        @telefono_emergencia, @id_socio_prestador_salud, @id_tutor,
+        @telefono_emergencia, @id_prestador_salud, @id_tutor,
         @id_grupo_familiar);
         END;
 GO
@@ -691,12 +691,9 @@ BEGIN
 END;
 GO
 
-
-
-
 --STORED PROCEDURES ACTUALIZACION
 
-CREATE  or ALTER PROCEDURE spActualizacion.actualizarCategorias
+CREATE  or ALTER PROCEDURE spActualizacion.actualizarCategoria
     @id_categoria INT,
 	@nombre_categoria VARCHAR(15),
 	@edad_min TINYINT,
@@ -704,67 +701,47 @@ CREATE  or ALTER PROCEDURE spActualizacion.actualizarCategorias
 	@precio_mensual INT
 AS
 BEGIN
+	IF @id_categoria IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION;
-		IF @id_categoria IS NOT NULL
+		IF NOT EXISTS (SELECT 1 FROM tabla.Categorias WHERE id_categoria = @id_categoria)
 		BEGIN
-			IF NOT EXISTS (SELECT 1 FROM tabla.Categorias WHERE id_categoria = @id_categoria)
-			BEGIN
-				RAISERROR('Error: No existe una categoria con el ID (%d)',16,1,@id_categoria);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.Categorias
-				SET
-					nombre_categoria = ISNULL(@nombre_categoria, nombre_categoria),
-                	edad_min = ISNULL(@edad_min, edad_min),
-                	edad_max = ISNULL(@edad_max, edad_max),
-                	precio_mensual = ISNULL(@precio_mensual, precio_mensual)
-				WHERE
-					id_categoria = @id_categoria;
-			END
+			RAISERROR('Error: No existe una categoria con el ID (%d)',16,1,@id_categoria);
 		END
-		COMMIT TRANSACTION;
+		ELSE
+		BEGIN
+			UPDATE tabla.Categorias
+			SET nombre_categoria = @nombre_categoria, edad_min = @edad_min,
+				edad_max = @edad_max,  precio_mensual = @precio_mensual
+			WHERE id_categoria = @id_categoria;
+		END
 	END
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarPrestadoresSalud
+CREATE or ALTER PROCEDURE spActualizacion.actualizarPrestadorSalud
 	@id_prestador_salud INT,
 	@tipo TINYINT,
 	@nombre VARCHAR(50),
 	@telefono INT
 AS
 BEGIN
+	IF @id_prestador_salud IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION
-		IF @id_prestador_salud IS NOT NULL
+		IF NOT EXISTS(SELECT 1 FROM tabla.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
 		BEGIN
-			IF NOT EXISTS(SELECT 1 FROM tabla.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
-			BEGIN
-				RAISERROR('Error: No existe un Prestador de Salud con el ID (%d)',16,1,@id_prestador_salud);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.PrestadoresSalud
-				SET
-					tipo = ISNULL(@tipo, tipo),
-					nombre = ISNULL(@nombre, nombre),
-					telefono = ISNULL(@telefono, telefono)
-				WHERE
-					id_prestador_salud = @id_prestador_salud;
-			END
+			RAISERROR('Error: No existe un Prestador de Salud con el ID (%d)',16,1,@id_prestador_salud);
 		END
-		COMMIT TRANSACTION;
-	END
+		ELSE
+		BEGIN
+			UPDATE tabla.PrestadoresSalud
+			SET tipo = @tipo, nombre = @nombre, telefono = @telefono
+			WHERE id_prestador_salud = @id_prestador_salud;
+		END
+	END	
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarAdministradores
+CREATE or ALTER PROCEDURE spActualizacion.actualizarAdministrador
 	@dni INT,
 	@email VARCHAR(30) ,
 	@rol TINYINT,
@@ -772,134 +749,95 @@ CREATE or ALTER PROCEDURE spActualizacion.actualizarAdministradores
 AS
 BEGIN
 	DECLARE @id_admin INT;
+	IF @dni IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION
-		IF @dni IS NOT NULL
-		BEGIN
-			SELECT @id_admin = id_admin FROM tabla.Administradores WHERE dni = @dni;
+		SELECT @id_admin = id_admin FROM tabla.Administradores WHERE dni = @dni;
 			
-			IF @id_admin IS NULL
-			BEGIN
-				RAISERROR('Error: No existe un Administrador con el DNI (%d)',16,1,@dni);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.Administradores
-				SET
-					email = ISNULL(@email, email),
-					rol = ISNULL(@rol, rol),
-					estado = ISNULL(@estado, estado)
-				WHERE
-					id_admin = @id_admin;
-			END
+		IF @id_admin IS NULL
+		BEGIN
+			RAISERROR('Error: No existe un Administrador con el DNI (%d)',16,1,@dni);
 		END
-		COMMIT TRANSACTION;
+		ELSE
+		BEGIN
+			UPDATE tabla.Administradores
+			SET email = @email, rol = @rol, estado = @estado
+			WHERE id_admin = @id_admin;
+		END
 	END
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarMediosPago
+CREATE or ALTER PROCEDURE spActualizacion.actualizarMedioPago
 	@id_medio_pago INT,
 	@nombre VARCHAR(50),
 	@descripcion VARCHAR(50),
 	@habilitado BIT
 AS
 BEGIN
+	IF @id_medio_pago IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION
-		IF @id_medio_pago IS NOT NULL
+		IF NOT EXISTS(SELECT 1 FROM tabla.MediosPago WHERE id_medio_pago = @id_medio_pago)
 		BEGIN
-			IF NOT EXISTS(SELECT 1 FROM tabla.MediosPago WHERE id_medio_pago = @id_medio_pago)
-			BEGIN
-				RAISERROR('Error: No existe un Medio de Pago con el ID (%d)',16,1,@id_medio_pago);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.MediosPago
-				SET
-					nombre = ISNULL(@nombre, nombre),
-					descripcion = ISNULL(@descripcion, descripcion),
-					habilitado = ISNULL(@habilitado, habilitado)
-				WHERE
-					id_medio_pago = @id_medio_pago;
-			END
+			RAISERROR('Error: No existe un Medio de Pago con el ID (%d)',16,1,@id_medio_pago);
 		END
-		COMMIT TRANSACTION;
+		ELSE
+		BEGIN
+			UPDATE tabla.MediosPago
+			SET nombre = @nombre, descripcion = @descripcion, habilitado = @habilitado
+			WHERE id_medio_pago = @id_medio_pago;
+		END
 	END
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarDeportes
+CREATE or ALTER PROCEDURE spActualizacion.actualizarDeporte
 	@id_deporte INT,
 	@nombre VARCHAR(50),
 	@precio INT,
 	@estado BIT
 AS
 BEGIN
+	IF @id_deporte IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION
-		IF @id_deporte IS NOT NULL
+		IF NOT EXISTS(SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
 		BEGIN
-			IF NOT EXISTS(SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
-			BEGIN
-				RAISERROR('Error: No existe un Deporte con el ID (%d)',16,1,@id_deporte);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.Deportes
-				SET
-					nombre = ISNULL(@nombre, nombre),
-					precio = ISNULL(@precio, precio),
-					estado = ISNULL(@estado, estado)
-				WHERE
-					id_deporte = @id_deporte;
-			END
+			RAISERROR('Error: No existe un Deporte con el ID (%d)',16,1,@id_deporte);
 		END
-		COMMIT TRANSACTION;
+		ELSE
+		BEGIN
+			UPDATE tabla.Deportes
+			SET nombre = @nombre, precio = @precio, estado = @estado
+			WHERE id_deporte = @id_deporte;
+		END
 	END
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarInvitados
+CREATE or ALTER PROCEDURE spActualizacion.actualizarInvitado
 	@dni INT,
 	@nombre VARCHAR(30),
 	@apellido VARCHAR(30)
 AS
 BEGIN
 	DECLARE @id_invitado INT;
+	IF @dni IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION
-		IF @dni IS NOT NULL
+		SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni;
+		IF @id_invitado IS NULL
 		BEGIN
-			SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni;
-			IF @id_invitado IS NULL
-			BEGIN
-				RAISERROR('Error: No existe un Invitado con el DNI (%d)',16,1,@dni);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.Invitados
-				SET
-					nombre = ISNULL(@nombre, nombre),
-					apellido = ISNULL(@apellido, apellido)
-				WHERE
-					id_invitado = @id_invitado;
-			END
+			RAISERROR('Error: No existe un Invitado con el DNI (%d)',16,1,@dni);
 		END
-		COMMIT TRANSACTION;
+		ELSE
+		BEGIN
+			UPDATE tabla.Invitados
+			SET nombre = @nombre, apellido = @apellido
+			WHERE id_invitado = @id_invitado;
+		END
 	END
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.Turnos
+CREATE or ALTER PROCEDURE spActualizacion.actualizarTurno
 	@id_turno INT,
 	@id_clase INT,
 	@dia TINYINT,
@@ -907,83 +845,23 @@ CREATE or ALTER PROCEDURE spActualizacion.Turnos
 	@hora_fin TIME
 AS
 BEGIN
+	IF @id_turno IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION
-		IF @id_turno IS NOT NULL
+		IF NOT EXISTS(SELECT 1 FROM tabla.Turnos WHERE id_turno = @id_turno)
 		BEGIN
-			IF NOT EXISTS(SELECT 1 FROM tabla.Turnos WHERE id_turno = @id_turno)
-			BEGIN
-				RAISERROR('Error: No existe un Turno con el ID (%d)',16,1,@id_turno);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.Turnos
-				SET
-					id_clase = ISNULL(@id_clase, id_clase),
-					dia = ISNULL(@dia, dia),
-					hora_inicio = ISNULL(@hora_inicio, hora_inicio),
-					hora_fin = ISNULL(@hora_fin, hora_fin)
-				WHERE
-					id_turno = @id_turno;
-			END
+			RAISERROR('Error: No existe un Turno con el ID (%d)',16,1,@id_turno);
 		END
-		COMMIT TRANSACTION;
+		ELSE
+		BEGIN
+			UPDATE tabla.Turnos
+			SET id_clase = @id_clase, dia = @dia, hora_inicio = @hora_inicio, hora_fin = @hora_fin
+			WHERE id_turno = @id_turno;
+		END
 	END
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarSocioMaster
-	@dni INT,
-	@nombre VARCHAR(30),
-	@apellido VARCHAR(30),
-	@email VARCHAR(50),
-	@fecha_nacimiento DATE,
-	@telefono INT,
-	@telefono_emergencia INT,
-	@estado BIT,
-	@id_prestador_salud INT,
-	@id_tutor INT,
-	@id_grupo_familiar INT
-AS
-BEGIN
-	DECLARE @id_socio INT;
-	BEGIN
-		BEGIN TRANSACTION
-		IF @dni IS NOT NULL
-		BEGIN
-			SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-			IF @id_socio IS NULL
-			BEGIN
-				RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.Socios
-				SET
-					nombre=ISNULL(@nombre, nombre),
-					apellido=ISNULL(@apellido, apellido),
-					email=ISNULL(@email, email),
-					fecha_nacimiento=ISNULL(@fecha_nacimiento, fecha_nacimiento),
-					telefono=ISNULL(@telefono, telefono),
-					telefono_emergencia=ISNULL(@telefono_emergencia, telefono_emergencia),
-					estado=ISNULL(@estado, estado),
-					id_prestador_salud=ISNULL(@id_prestador_salud, id_prestador_salud),
-					id_tutor=ISNULL(@id_tutor, id_tutor),
-					id_grupo_familiar=ISNULL(@id_grupo_familiar, id_grupo_familiar)
-				WHERE
-					id_socio = @id_socio;
-			END
-		END
-		COMMIT TRANSACTION;
-	END
-END;
-GO
-
-CREATE or ALTER PROCEDURE spActualizacion.actualizarSocioMinor
+CREATE or ALTER PROCEDURE spActualizacion.actualizarSocio
 	@dni INT,
 	@email VARCHAR(50),
 	@telefono INT,
@@ -993,152 +871,138 @@ CREATE or ALTER PROCEDURE spActualizacion.actualizarSocioMinor
 AS
 BEGIN
 	DECLARE @id_socio INT;
+	IF @dni IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION
-		IF @dni IS NOT NULL
+		SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+		IF @id_socio IS NULL
 		BEGIN
-			SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-			IF @id_socio IS NULL
-			BEGIN
-				RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.Socios
-				SET
-					email=ISNULL(@email, email),
-					telefono=ISNULL(@telefono, telefono),
-					telefono_emergencia=ISNULL(@telefono_emergencia, telefono_emergencia),
-					estado=ISNULL(@estado, estado),
-					id_prestador_salud=ISNULL(@id_prestador_salud, id_prestador_salud)
-				WHERE
-					id_socio = @id_socio;
-			END
+			RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
 		END
-		COMMIT TRANSACTION;
+		ELSE
+		BEGIN
+			UPDATE tabla.Socios
+			SET email= @email, telefono= @telefono, telefono_emergencia= @telefono_emergencia,
+				estado= @estado, id_prestador_salud= @id_prestador_salud
+			WHERE id_socio = @id_socio;
+		END
 	END
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarActividades
+CREATE or ALTER PROCEDURE spActualizacion.actualizarSocioTutor
+	@dniTutor INT,
+	@dniMenor INT
+AS
+BEGIN
+	DECLARE @id_socio_tutor INT;
+	DECLARE @id_socio_menor INT;
+
+	SELECT @id_socio_tutor = id_socio FROM tabla.Socios WHERE dni = @dniTutor;
+	SELECT @id_socio_menor = id_socio FROM tabla.Socios WHERE dni = @dniMenor;
+
+	IF @id_socio_tutor IS NULL OR @id_socio_menor IS NULL
+	BEGIN
+		PRINT('Error: Alguno de los DNI ingresados es invalido');
+	END
+	ELSE
+	BEGIN
+		UPDATE tabla.Socios
+		SET id_tutor = @id_socio_tutor
+		WHERE id_socio = @id_socio_menor;
+	END
+END
+GO
+
+CREATE or ALTER PROCEDURE spActualizacion.actualizarSocioGrupoFamiliar
+	@dni INT,
+	@dniResponsableGrupoFamiliar INT
+AS
+BEGIN
+	DECLARE @id_socio INT;
+	DECLARE @id_socio_responsable INT;
+
+	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	SELECT @id_socio_responsable = id_socio FROM tabla.Socios WHERE dni = @dniResponsableGrupoFamiliar;
+
+	IF @id_socio IS NULL OR @id_socio_responsable IS NULL
+	BEGIN
+		PRINT('Error: Alguno de los DNI ingresados es invalido');
+	END
+	ELSE
+	BEGIN
+		UPDATE tabla.Socios
+		SET id_grupo_familiar = @id_socio_responsable
+		WHERE id_socio = @id_socio;
+	END
+END
+GO
+
+
+CREATE or ALTER PROCEDURE spActualizacion.actualizarActividad
 	@dni INT,
 	@id_deporte INT
 AS
 BEGIN
+	DECLARE @id_socio INT;
+	IF @dni IS NOT NULL
 	BEGIN
-		BEGIN TRANSACTION
-		DECLARE @id_socio INT;
-		IF @dni IS NOT NULL
+		SELECT @id_socio = id_socio FROM tabla.Socio WHERE dni = @dni;
+		IF @id_socio IS NULL
 		BEGIN
-			SELECT @id_socio = id_socio FROM tabla.Socio WHERE dni = @dni;
-			IF @id_socio IS NULL
-			BEGIN
-				RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			IF NOT EXISTS (SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
-			BEGIN
-				RAISERROR('Error: No existe un Deporte con el ID (%d)', 16, 1, @id_deporte);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-			ELSE
-			BEGIN
-				UPDATE tabla.Actividades
-				SET
-					id_deporte = ISNULL(@id_deporte, id_deporte)
-				WHERE
-					id_socio = @id_socio;
-			END
+			RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
 		END
-		COMMIT TRANSACTION;
+		ELSE IF NOT EXISTS (SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
+		BEGIN
+			RAISERROR('Error: No existe un Deporte con el ID (%d)', 16, 1, @id_deporte);
+		END
+		ELSE
+		BEGIN
+			UPDATE tabla.Actividades
+			SET id_deporte = @id_deporte
+			WHERE id_socio = @id_socio;
+		END
 	END
 END;
 GO
 
 
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarActividadesExtrasMaster
-    @dni_invitado INT,
+CREATE OR ALTER PROCEDURE spActualizacion.actualizarActividadExtra
     @dni_socio INT,
+    @dni_invitado INT = NULL,
     @id_actividad_extra INT,
     @tipo_actividad TINYINT,
     @fecha DATE,
-    @fecha_reserva DATETIME,
+    @fecha_reserva DATETIME = NULL,
     @monto INT,
-    @monto_invitado INT,
-    @lluvia BIT
+    @monto_invitado INT = NULL,
+    @lluvia BIT = NULL
 AS
 BEGIN
-    BEGIN
-        BEGIN TRANSACTION;
+	DECLARE @id_socio INT;
+	DECLARE @id_invitado INT;
 
-        DECLARE @id_socio INT;
-        DECLARE @id_invitado INT;
+	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni_socio;
+	SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni_invitado;
 
-        SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni_socio;
-        IF @id_socio IS NULL
-        BEGIN
-            RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni_socio);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
-        SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni_invitado;
-        IF @id_invitado IS NULL
-        BEGIN
-            RAISERROR('Error: No existe un Invitado con el DNI (%d)',16,1,@dni_invitado);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
-        UPDATE tabla.ActividadesExtra
-        SET
-            id_socio = ISNULL(@id_deporte, id_deporte),
-            id_invitado = ISNULL(@id_invitado, id_invitado),
-            tipo_actividad = ISNULL(@id_invitado, id_invitado),
-            fecha = ISNULL(@id_invitado, id_invitado),
-            fecha_reserva = ISNULL(@id_invitado, id_invitado),
-            monto = ISNULL(@id_invitado, id_invitado),
-            monto_invitado = ISNULL(@id_invitado, id_invitado),
-            lluvia = ISNULL(@id_invitado, id_invitado)
-        WHERE
-            id_actividad_extra = @id_actividad_extra;
-        COMMIT TRANSACTION;
-    END
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni_socio);
+	END
+	ELSE IF @id_invitado IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un Invitado con el DNI (%d)',16,1,@dni_invitado);
+	END
+	ELSE
+	BEGIN
+		UPDATE tabla.ActividadesExtra
+		SET id_socio = @id_socio, id_invitado = @id_invitado, tipo_actividad = @tipo_actividad,
+			fecha = @fecha, fecha_reserva = @fecha_reserva, monto = @monto, monto_invitado = @monto_invitado, lluvia = @lluvia
+		WHERE id_actividad_extra = @id_actividad_extra;
+	END
 END;
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarActividadesExtrasMinor
-    @id_actividad_extra INT,
-    @tipo_actividad TINYINT,
-    @fecha DATE,
-    @fecha_reserva DATETIME,
-    @monto INT,
-    @monto_invitado INT,
-    @lluvia BIT
-AS
-BEGIN
-    BEGIN
-        BEGIN TRANSACTION;
-        	UPDATE tabla.ActividadesExtra
-        	SET
-            	tipo_actividad = ISNULL(@tipo_actividad, tipo_actividad),
-            	fecha = ISNULL(@tipo_actividad, tipo_actividad),
-            	fecha_reserva = ISNULL(@tipo_actividad, tipo_actividad),
-            	monto = ISNULL(@tipo_actividad, tipo_actividad),
-            	monto_invitado = ISNULL(@tipo_actividad, tipo_actividad),
-            	lluvia = ISNULL(@tipo_actividad, tipo_actividad)
-        	WHERE
-        		id_actividad_extra = @id_actividad_extra;
-        	COMMIT TRANSACTION;
-    END
-END
-GO
-
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarCuentasSocios
+CREATE OR ALTER PROCEDURE spActualizacion.actualizarCuentaSocio
 	@dni INT,
 	@contrasena VARCHAR(30),
 	@usuario VARCHAR(30),
@@ -1148,333 +1012,238 @@ CREATE OR ALTER PROCEDURE spActualizacion.actualizarCuentasSocios
 	@estado_cuenta BIT
 AS
 BEGIN
+    DECLARE @id_socio INT;
+
+    SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+    IF @id_socio IS NULL
     BEGIN
-        BEGIN TRANSACTION;
-
-        DECLARE @id_socio INT;
-
-        SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-        IF @id_socio IS NULL
-        BEGIN
-            RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
-        UPDATE tabla.CuentasSocios
-        SET
-			contrasena = ISNULL(@contrasena, contrasena),
-			usuario = ISNULL(@usuario, usuario),
-			rol = ISNULL(@rol, rol),
-			saldo = ISNULL(@saldo, saldo),
-			fecha_vigencia_contrasena = ISNULL(@fecha_vigencia_contrasena, fecha_vigencia_contrasena),
-			estado_cuenta = ISNULL(@estado_cuenta, estado_cuenta)
-        WHERE
-            id_socio = @id_socio;
-        COMMIT TRANSACTION;
+        RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
     END
-END
-GO
-
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarPagos
-	@id_medio_pago INT,
-	@id_pago INT
-AS
-BEGIN
-    BEGIN
-        BEGIN TRANSACTION;
-        IF NOT EXISTS(SELECT 1 FROM tabla.Pagos WHERE id_pago = @id_pago)
-			BEGIN
-				RAISERROR('Error: No existe un Pago con el ID (%d)',16,1,@id_pago);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-		ELSE
-        UPDATE tabla.Pagos
-        SET
-			id_medio_pago = ISNULL(@id_medio_pago, id_medio_pago)
-        WHERE
-            id_pago = @id_pago;
-        COMMIT TRANSACTION;
-    END
-END
-GO
-
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarAsistenciasClase
-	@id_asistencia INT,
-	@dni INT, 
-	@presente BIT
-AS
-BEGIN
-    BEGIN
-        BEGIN TRANSACTION;
-        DECLARE @id_socio INT;
-        SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-        IF @id_socio IS NULL
-        BEGIN
-            RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-		ELSE
-        UPDATE tabla.AsistenciasClase
-        SET
-			presente = ISNULL(@presente, presente)
-        WHERE
-            id_socio = @id_socio AND id_asistencia = @id_asistencia;
-        COMMIT TRANSACTION;
-    END
-END
-GO
-
---STORES PROCEDURES ELIMINACION LOGICO
-
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarSocio
-	@dni INT,
-	@estado BIT
-AS
-BEGIN
+	ELSE
 	BEGIN
-		BEGIN TRANSACTION
-		DECLARE @id_socio INT;
-		SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-		IF @id_socio IS NULL
-		BEGIN
-		    RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-		ELSE
-		UPDATE tabla.Socios
-		SET
-			estado= ISNULL(@estado, estado)
-		WHERE
-			id_socio = @id_socio;
-		UPDATE tabla.CuentasSocios --------------------------------------------- AVERIFICAR ---------------------------------------
-		SET
-			estado_cuenta = ISNULL(@estado, estado_cuenta)
-		WHERE 
-			id_socio = @id_socio;
-		COMMIT TRANSACTION;
+		UPDATE tabla.CuentasSocios
+		SET contrasena = @contrasena, usuario = @usuario, rol = @rol, saldo = @saldo, 
+			fecha_vigencia_contrasena = @fecha_vigencia_contrasena, estado_cuenta = @estado_cuenta
+		WHERE id_socio = @id_socio;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarAdministradores
-	@dni INT,
-	@estado BIT
+CREATE OR ALTER PROCEDURE spActualizacion.actualizarPago ---REVISAR
+	@id_medio_pago INT,
+	@id_pago INT
 AS
 BEGIN
+    IF NOT EXISTS(SELECT 1 FROM tabla.Pagos WHERE id_pago = @id_pago)
 	BEGIN
-		BEGIN TRANSACTION
-		DECLARE @id_admin INT;
-		SELECT @id_admin = id_admin FROM tabla.Administradores WHERE dni = @dni;
-		IF @id_admin IS NULL
-		BEGIN
-		    RAISERROR('Error: No existe un Administrador con el DNI (%d)',16,1,@dni);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-		ELSE
+		RAISERROR('Error: No existe un Pago con el ID (%d)',16,1,@id_pago);
+	END
+	ELSE
+	BEGIN
+		UPDATE tabla.Pagos
+		SET id_medio_pago = @id_medio_pago
+		WHERE id_pago = @id_pago;
+	END
+END
+GO
+
+CREATE OR ALTER PROCEDURE spActualizacion.actualizarAsistenciaClase
+	@id_asistencia INT,
+	@dni INT, 
+	@presente BIT,
+	@fecha DATETIME
+AS
+BEGIN
+    DECLARE @id_socio INT;
+    SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+    IF @id_socio IS NULL
+    BEGIN
+        RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
+    END
+	ELSE
+	BEGIN
+		UPDATE tabla.AsistenciasClase
+		SET presente = @presente, fecha = @fecha
+		WHERE id_socio = @id_socio AND id_asistencia = @id_asistencia;
+	END
+END
+GO
+
+--STORE PROCEDURES ELIMINACION 
+
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarSocio
+	@dni INT
+AS
+BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
+    END
+	ELSE
+	BEGIN
+		UPDATE tabla.Socios
+		SET estado = 0
+		WHERE id_socio = @id_socio;
+
+		UPDATE tabla.CuentasSocios 
+		SET estado_cuenta = 0
+		WHERE id_socio = @id_socio;
+	END
+END
+GO
+
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarAdministrador
+	@dni INT
+AS
+BEGIN
+	DECLARE @id_admin INT;
+	SELECT @id_admin = id_admin FROM tabla.Administradores WHERE dni = @dni;
+	IF @id_admin IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un Administrador con el DNI (%d)',16,1,@dni);
+    END
+	ELSE
+	BEGIN
 		UPDATE tabla.Administradores
-		SET
-			estado=ISNULL(@estado, estado)
-		WHERE
-			id_admin = @id_admin;
-		COMMIT TRANSACTION;
+		SET estado = 0
+		WHERE id_admin = @id_admin;
 	END
 END
 GO
 
 CREATE OR ALTER PROCEDURE spEliminacion.eliminarDeporte
-	@id_deporte INT,
-	@estado BIT
+	@id_deporte INT
 AS
 BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
+		BEGIN
+			RAISERROR('Error: No existe un Deporte con el ID (%d)',16,1,@id_deporte);
+		END
+	ELSE
 	BEGIN
-		BEGIN TRANSACTION
-		IF NOT EXISTS(SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
-			BEGIN
-				RAISERROR('Error: No existe un Deporte con el ID (%d)',16,1,@id_deporte);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-		ELSE
 		UPDATE tabla.Deportes
-		SET
-			estado=ISNULL(@estado, estado)
-		WHERE
-			id_deporte = @id_deporte;
-		COMMIT TRANSACTION;
+		SET estado = 0
+		WHERE id_deporte = @id_deporte;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarMediosPago
-	@id_medio_pago INT,
-	@habilitado BIT
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarMedioPago
+	@id_medio_pago INT
 AS
 BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.MediosPago WHERE id_medio_pago = @id_medio_pago)
+		BEGIN
+			RAISERROR('Error: No existe un Medio de pago con el ID (%d)',16,1,@id_medio_pago);
+		END
+	ELSE
 	BEGIN
-		BEGIN TRANSACTION
-		IF NOT EXISTS(SELECT 1 FROM tabla.MediosPago WHERE id_medio_pago = @id_medio_pago)
-			BEGIN
-				RAISERROR('Error: No existe un Medio de pago con el ID (%d)',16,1,@id_medio_pago);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-		ELSE
 		UPDATE tabla.MediosPago
-		SET
-			habilitado=ISNULL(@habilitado, habilitado)
-		WHERE
-			id_medio_pago = @id_medio_pago;
-		COMMIT TRANSACTION;
+		SET habilitado = 0
+		WHERE id_medio_pago = @id_medio_pago;
 	END
 END
 GO
 
 CREATE OR ALTER PROCEDURE spEliminacion.eliminarCuentaSocio
-	@dni INT,
-	@estado_cuenta BIT
+	@dni INT
 AS
 BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	IF @id_socio IS NULL
 	BEGIN
-		BEGIN TRANSACTION
-		DECLARE @id_socio INT;
-		SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-		IF @id_socio IS NULL
-		BEGIN
-		    RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-		ELSE
-		UPDATE tabla.Socios
-		SET
-			estado=@estado_cuenta
-		WHERE
-			id_socio = @id_socio;
-		UPDATE tabla.CuentasSocios --------------------------------------------- AVERIFICAR ---------------------------------------
-		SET
-			estado_cuenta = @estado_cuenta
-		WHERE 
-			id_socio = @id_socio;
-		COMMIT TRANSACTION;
+		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
+    END
+	ELSE
+	BEGIN
+		UPDATE tabla.CuentasSocios
+		SET estado_cuenta = 0
+		WHERE id_socio = @id_socio;
 	END
 END
 GO
-
-
--------------------------------------------- eliminar FISCO -----------------------------------
 
 CREATE OR ALTER PROCEDURE spEliminacion.eliminarInvitado
 	@dni INT
 AS
 BEGIN
+	DECLARE @id_invitado INT;
+	SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni;
+	IF @id_invitado IS NULL
 	BEGIN
-		BEGIN TRANSACTION
-		DECLARE @id_invitado INT;
-		SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni;
-		IF @id_invitado IS NULL
-		BEGIN
-		    RAISERROR('Error: No existe un Invitado con el DNI (%d)',16,1,@dni);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-		DELETE FROM
-			tabla.Invitados
-		WHERE
-			@id_invitado = @id_invitado;
-		COMMIT TRANSACTION;
+		RAISERROR('Error: No existe un Invitado con el DNI (%d)',16,1,@dni);
+    END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.Invitados
+		WHERE @id_invitado = @id_invitado;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarTurnos
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarTurno
 	@id_turno INT
 AS
 BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.Turnos WHERE id_turno = @id_turno)
 	BEGIN
-		BEGIN TRANSACTION
-		IF NOT EXISTS(SELECT 1 FROM tabla.Turnos WHERE id_turno = @id_turno)
-			BEGIN
-				RAISERROR('Error: No existe un Turno con el ID (%d)',16,1,@id_turno);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-		ELSE
-		DELETE FROM
-			tabla.Turnos
-		WHERE
-			id_turno = @id_turno;
-		COMMIT TRANSACTION;
+		RAISERROR('Error: No existe un Turno con el ID (%d)',16,1,@id_turno);
+	END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.Turnos
+		WHERE id_turno = @id_turno;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarClases
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarClase
 	@id_clase INT
 AS
 BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.Clases WHERE id_clase = @id_clase)
 	BEGIN
-		BEGIN TRANSACTION
-		IF NOT EXISTS(SELECT 1 FROM tabla.Clases WHERE id_clase = @id_clase)
-			BEGIN
-				RAISERROR('Error: No existe una Clase con el ID (%d)',16,1,@id_clase);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-		ELSE
-		DELETE FROM
-			tabla.Clases
-		WHERE
-			id_clase = @id_clase;
-		COMMIT TRANSACTION;
+		RAISERROR('Error: No existe una Clase con el ID (%d)',16,1,@id_clase);
+	END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.Clases
+		WHERE id_clase = @id_clase;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarCategorias
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarCategoria
 	@id_categoria INT
 AS
 BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.Categorias WHERE id_categoria = @id_categoria)
 	BEGIN
-		BEGIN TRANSACTION
-		IF NOT EXISTS(SELECT 1 FROM tabla.Categorias WHERE id_categoria = @id_categoria)
-			BEGIN
-				RAISERROR('Error: No existe una Categoria con el ID (%d)',16,1,@id_categoria);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-		ELSE
-		DELETE FROM
-			tabla.Categorias
-		WHERE
-			id_categoria = @id_categoria;
-		COMMIT TRANSACTION;
+		RAISERROR('Error: No existe una Categoria con el ID (%d)',16,1,@id_categoria);
+	END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.Categorias
+		WHERE id_categoria = @id_categoria;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarPrestadoresSalud
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarPrestadorSalud
 	@id_prestador_salud INT
 AS
 BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
 	BEGIN
-		BEGIN TRANSACTION
-		IF NOT EXISTS(SELECT 1 FROM tabla.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
-			BEGIN
-				RAISERROR('Error: No existe una Clase con el ID (%d)',16,1,@id_prestador_salud);
-				ROLLBACK TRANSACTION;
-				RETURN;
-			END
-		ELSE
-		DELETE FROM
-			tabla.PrestadoresSalud
-		WHERE
-			id_prestador_salud = @id_prestador_salud;
-		COMMIT TRANSACTION;
+		RAISERROR('Error: No existe una Clase con el ID (%d)',16,1,@id_prestador_salud);
+	END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.PrestadoresSalud
+		WHERE id_prestador_salud = @id_prestador_salud;
 	END
 END
 GO
@@ -1486,11 +1255,12 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM tabla.AsistenciasClase WHERE id_asistencia = @id_asistencia)
     BEGIN
         RAISERROR('Error: No existe una Asistencia con el ID (%d)', 16, 1, @id_asistencia);
-        RETURN;
     END
-
-    DELETE FROM tabla.AsistenciasClase
-    WHERE id_asistencia = @id_asistencia;
+	ELSE
+	BEGIN
+		DELETE FROM tabla.AsistenciasClase
+		WHERE id_asistencia = @id_asistencia;
+	END
 END
 GO
 
