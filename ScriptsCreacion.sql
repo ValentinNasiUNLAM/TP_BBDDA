@@ -44,6 +44,7 @@ BEGIN
 		edad_min TINYINT,
 		edad_max TINYINT,
 		precio_mensual INT,
+		estado BIT DEFAULT(1),
 		--CONSTRAINTS
 		CONSTRAINT chk_nombre_categoria CHECK (LEN(LTRIM(RTRIM(nombre_categoria))) > 0),
 		CONSTRAINT chk_rango_edades_categoria CHECK (edad_min <= edad_max),
@@ -707,7 +708,8 @@ CREATE  or ALTER PROCEDURE spActualizacion.actualizarCategoria
 	@nombre_categoria VARCHAR(15),
 	@edad_min TINYINT,
 	@edad_max TINYINT,
-	@precio_mensual INT
+	@precio_mensual INT,
+	@estado BIT = 1
 AS
 BEGIN
 	IF @id_categoria IS NOT NULL
@@ -720,7 +722,7 @@ BEGIN
 		BEGIN
 			UPDATE tabla.Categorias
 			SET nombre_categoria = @nombre_categoria, edad_min = @edad_min,
-				edad_max = @edad_max,  precio_mensual = @precio_mensual
+				edad_max = @edad_max,  precio_mensual = @precio_mensual, estado = @estado
 			WHERE id_categoria = @id_categoria;
 		END
 	END
@@ -1189,7 +1191,7 @@ BEGIN
 	ELSE
 	BEGIN
 		UPDATE tabla.CuentasSocios
-		SET estado = 0
+		SET estado_cuenta = 0
 		WHERE @id_invitado = @id_invitado;
 	END
 END
@@ -1221,6 +1223,12 @@ BEGIN
 	END
 	ELSE
 	BEGIN
+		DELETE FROM tabla.Turnos
+		WHERE id_clase = @id_clase
+
+		DELETE FROM tabla.AsistenciasClase
+		WHERE id_clase = @id_clase
+
 		DELETE FROM tabla.Clases
 		WHERE id_clase = @id_clase;
 	END
