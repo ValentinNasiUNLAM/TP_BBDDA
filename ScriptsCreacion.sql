@@ -421,7 +421,7 @@ IF NOT EXISTS (
 BEGIN
 	CREATE TABLE tabla.Reembolsos(
 		id_reembolso INT PRIMARY KEY IDENTITY(1,1),
-		id_pago INT NOT NULL,
+		id_pago INT UNIQUE NOT NULL,
 		id_cuenta INT NOT NULL,
 		id_admin INT NOT NULL,
 		motivo VARCHAR(200),
