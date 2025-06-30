@@ -34,8 +34,8 @@ EXEC spInsercion.CrearFacturaARCA
     @descripcion = 'Factura de prueba',
     @total = 10000,
     @tipo = 'A',
-    @primer_vencimiento = '2023-10-15',
-    @segundo_vencimiento = '2023-10-30',
+    @primer_vencimiento = '2025-10-15',
+    @segundo_vencimiento = '2025-10-30',
     @recargo = 5
 GO
 
@@ -56,6 +56,8 @@ EXEC spInsercion.CrearFacturaARCA
     @descripcion = 'Factura de prueba',
     @total = -10000,
     @tipo = 'A',
+	@primer_vencimiento = '2025-10-15',
+    @segundo_vencimiento = '2025-10-30',
     @recargo = 5
 GO
 
@@ -65,6 +67,8 @@ EXEC spInsercion.CrearFacturaARCA
     @descripcion = 'Factura de prueba',
     @total = 10000,
     @tipo = 'X', -- Tipo no válido
+	@primer_vencimiento = '2025-10-15',
+    @segundo_vencimiento = '2025-10-30',
     @recargo = 5
 GO
 
@@ -73,6 +77,8 @@ EXEC spInsercion.CrearFacturaARCA
     @dni = 22333444,
     @descripcion = 'Factura de prueba',
     @total = 10000,
+	@primer_vencimiento = '2025-10-15',
+    @segundo_vencimiento = '2025-10-30',
     @tipo = 'A',
     @recargo = -5 -- Recargo negativo
 GO

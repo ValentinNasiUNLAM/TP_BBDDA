@@ -309,7 +309,7 @@ BEGIN
 		CONSTRAINT chk_monto_facturaarca CHECK (total > 0),
 		CONSTRAINT chk_segundo_vencimiento_facturaarca CHECK ( segundo_vencimiento > primer_vencimiento),
 		CONSTRAINT chk_recargo_facturaarca CHECK (recargo >= 0),
-		CONSTRAINT chk_fecha_creacion CHECK (fecha_creacion < CAST(GETDATE() AS DATETIME))
+		CONSTRAINT chk_fecha_creacion CHECK (fecha_creacion <= CAST(GETDATE() AS DATETIME))
 	)
 END
 GO
@@ -642,7 +642,6 @@ GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearFacturaARCA
 	@dni INT,
-	@fecha_creacion DATETIME,
 	@descripcion VARCHAR(200),
 	@tipo CHAR(1),
 	@total INT,
@@ -660,7 +659,7 @@ BEGIN
 	ELSE
     INSERT INTO tabla.FacturasARCA(id_socio, fecha_creacion, descripcion, tipo, total, 
 		primer_vencimiento, segundo_vencimiento, recargo)
-    VALUES(@id_socio, @fecha_creacion, @descripcion, @tipo, @total, 
+    VALUES(@id_socio, GETDATE(), @descripcion, @tipo, @total, 
 		@primer_vencimiento, @segundo_vencimiento, @recargo);
 END;
 GO
