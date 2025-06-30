@@ -44,7 +44,7 @@ WHERE nombre_categoria = 'Juvenil_test'
 
 EXEC spInsercion.CrearCuota
     @dni = 11222333,
-    @id_categoria = 1
+    @id_categoria = @id_categoria_test
 
 SELECT * FROM tabla.Cuotas;
 GO

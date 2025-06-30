@@ -333,7 +333,7 @@ BEGIN
 		--CONSTRAINTS
 		CONSTRAINT chk_fecha_creacion_cargosocio CHECK (fecha_creacion <= CAST(GETDATE() AS DATETIME)),
 		CONSTRAINT chk_descuento_cargosocio CHECK (monto_descuento >= 0),
-		CONSTRAINT chk_monto_cargosocio CHECK (monto_total >= 0),
+		CONSTRAINT chk_monto_cargosocio CHECK (monto_total > 0),
 		CONSTRAINT chk_al_menos_un_item_cargosocio CHECK (
 			id_deporte IS NOT NULL OR
 			id_actividad_extra IS NOT NULL OR
@@ -675,6 +675,17 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearCargoSocio
 	@id_cuota INT = NULL
 AS
 BEGIN
+	-- Validar que exactamente uno de los tres campos tenga valor
+	IF (
+		(CASE WHEN @id_deporte IS NOT NULL THEN 1 ELSE 0 END) +
+		(CASE WHEN @id_actividad_extra IS NOT NULL THEN 1 ELSE 0 END) +
+		(CASE WHEN @id_cuota IS NOT NULL THEN 1 ELSE 0 END)
+	) != 1
+	BEGIN
+		RAISERROR('Debe especificar exactamente uno entre @id_deporte, @id_actividad_extra o @id_cuota.', 16, 1);
+		RETURN;
+	END;
+
     INSERT INTO tabla.CargosSocio(numero_factura, fecha_creacion, descripcion, monto_descuento,
 		monto_total, id_deporte, id_actividad_extra, id_cuota)
     VALUES(@numero_factura, @fecha_creacion, @descripcion, @monto_descuento,
@@ -1225,7 +1236,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarCargoSocio
+CREATE OR ALTER PROCEDURE spActualizacion.ActualizarCargoSocio
 	@id_cargo_socio INT,
 	@numero_factura INT,
 	@fecha_creacion DATETIME,
@@ -1237,6 +1248,17 @@ CREATE OR ALTER PROCEDURE spActualizacion.actualizarCargoSocio
 	@id_cuota INT = NULL
 AS
 BEGIN
+	-- Validar que exactamente uno de los tres campos tenga valor
+	IF (
+		(CASE WHEN @id_deporte IS NOT NULL THEN 1 ELSE 0 END) +
+		(CASE WHEN @id_actividad_extra IS NOT NULL THEN 1 ELSE 0 END) +
+		(CASE WHEN @id_cuota IS NOT NULL THEN 1 ELSE 0 END)
+	) != 1
+	BEGIN
+		RAISERROR('Debe especificar exactamente uno entre @id_deporte, @id_actividad_extra o @id_cuota.', 16, 1);
+		RETURN;
+	END;
+
 	IF NOT EXISTS(SELECT 1 FROM tabla.CargosSocio WHERE id_cargo_socio = @id_cargo_socio)
 	BEGIN
 		RAISERROR('Error: No existe un Cargo Socio con el ID (%d)',16,1,@id_cargo_socio);
