@@ -4,10 +4,8 @@
 USE Com2900G07
 GO
 
-DECLARE @id_socio INT;
-
-
 --INSERCION
+
 --TEST 1.1: Insercion correcta
 SELECT TOP 1 * FROM tabla.Socios -------------ESTE ES PARA TENER EN LOS PROXIMOS TESTS
 EXEC spInsercion.CrearSocio
@@ -37,7 +35,7 @@ EXEC spInsercion.CrearSocio
     @id_tutor = 1,
     @id_grupo_familiar = 100
 GO
-SELECT @id_socio = id_socio, * FROM tabla.Socios WHERE dni = 23777222;
+SELECT * FROM tabla.Socios WHERE dni = 23777222;
 
 
 --TEST 1.2: Error Incorrecta DNI Incorrecto
@@ -85,6 +83,7 @@ EXEC spInsercion.CrearSocio
     @id_grupo_familiar = 100
 GO
 SELECT * FROM tabla.Socios WHERE dni = 23777224;
+
 --TEST 1.5: Error Fecha Nacimiento
 SELECT TOP 1 * FROM tabla.Socios
 EXEC spInsercion.CrearSocio
@@ -100,6 +99,7 @@ EXEC spInsercion.CrearSocio
     @id_grupo_familiar = 100
 GO
 SELECT * FROM tabla.Socios WHERE dni = 23777225;
+
 --TEST 1.6: Error Tutor Socio
 SELECT TOP 1 * FROM tabla.Socios
 EXEC spInsercion.CrearSocio
@@ -115,6 +115,7 @@ EXEC spInsercion.CrearSocio
     @id_grupo_familiar = 100
 GO
 SELECT * FROM tabla.Socios WHERE dni = 23777226;
+
 --TEST 1.7:Error Grupo Familiar
 SELECT TOP 1 * FROM tabla.Socios
 EXEC spInsercion.CrearSocio
@@ -132,34 +133,34 @@ GO
 SELECT * FROM tabla.Socios WHERE dni = 23777227;
 
 --ACTUALIZACION
+
 --TEST 2.1: Actualizacion Correcta
-SELECT TOP 1 * FROM tabla.Socios WHERE id_socio = @id_socio
 EXEC spActualizacion.actualizarSocio
     @dni = 23777222,
     @email = 'BartSimpson@sol.com',
-    @telefono = 12345678
+    @telefono = 12345678,
     @telefono_emergencia = 11112222,
     @estado = 1,
     @id_prestador_salud = 2
 GO
 SELECT * FROM tabla.Socios WHERE dni = 23777222;
+
 --TEST 2.2: Error DNI
-SELECT TOP 1 * FROM tabla.Socios WHERE id_socio = @id_socio
 EXEC spActualizacion.actualizarSocio
     @dni = 99999991,
     @email = 'BartSimpson@sol.com',
-    @telefono = 12345678
+    @telefono = 12345678,
     @telefono_emergencia = 11112222,
     @estado = 1,
     @id_prestador_salud = 2
 GO
 SELECT * FROM tabla.Socios WHERE dni = 99999991;
+
 --TEST 2.3: Error Mail
-SELECT TOP 1 * FROM tabla.Socios WHERE id_socio = @id_socio
 EXEC spActualizacion.actualizarSocio
     @dni = 23777222,
     @email = 'BartSimpsonsol.com',
-    @telefono = 12345678
+    @telefono = 12345678,
     @telefono_emergencia = 11112222,
     @estado = 1,
     @id_prestador_salud = 2
@@ -167,11 +168,13 @@ GO
 SELECT * FROM tabla.Socios WHERE dni = 23777222;
 
 --ELIMINACION
+
 --TEST 3.1:  Eliminacion Correcta
 EXEC spEliminacion.eliminarSocio
     @dni = 23777222
 GO
 SELECT * FROM tabla.Socios WHERE dni = 23777222;
+
 --TEST 3.2: DNI Incorrecto
 EXEC spEliminacion.eliminarSocio
     @dni = 99999991

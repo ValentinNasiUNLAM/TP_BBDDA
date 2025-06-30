@@ -1,9 +1,12 @@
 --CATEGORIAS
---INSERCION
+
 -- Se crean los TESTS para la insercion, actualizacion y eliminacion de categorias
+
 
 USE Com2900G07
 GO
+
+--INSERCION
 
 --TEST 1.1: Resultado esperado, Juvenil, 12, 17, 5000
 EXEC spInsercion.CrearCategoria -- ok

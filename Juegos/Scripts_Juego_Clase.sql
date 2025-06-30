@@ -4,6 +4,7 @@ USE Com2900G07
 GO
 
 --INSERCION
+
 -- TEST 1.1: Insertar un Deporte
 SELECT * FROM tabla.Clases
 EXEC spInsercion.CrearClase
@@ -11,15 +12,7 @@ EXEC spInsercion.CrearClase
 GO
 SELECT * FROM tabla.Clases WHERE id_clase = 1
 GO
--- ACTUALIZACION
---TEST 2.1: Actualizar un Deporte
-SELECT * FROM tabla.Clases
-EXEC spActualizacion.ActualizarClase
-    @id_clase = 1,
-    @id_deporte = 1
-GO
-SELECT * FROM tabla.Clases WHERE id_clase = 1
-GO
+
 -- ELIMINACION
 -- TEST 3.1: Eliminar un Deporte
 SELECT * FROM tabla.Clases

@@ -845,7 +845,7 @@ CREATE or ALTER PROCEDURE spActualizacion.actualizarDeporte
 	@id_deporte INT,
 	@nombre VARCHAR(50),
 	@precio INT,
-	@estado BIT
+	@estado BIT = 1
 AS
 BEGIN
 	IF @id_deporte IS NOT NULL
