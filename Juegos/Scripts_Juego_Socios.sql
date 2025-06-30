@@ -6,9 +6,6 @@ GO
 
 DECLARE id_socio INT;
 
-SELECT TOP 1 @id_socio = id_socio
-FROM tabla.Socios
-ORDER BY id_socio DESC;
 
 --INSERCION
 --TEST 1.1: Insercion correcta
@@ -40,7 +37,7 @@ EXEC spInsercion.CrearSocio
     @id_tutor = 1,
     @id_grupo_familiar = 100
 GO
-SELECT @id_socio = id_socio, * FROM tabla.Socios WHERE dni = 23777221;
+SELECT * FROM tabla.Socios WHERE dni = 23777221;
 
 --TEST 1.2: Error Incorrecta DNI Incorrecto
 SELECT TOP 1 * FROM tabla.Socios
