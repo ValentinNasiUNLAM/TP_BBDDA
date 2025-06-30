@@ -220,7 +220,7 @@ BEGIN
 		CONSTRAINT chk_fecha_nacimiento_no_futuro_socio CHECK (fecha_nacimiento <= CAST(GETDATE() AS DATE)),
 		CONSTRAINT fk_prestador_socio FOREIGN KEY (id_prestador_salud) REFERENCES tabla.PrestadoresSalud(id_prestador_salud),
 		CONSTRAINT fk_tutor_socio FOREIGN KEY (id_tutor) REFERENCES tabla.Socios(id_socio),
-		CONSTRAINT fk_grupo_familiar_socio FOREIGN KEY (id_grupo_familiar) REFERENCES tabla.Socios(id_socio)
+		CONSTRAINT fk_grupo_familiar_socio FOREIGN KEY (id_grupo_familiar) REFERENCES tabla.Socios(id_socio),
 		CONSTRAINT chk_nombre_socio CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
 		CONSTRAINT chk_apellido_socio CHECK (LEN(LTRIM(RTRIM(apellido))) > 0)
 	)
@@ -574,14 +574,16 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearCuota
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.Buscarsocio(@dni);
+	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
-		RETURN;
 	END
-    INSERT INTO tabla.Cuotas(id_socio, id_categoria)
-    VALUES(@id_socio, @id_categoria);
+	ELSE
+	BEGIN
+		INSERT INTO tabla.Cuotas(id_socio, id_categoria)
+		VALUES(@id_socio, @id_categoria);
+	END
 END;
 GO
 
@@ -591,14 +593,16 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearActividad
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.Buscarsocio(@dni);
+	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
-		RETURN;
 	END
-    INSERT INTO tabla.Actividades(id_socio, id_deporte)
-    VALUES(@id_socio, @id_deporte);
+	ELSE
+	BEGIN
+		INSERT INTO tabla.Actividades(id_socio, id_deporte)
+		VALUES(@id_socio, @id_deporte);
+	END
 END;
 GO
 
@@ -614,18 +618,22 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearActividadExtra
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.fnObtenerIdSocioPorDni(@dni);
+	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
-		RETURN;
 	END
-	DECLARE @id_invitado INT;
-	SELECT @id_invitado = fnBusqueda.BuscarInvitado(@dni_invitado);
-    INSERT INTO tabla.ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
-		fecha_reserva, monto, monto_invitado, lluvia)
-    VALUES(@id_socio, @id_invitado, @tipo_actividad, @fecha, @fecha_reserva, 
-		@monto, @monto_invitado, @lluvia);
+	ELSE
+	BEGIN
+		DECLARE @id_invitado INT;
+
+		SELECT @id_invitado = fnBusqueda.BuscarInvitado(@dni_invitado);
+
+		INSERT INTO tabla.ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
+			fecha_reserva, monto, monto_invitado, lluvia)
+		VALUES(@id_socio, @id_invitado, @tipo_actividad, @fecha, @fecha_reserva, 
+			@monto, @monto_invitado, @lluvia);
+	END
 END;
 GO
 
@@ -1001,36 +1009,8 @@ BEGIN
 			WHERE id_socio = @id_socio;
 		END
 	END
-END;
-
-
-CREATE or ALTER PROCEDURE spActualizacion.actualizarActividad
-	@dni INT,
-	@id_deporte INT
-AS
-BEGIN
-	DECLARE @id_socio INT;
-	IF @dni IS NOT NULL
-	BEGIN
-		SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-		IF @id_socio IS NULL
-		BEGIN
-			RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-		END
-		ELSE IF NOT EXISTS (SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
-		BEGIN
-			RAISERROR('Error: No existe un Deporte con el ID (%d)', 16, 1, @id_deporte);
-		END
-		ELSE
-		BEGIN
-			UPDATE tabla.Actividades
-			SET id_deporte = @id_deporte
-			WHERE id_socio = @id_socio;
-		END
-	END
-END;
-GO
-
+END
+GO 
 
 CREATE OR ALTER PROCEDURE spActualizacion.actualizarActividadExtra
     @dni_socio INT,
@@ -1155,6 +1135,44 @@ BEGIN
 
 		UPDATE tabla.CuentasSocios 
 		SET estado_cuenta = 0
+		WHERE id_socio = @id_socio;
+	END
+END
+GO
+
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarSocioTutor
+	@dni INT
+AS
+BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
+    END
+	ELSE
+	BEGIN
+		UPDATE tabla.Socios
+		SET id_tutor = NULL
+		WHERE id_socio = @id_socio;
+	END
+END
+GO
+
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarSocioGrupoFamiliar
+	@dni INT
+AS
+BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
+    END
+	ELSE
+	BEGIN
+		UPDATE tabla.Socios
+		SET id_grupo_familiar = NULL
 		WHERE id_socio = @id_socio;
 	END
 END
@@ -1360,7 +1378,7 @@ GO
 
 ------FUNCIONES
 
-CREATE OR ALTER FUNCTION fnBusqueda.Buscarsocio (
+CREATE OR ALTER FUNCTION fnBusqueda.BuscarSocio (
     @dni INT
 )
 RETURNS INT
@@ -1385,7 +1403,7 @@ BEGIN
     DECLARE @id_invitado INT;
 
     SELECT @id_invitado = id_invitado
-    FROM tabla.Socios
+    FROM tabla.Invitados
     WHERE dni = @dni;
 
     RETURN @id_invitado;
