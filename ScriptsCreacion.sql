@@ -1289,3 +1289,21 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER PROCEDURE spEliminacion.eliminarActividad
+	@dni INT,
+	@id_deporte INT
+AS
+BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
+    END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.Actividades
+		WHERE id_socio = @id_socio AND id_deporte = @id_deporte;
+	END
+END
+GO
