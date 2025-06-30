@@ -216,6 +216,8 @@ BEGIN
 		CONSTRAINT fk_prestador_socio FOREIGN KEY (id_prestador_salud) REFERENCES tabla.PrestadoresSalud(id_prestador_salud),
 		CONSTRAINT fk_tutor_socio FOREIGN KEY (id_tutor) REFERENCES tabla.Socios(id_socio),
 		CONSTRAINT fk_grupo_familiar_socio FOREIGN KEY (id_grupo_familiar) REFERENCES tabla.Socios(id_socio)
+		CONSTRAINT chk_nombre_socio CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
+		CONSTRAINT chk_apellido_socio CHECK (LEN(LTRIM(RTRIM(apellido))) > 0)
 	)
 END
 GO
