@@ -3,22 +3,52 @@
 
 USE Com2900G07
 GO
-/*
-CONSTRAINT fk_id_socio_actividadextra FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
-CONSTRAINT fk_id_invitado_actividadextra FOREIGN KEY (id_invitado) REFERENCES tabla.Invitados(id_invitado),
-CONSTRAINT chk_tipo_activado_actividadextra CHECK ( tipo_actividad >= 1 AND tipo_actividad <=5),
-CONSTRAINT chk_monto_actividadextra CHECK (monto > 0),
-CONSTRAINT chk_fecha_reserva CHECK (fecha_reserva < CAST(GETDATE() AS DATETIME))
-*/
 
+--Agregamos un socio y una categoria para testear
+EXEC spInsercion.CrearPrestadorSalud
+    @nombre = 'Galeno_test_cuota',
+    @tipo = 1,
+    @telefono = 46254016
+
+DECLARE @id_prestador_salud_test INT;
+
+SELECT @id_prestador_salud_test = id_prestador_salud
+FROM tabla.PrestadoresSalud
+WHERE nombre = 'Galeno_test_cuota';
+
+EXEC spInsercion.CrearSocio
+    @dni = 11222333,
+    @nombre = 'Test',
+    @apellido = 'Cuota',
+    @email = 'test_couta@sol.com',
+    @fecha_nacimiento = '2002-11-26',
+    @telefono = 1566667777,
+    @telefono_emergencia = 48881122,
+    @id_prestador_salud = @id_prestador_salud_test
+
+EXEC spInsercion.CrearCategoria
+    @nombre_categoria = 'Juvenil_test',
+    @edad_min = 12,
+    @edad_max = 17,
+    @precio_mensual = 5000
+GO
 
 --INSERCION
+
 --TEST 1.1: Insercion Correcta
+DECLARE @id_categoria_test INT
+
+SELECT @id_categoria_test = id_categoria
+FROM tabla.Categorias
+WHERE nombre_categoria = 'Juvenil_test'
+
 EXEC spInsercion.CrearCuota
-    @dni = 23777221,
+    @dni = 11222333,
     @id_categoria = 1
+
+SELECT * FROM tabla.Cuotas;
 GO
-SELECT * FROM tabla.Cuotas WHERE id_categoria = @id_categoria;
+
 --TEST 1.2: Dni Incorrecto
 EXEC spInsercion.CrearCuota
     @dni = 99999999,
@@ -27,28 +57,41 @@ GO
 
 --TEST 1.3: Categoria Incorrecta
 EXEC spInsercion.CrearCuota
-    @dni = 23777221,
+    @dni = 11222333,
     @id_categoria = 999999
 GO
-SELECT * FROM tabla.Cuotas WHERE id_categoria = @id_categoria;
 
 --ACTUALIZACION
+
 --TEST 2.1: Actualizacion Correcta
-EXEC spActualizacion.actulizarCuota
-    @dni = 23777221,
-    @id_categoria = 2
+EXEC spInsercion.CrearCategoria
+    @nombre_categoria = 'Juvenil_test2',
+    @edad_min = 12,
+    @edad_max = 17,
+    @precio_mensual = 5000
 GO
-SELECT * FROM tabla.Cuotas WHERE id_categoria = @id_categoria;
+
+DECLARE @id_categoria_test INT
+
+SELECT @id_categoria_test = id_categoria
+FROM tabla.Categorias
+WHERE nombre_categoria = 'Juvenil_test2'
+
+EXEC spActualizacion.ActualizarCuota
+    @dni = 11222333,
+    @id_categoria = @id_categoria_test
+GO
+SELECT * FROM tabla.Cuotas;
+
 --TEST 2.2: Error DNI
-EXEC spActualizacion.actulizarCuota
+EXEC spActualizacion.ActualizarCuota
     @dni = 99999999,
     @id_categoria = 1
 GO
-SELECT * FROM tabla.Cuotas WHERE id_categoria = @id_categoria;
+
 --TEST 2.3: Error Categoria
-EXEC spActualizacion.actulizarCuota
-    @dni = 23777221,
+EXEC spActualizacion.ActualizarCuota
+    @dni = 11222333,
     @id_categoria = 99991
 GO
-SELECT * FROM tabla.Cuotas WHERE id_categoria = @id_categoria;
 

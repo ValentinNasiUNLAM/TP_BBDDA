@@ -9,7 +9,7 @@ GO
 --INSERCION
 
 --TEST 1.1: Resultado esperado, Juvenil, 12, 17, 5000
-EXEC spInsercion.CrearCategoria -- ok
+EXEC spInsercion.CrearCategoria
     @nombre_categoria = 'Juvenil',
     @edad_min = 12,
     @edad_max = 17,
@@ -19,7 +19,7 @@ SELECT * FROM tabla.Categorias WHERE nombre_categoria = 'Juvenil'
 GO
 
 --TEST 1.2: Edad Minima Invalida 
-EXEC spInsercion.CrearCategoria --ok
+EXEC spInsercion.CrearCategoria
     @nombre_categoria = 'Error_Edad',
     @edad_min = 20,
     @edad_max = 17,
@@ -30,7 +30,7 @@ GO
 
 --TEST 1.3: Precio Invalido
 EXEC spInsercion.CrearCategoria 
-    @nombre_categoria = 'Error_Precio', --ok
+    @nombre_categoria = 'Error_Precio', 
     @edad_min = 12,
     @edad_max = 17,
     @precio_mensual = -1000
@@ -39,7 +39,7 @@ SELECT * FROM tabla.Categorias WHERE nombre_categoria = 'Error_Precio'
 GO
 
 --TEST 1.4: Nombre Categoria Vacio
-EXEC spInsercion.CrearCategoria --ok
+EXEC spInsercion.CrearCategoria
     @nombre_categoria = '',
     @edad_min = 12,
     @edad_max = 17,
@@ -51,7 +51,7 @@ GO
 --ACTUALIZACION
 
 --TEST 2.1: Resultado esperado Juvenil, 10, 18, 2000 - Actualizacion de precio mensual
-EXEC spActualizacion.ActualizarCategoria --ok
+EXEC spActualizacion.ActualizarCategoria
     @id_categoria = 1,
     @nombre_categoria = 'Juvenil',
     @edad_min = 10,
@@ -61,8 +61,8 @@ GO
 SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
---TEST 2.2: Error Actualizar Edad -- Se verifica que en la Edad Minima no hubo modificaciones 
-EXEC spActualizacion.ActualizarCategoria --ok
+--TEST 2.2: Error Actualizar Edad 
+EXEC spActualizacion.ActualizarCategoria 
     @id_categoria = 1,
     @nombre_categoria = 'Juvenil',
     @edad_min = 20,
@@ -72,8 +72,8 @@ GO
 SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
---TEST 2.3: ERROR PRECIO MENSUAL INVALIDO -- Se verifica que en el Precio Mensual no hubo modificaciones
-EXEC spActualizacion.ActualizarCategoria -- ok
+--TEST 2.3: ERROR PRECIO MENSUAL INVALIDO 
+EXEC spActualizacion.ActualizarCategoria
     @id_categoria = 1,
     @nombre_categoria = 'Juvenil',
     @edad_min = 12,
@@ -83,7 +83,7 @@ GO
 SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
---TEST 2.4: ERROR NOMBRE CATEGORIA VACIO -- Se verifica que nombre de la categoria no tuvo modificaciones
+--TEST 2.4: ERROR NOMBRE CATEGORIA VACIO 
 EXEC spActualizacion.ActualizarCategoria
     @id_categoria = 1,
     @nombre_categoria = '',
@@ -95,7 +95,7 @@ SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
 --TEST 2.5: NO EXISTE ID CATEGORIA
-EXEC spActualizacion.ActualizarCategoria --ok
+EXEC spActualizacion.ActualizarCategoria
     @id_categoria = 99991,
     @nombre_categoria = 'Juvenil',
     @edad_min = 12,
