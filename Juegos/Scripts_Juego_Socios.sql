@@ -4,11 +4,26 @@
 USE Com2900G07
 GO
 
-DECLARE id_socio INT;
+DECLARE @id_socio INT;
 
 
 --INSERCION
 --TEST 1.1: Insercion correcta
+SELECT TOP 1 * FROM tabla.Socios -------------ESTE ES PARA TENER EN LOS PROXIMOS TESTS
+EXEC spInsercion.CrearSocio
+    @dni = 23777221,
+    @nombre = 'Bart',
+    @apellido = 'Simpson_Prueba',
+    @email = 'BSimpson@sol.com',
+    @fecha_nacimiento = '26-11-2002',
+    @telefono = 1566667777,
+    @telefono_emergencia = 48881122,
+    @id_prestador_salud = 2,
+    @id_tutor = 1,
+    @id_grupo_familiar = 100
+GO
+SELECT * FROM tabla.Socios WHERE dni = 23777221;
+
 SELECT TOP 1 * FROM tabla.Socios
 EXEC spInsercion.CrearSocio
     @dni = 23777222,
@@ -24,20 +39,6 @@ EXEC spInsercion.CrearSocio
 GO
 SELECT @id_socio = id_socio, * FROM tabla.Socios WHERE dni = 23777222;
 
-SELECT TOP 1 * FROM tabla.Socios
-EXEC spInsercion.CrearSocio
-    @dni = 23777221,
-    @nombre = 'Bart',
-    @apellido = 'Simpson',
-    @email = 'BSimpson@sol.com',
-    @fecha_nacimiento = '26-11-2002',
-    @telefono = 1566667777,
-    @telefono_emergencia = 48881122,
-    @id_prestador_salud = 2,
-    @id_tutor = 1,
-    @id_grupo_familiar = 100
-GO
-SELECT * FROM tabla.Socios WHERE dni = 23777221;
 
 --TEST 1.2: Error Incorrecta DNI Incorrecto
 SELECT TOP 1 * FROM tabla.Socios

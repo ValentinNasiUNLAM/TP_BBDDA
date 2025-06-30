@@ -30,9 +30,14 @@ BEGIN
     EXEC('CREATE SCHEMA spEliminacion')
 END
 
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'fnBusqueda')
+BEGIN
+    EXEC('CREATE SCHEMA fnBusqueda')
+END
+
 --TABLAS
 
-IF NOT EXISTS (
+IF NOT EXISTS ( 
     SELECT * FROM sys.tables 
     WHERE name = 'Categorias' 
     AND schema_id = SCHEMA_ID('tabla')
@@ -564,28 +569,42 @@ BEGIN
 GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearCuota
-	@id_socio INT,
+	@dni INT,
 	@id_categoria INT
 AS
 BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = fnBusqueda.Buscarsocio(@dni);
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
+		RETURN;
+	END
     INSERT INTO tabla.Cuotas(id_socio, id_categoria)
     VALUES(@id_socio, @id_categoria);
 END;
 GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearActividad
-	@id_socio INT,
+	@dni INT,
 	@id_deporte INT
 AS
 BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = fnBusqueda.Buscarsocio(@dni);
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
+		RETURN;
+	END
     INSERT INTO tabla.Actividades(id_socio, id_deporte)
     VALUES(@id_socio, @id_deporte);
 END;
 GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearActividadExtra
-	@id_socio INT,
-	@id_invitado INT,
+	@dni INT,
+	@dni_invitado INT,
 	@tipo_actividad TINYINT,
 	@fecha DATE,
 	@fecha_reserva DATETIME = NULL,
@@ -594,6 +613,15 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearActividadExtra
 	@lluvia BIT = NULL
 AS
 BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = fnBusqueda.fnObtenerIdSocioPorDni(@dni);
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
+		RETURN;
+	END
+	DECLARE @id_invitado INT;
+	SELECT @id_invitado = fnBusqueda.BuscarInvitado(@dni_invitado);
     INSERT INTO tabla.ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
 		fecha_reserva, monto, monto_invitado, lluvia)
     VALUES(@id_socio, @id_invitado, @tipo_actividad, @fecha, @fecha_reserva, 
@@ -1306,4 +1334,38 @@ BEGIN
 		WHERE id_socio = @id_socio AND id_deporte = @id_deporte;
 	END
 END
+GO
+
+------FUNCIONES
+
+CREATE OR ALTER FUNCTION fnBusqueda.Buscarsocio (
+    @dni INT
+)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @id_socio INT;
+
+    SELECT @id_socio = id_socio
+    FROM tabla.Socios
+    WHERE dni = @dni;
+
+    RETURN @id_socio;
+END;
+GO
+
+CREATE OR ALTER FUNCTION fnBusqueda.BuscarInvitado(
+    @dni INT
+)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @id_invitado INT;
+
+    SELECT @id_invitado = id_invitado
+    FROM tabla.Socios
+    WHERE dni = @dni;
+
+    RETURN @id_invitado;
+END;
 GO
