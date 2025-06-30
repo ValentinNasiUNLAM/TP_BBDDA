@@ -638,7 +638,7 @@ END;
 GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearFacturaARCA
-	@id_socio INT,
+	@dni INT,
 	@fecha_creacion DATETIME,
 	@descripcion VARCHAR(200),
 	@tipo CHAR(1),
@@ -648,6 +648,13 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearFacturaARCA
 	@recargo INT
 AS
 BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
+	END
+	ELSE
     INSERT INTO tabla.FacturasARCA(id_socio, fecha_creacion, descripcion, tipo, total, 
 		primer_vencimiento, segundo_vencimiento, recargo)
     VALUES(@id_socio, @fecha_creacion, @descripcion, @tipo, @total, 
@@ -1115,7 +1122,50 @@ BEGIN
 END
 GO
 
---STORE PROCEDURES ELIMINACION 
+CREATE OR ALTER PROCEDURE spActualizcion.actualizarCargoSocio
+	@id_cargo_socio INT,
+	@numero_factura INT,
+	@fecha_creacion DATETIME,
+	@descripcion VARCHAR(200),
+	@monto_descuento INT = NULL,
+	@monto_total INT,
+	@id_deporte INT = NULL,
+	@id_actividad_extra INT = NULL,
+	@id_cuota INT = NULL
+AS
+BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.CargosSocio WHERE id_cargo_socio = @id_cargo_socio)
+	BEGIN
+		RAISERROR('Error: No existe un Cargo Socio con el ID (%d)',16,1,@id_cargo_socio);
+	END
+	ELSE
+	BEGIN
+		UPDATE tabla.CargosSocio
+		SET numero_factura = @numero_factura, fecha_creacion = @fecha_creacion, 
+			descripcion = @descripcion, monto_descuento = @monto_descuento, 
+			monto_total = @monto_total, id_deporte = @id_deporte, 
+			id_actividad_extra = @id_actividad_extra, id_cuota = @id_cuota
+		WHERE id_cargo_socio = @id_cargo_socio;
+	END
+END;	
+
+--STORE PROCEDURES ELIMINACION
+
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarCargoSocio
+	@id_cargo_socio INT
+AS
+BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.CargosSocio WHERE id_cargo_socio = @id_cargo_socio)
+	BEGIN
+		RAISERROR('Error: No existe un Cargo Socio con el ID (%d)',16,1,@id_cargo_socio);
+	END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.CargosSocio
+		WHERE id_cargo_socio = @id_cargo_socio;
+	END
+END
+
 
 CREATE OR ALTER PROCEDURE spEliminacion.EliminarSocio
 	@dni INT
