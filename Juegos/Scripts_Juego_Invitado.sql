@@ -1,6 +1,6 @@
 -- Invitados
 
--- Se crean los TESTS para la insercion, actualizacion y eliminacion de Administradores
+-- Se crean los TESTS para la insercion, actualizacion y eliminacion de Invitados
 
 USE Com2900G07
 GO
