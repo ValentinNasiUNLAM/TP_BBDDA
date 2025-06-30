@@ -981,6 +981,28 @@ BEGIN
 END
 GO
 
+CREATE or ALTER PROCEDURE spActualizacion.actualizarCuota
+	@dni INT,
+	@id_categoria INT
+AS
+BEGIN
+	DECLARE @id_socio INT;
+	IF @dni IS NOT NULL
+	BEGIN
+		SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+		IF @id_socio IS NULL
+		BEGIN
+			RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
+		END
+		ELSE
+		BEGIN
+			UPDATE tabla.Cuotas
+			SET id_categoria = @id_categoria
+			WHERE id_socio = @id_socio;
+		END
+	END
+END;
+
 
 CREATE or ALTER PROCEDURE spActualizacion.actualizarActividad
 	@dni INT,
