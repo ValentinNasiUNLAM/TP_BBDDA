@@ -692,7 +692,7 @@ END;
 GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearCuentaSocio
-	@id_socio INT,
+	@dni, INT,
 	@contrasena VARCHAR(30),
 	@usuario VARCHAR(30),
 	@rol TINYINT,
@@ -701,6 +701,13 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearCuentaSocio
 	@estado_cuenta BIT
 AS
 BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
+	END
+	ELSE
     INSERT INTO tabla.CuentasSocios(id_socio, contrasena, usuario, rol, saldo, 
 		fecha_vigencia_contrasena, estado_cuenta)
     VALUES(@id_socio, @contrasena, @usuario, @rol, @saldo, 
@@ -723,25 +730,47 @@ GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearReembolso
 	@id_pago INT,
-	@id_cuenta INT,
-	@id_admin INT,
+	@dni_socio INT,
+	@dni_admin INT,
 	@motivo VARCHAR(200),
 	@fecha DATETIME,
 	@monto INT
 AS
 BEGIN
+	DECLARE @id_cuenta INT;
+	SELECT @id_cuenta = fnBusqueda.BuscarCuentaSocio(@dni_socio);
+	IF @id_cuenta IS NULL
+	BEGIN
+		RAISERROR('Error: No existe una cuenta de socio con el DNI (%d)', 16, 1, @dni_socio);
+	END
+	ELSE
+	DECLARE @id_admin INT;
+	SELECT @id_admin = fnBusqueda.BuscarAdministrador(@dni_admin);
+	IF @id_admin IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un administrador con el DNI (%d)', 16, 1, @dni_admin);
+	END
+	ELSE
+	BEGIN
     INSERT INTO tabla.Reembolsos(id_pago, id_cuenta, id_admin, motivo, fecha, monto)
     VALUES(@id_pago, @id_cuenta, @id_admin, @motivo, @fecha, @monto);
 END;
 GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearAsistenciaClase
-	@id_socio INT,
+	@dni_socio INT,
 	@id_clase INT,
 	@presente BIT,
 	@fecha DATETIME
 AS
 BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni_socio);
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni_socio);
+	END
+	ELSE
     INSERT INTO tabla.AsistenciasClase(id_socio, id_clase, presente, fecha)
     VALUES(@id_socio, @id_clase, @presente, @fecha);
 END;
@@ -1082,6 +1111,62 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER PROCEDURE spActualizacion.ActualizarMorosidad
+	@id_morosidad INT,
+	@numero_factura INT,
+	@monto_total INT,
+	@fecha_pago DATETIME
+AS
+BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.Morosidades WHERE id_morosidad = @id_morosidad)
+	BEGIN
+		RAISERROR('Error: No existe una Morosidad con el ID (%d)',16,1,@id_morosidad);
+	END
+	ELSE
+	BEGIN
+		UPDATE tabla.Morosidades
+		SET numero_factura = @numero_factura, monto_total = @monto_total, fecha_pago = @fecha_pago
+		WHERE id_morosidad = @id_morosidad;
+	END
+END
+GO
+
+CREATE OR ALTER PROCEDURE spActualizacion.ActualizarReembolso
+	@id_reembolso INT,
+	@id_pago INT,
+	@dni_socio INT,
+	@dni_admin INT,
+	@motivo VARCHAR(200),
+	@fecha DATETIME,
+	@monto INT
+AS
+BEGIN
+	DECLARE @id_cuenta INT;
+	SELECT @id_cuenta = fnBusqueda.BuscarCuentaSocio(@dni_socio);
+	IF @id_cuenta IS NULL
+	BEGIN
+		RAISERROR('Error: No existe una cuenta de socio con el DNI (%d)', 16, 1, @dni_socio);
+	END
+	ELSE
+	DECLARE @id_admin INT;
+	SELECT @id_admin = fnBusqueda.BuscarAdministrador(@dni_admin);
+	IF @id_admin IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un administrador con el DNI (%d)', 16, 1, @dni_admin);
+	END
+	ELSE IF NOT EXISTS(SELECT 1 FROM tabla.Reembolsos WHERE id_reembolso = @id_reembolso)
+	BEGIN
+		RAISERROR('Error: No existe un Reembolso con el ID (%d)',16,1,@id_reembolso);
+	END
+	ELSE
+	BEGIN
+		UPDATE tabla.Reembolsos
+		SET id_pago = @id_pago, id_cuenta = @id_cuenta, id_admin = @id_admin,
+			motivo = @motivo, fecha = @fecha, monto = @monto
+		WHERE id_reembolso = @id_reembolso;
+	END
+END;
+
 CREATE OR ALTER PROCEDURE spActualizacion.ActualizarPago ---REVISAR
 	@id_medio_pago INT,
 	@id_pago INT
@@ -1148,6 +1233,34 @@ BEGIN
 		WHERE id_cargo_socio = @id_cargo_socio;
 	END
 END;	
+
+CREATE OR ALTER PROCEDURE spActualizacion.ActualizarAsistenciaClase
+	@id_asistencia INT,
+	@dni_socio INT,
+	@id_clase INT,
+	@presente BIT,
+	@fecha DATETIME
+AS
+BEGIN
+	DECLARE @id_socio INT;
+	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni_socio);
+	IF @id_socio IS NULL
+	BEGIN
+		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni_socio);
+	END
+	ELSE IF NOT EXISTS(SELECT 1 FROM tabla.AsistenciasClase WHERE id_asistencia = @id_asistencia)
+	BEGIN
+		RAISERROR('Error: No existe una asistencia de clase con el ID (%d)',16,1,@id_asistencia);
+	END
+	ELSE
+	BEGIN
+		UPDATE tabla.AsistenciasClase
+		SET id_socio = @id_socio, id_clase = @id_clase, presente = @presente, fecha = @fecha
+		WHERE id_asistencia = @id_asistencia;
+	END
+END;
+GO
+
 
 --STORE PROCEDURES ELIMINACION
 
@@ -1424,6 +1537,52 @@ BEGIN
 		WHERE id_socio = @id_socio AND id_deporte = @id_deporte;
 	END
 END
+GO
+
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarMorosidad
+	@id_morosidad INT
+AS
+BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.Morosidades WHERE id_morosidad = @id_morosidad)
+	BEGIN
+		RAISERROR('Error: No existe una Morosidad con el ID (%d)',16,1,@id_morosidad);
+	END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.Morosidades
+		WHERE id_morosidad = @id_morosidad;
+	END
+END;
+
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarReembolso
+	@id_reembolso INT
+AS
+BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.Reembolsos WHERE id_reembolso = @id_reembolso)
+	BEGIN
+		RAISERROR('Error: No existe un Reembolso con el ID (%d)',16,1,@id_reembolso);
+	END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.Reembolsos
+		WHERE id_reembolso = @id_reembolso;
+	END
+END;
+
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarAsistenciaClase
+	@id_asistencia INT
+AS
+BEGIN
+	IF NOT EXISTS(SELECT 1 FROM tabla.AsistenciasClase WHERE id_asistencia = @id_asistencia)
+	BEGIN
+		RAISERROR('Error: No existe una Asistencia con el ID (%d)',16,1,@id_asistencia);
+	END
+	ELSE
+	BEGIN
+		DELETE FROM tabla.AsistenciasClase
+		WHERE id_asistencia = @id_asistencia;
+	END
+END;
 GO
 
 ------FUNCIONES
