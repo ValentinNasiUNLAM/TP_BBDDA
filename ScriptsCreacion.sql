@@ -323,7 +323,7 @@ BEGIN
 	CREATE TABLE tabla.CargosSocio(
 		id_cargo_socio INT PRIMARY KEY IDENTITY (1,1),
 		numero_factura INT NOT NULL,
-		fecha_creacion DATETIME,
+		fecha_creacion DATETIME DEFAULT(GETDATE()),
 		descripcion VARCHAR(200),
 		monto_descuento INT NULL,
 		monto_total INT,
