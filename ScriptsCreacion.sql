@@ -383,6 +383,7 @@ BEGIN
 		--CONSTRAINTS
 		CONSTRAINT fk_id_socio_cuenta_socio FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
 		CONSTRAINT chk_rol_cuenta_socio CHECK (rol >=0 AND rol <=5),
+		CONSTRAINT chk_usuario_no_vacio_cuenta_socio CHECK (LEN(usuario) > 0),
 		CONSTRAINT chk_contrasena_no_vacia_cuenta_socio CHECK (LEN(contrasena) > 0),
 		CONSTRAINT chk_fecha_vigencia_contrasena_cuenta_socio CHECK (fecha_vigencia_contrasena > CAST(GETDATE() AS DATETIME))
 	)
@@ -397,7 +398,7 @@ IF NOT EXISTS (
 BEGIN
 	CREATE TABLE tabla.Pagos(
 		id_pago INT PRIMARY KEY IDENTITY(1,1),
-		numero_factura INT NOT NULL,
+		numero_factura INT UNIQUE NOT NULL,
 		id_medio_pago INT NOT NULL,
 		fecha DATETIME,
 		total INT,
@@ -405,7 +406,9 @@ BEGIN
 		--CONSTRAINTS
 		CONSTRAINT fk_id_medio_pago_pago FOREIGN KEY (id_medio_pago) REFERENCES tabla.MediosPago(id_medio_pago),
 		CONSTRAINT fk_numero_factura_pago FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura),
-		CONSTRAINT chk_fecha_pago CHECK (fecha <= CAST(GETDATE() AS DATETIME))
+		CONSTRAINT chk_fecha_pago CHECK (fecha <= CAST(GETDATE() AS DATETIME)),
+		CONSTRAINT chk_total_pago CHECK (total > 0),
+		CONSTRAINT chk_reembolso_pago CHECK (reembolso >= 0)
 	)
 END
 GO
@@ -711,7 +714,7 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearCuentaSocio
 	@rol TINYINT,
 	@saldo INT,
 	@fecha_vigencia_contrasena DATETIME,
-	@estado_cuenta BIT
+	@estado_cuenta BIT = 1
 AS
 BEGIN
 	DECLARE @id_socio INT;
