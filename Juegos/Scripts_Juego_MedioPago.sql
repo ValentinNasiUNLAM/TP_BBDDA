@@ -36,7 +36,7 @@ GO
 SELECT * FROM tabla.MediosPago WHERE id_medio_pago = 9898989
 GO
 
---TEST 2.2: Error al actualizar un medio de pago con nombre vacío
+--TEST 2.2: Error al Actualizar un medio de pago con nombre vacío
 EXEC spActualizacion.ActualizarMedioPago
     @id_medio_pago = 1,
     @Nombre = '',
@@ -55,7 +55,7 @@ GO
 SELECT * FROM tabla.MediosPago WHERE id_medio_pago = 1
 GO
 
---TEST 3.2: Error al eliminar un medio de pago inexistente
+--TEST 3.2: Error al Eliminar un medio de pago inexistente
 EXEC spEliminacion.EliminarMedioPago
     @id_medio_pago = 9999 -- Asumiendo que este ID no existe
 GO

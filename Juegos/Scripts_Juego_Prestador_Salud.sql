@@ -41,7 +41,7 @@ GO
 
 --TEST 2.1: Resultado esperado ID, 2, IOMA, 1199998888
 SELECT * FROM tabla.PrestadoresSalud
-EXEC spActualizacion.actualizarPrestadorSalud
+EXEC spActualizacion.ActualizarPrestadorSalud
     @id_prestador_salud = 1,
     @nombre = 'IOMA',
     @tipo = 2,
@@ -52,7 +52,7 @@ GO
 
 --TEST 2.2: Error nombre vacio
 SELECT * FROM tabla.PrestadoresSalud
-EXEC spActualizacion.actualizarPrestadorSalud
+EXEC spActualizacion.ActualizarPrestadorSalud
     @id_prestador_salud = 1,
     @nombre = '',
     @tipo = 2,
@@ -63,7 +63,7 @@ GO
 
 --TEST 2.3: Error tipo:
 SELECT * FROM tabla.PrestadoresSalud
-EXEC spActualizacion.actualizarPrestadorSalud
+EXEC spActualizacion.ActualizarPrestadorSalud
     @id_prestador_salud = 1,
     @nombre = 'IOMA',
     @tipo = 5,
@@ -74,7 +74,7 @@ GO
 
 --TEST 2.4: Error no existe ID
 SELECT * FROM tabla.PrestadoresSalud
-EXEC spActualizacion.actualizarPrestadorSalud
+EXEC spActualizacion.ActualizarPrestadorSalud
     @id_prestador_salud = 99991,
     @nombre = 'IOMA',
     @tipo = 5,
@@ -85,7 +85,7 @@ GO
 
 --TEST 3.1: Eliminacion Exitosa
 SELECT * FROM tabla.PrestadoresSalud
-EXEC spEliminacion.eliminarPrestadorSalud
+EXEC spEliminacion.EliminarPrestadorSalud
     @id_prestador_salud = 1
 GO
 SELECT * FROM tabla.PrestadoresSalud WHERE id_prestador_salud = 1
@@ -93,6 +93,6 @@ GO
 
 --TEST 3.2: No existe ID
 SELECT * FROM tabla.PrestadoresSalud
-EXEC spEliminacion.eliminarPrestadorSalud
+EXEC spEliminacion.EliminarPrestadorSalud
     @id_prestador_salud = 99991
 GO

@@ -31,7 +31,7 @@ SELECT * FROM tabla.Deportes;
 --ACTUALIZACION
 
 --TEST 2.1: Actualizar un deporte exitoso
-EXEC spActualizacion.actualizarDeporte
+EXEC spActualizacion.ActualizarDeporte
     @id_deporte = 1,
     @nombre = 'Futbol Profesional',
     @precio = 1200
@@ -39,7 +39,7 @@ GO
 SELECT * FROM tabla.Deportes WHERE id_deporte = 1;
 
 --TEST 2.2: Actualizar un deporte con nombre vacio
-EXEC spActualizacion.actualizarDeporte
+EXEC spActualizacion.ActualizarDeporte
     @id_deporte = 1,
     @nombre = '',
     @precio = 1200
@@ -47,7 +47,7 @@ GO
 SELECT * FROM tabla.Deportes WHERE id_deporte = 1;
 
 --TEST 2.3: Actualizar un deporte con precio negativo
-EXEC spActualizacion.actualizarDeporte
+EXEC spActualizacion.ActualizarDeporte
     @id_deporte = 1,
     @nombre = 'Futbol Profesional',
     @precio = -1000

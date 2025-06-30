@@ -61,7 +61,7 @@ GO
 
 --TEST 2.1: Actualizacion correcta
 SELECT * FROM tabla.Invitados
-EXEC spActualizacion.actualizarInvitado
+EXEC spActualizacion.ActualizarInvitado
     @dni = 12345678,
 	@nombre = 'Pepe',
 	@apellido = 'Azul'
@@ -71,7 +71,7 @@ GO
 
 --TEST 2.2: Activar invitado
 SELECT * FROM tabla.Invitados
-EXEC spActualizacion.actualizarInvitado
+EXEC spActualizacion.ActualizarInvitado
     @dni = 12345678,
 	@nombre = 'Pepe',
 	@apellido = 'Azul',
@@ -84,7 +84,7 @@ GO
 
 --TEST 3.1: Eliminacion correcta
 SELECT * FROM tabla.Invitados
-EXEC spEliminacion.eliminarInvitado
+EXEC spEliminacion.EliminarInvitado
     @dni = 12345678
 GO
 SELECT * FROM tabla.Invitados WHERE dni = 12345678
@@ -92,7 +92,7 @@ GO
 
 --TEST 3.2: DNI inexistente
 SELECT * FROM tabla.Invitados
-EXEC spEliminacion.eliminarInvitado
+EXEC spEliminacion.EliminarInvitado
     @dni = 87654321
 GO
 SELECT * FROM tabla.Invitados WHERE dni = 87654321

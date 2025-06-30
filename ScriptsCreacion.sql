@@ -742,7 +742,7 @@ GO
 
 --STORED PROCEDURES ACTUALIZACION
 
-CREATE  or ALTER PROCEDURE spActualizacion.actualizarCategoria
+CREATE  or ALTER PROCEDURE spActualizacion.ActualizarCategoria
     @id_categoria INT,
 	@nombre_categoria VARCHAR(15),
 	@edad_min TINYINT,
@@ -768,7 +768,7 @@ BEGIN
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarPrestadorSalud
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarPrestadorSalud
 	@id_prestador_salud INT,
 	@tipo TINYINT,
 	@nombre VARCHAR(50),
@@ -792,7 +792,7 @@ BEGIN
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarAdministrador
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarAdministrador
 	@dni INT,
 	@email VARCHAR(30) ,
 	@rol TINYINT,
@@ -818,7 +818,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarMedioPago
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarMedioPago
 	@id_medio_pago INT,
 	@nombre VARCHAR(50),
 	@descripcion VARCHAR(50),
@@ -841,7 +841,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarDeporte
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarDeporte
 	@id_deporte INT,
 	@nombre VARCHAR(50),
 	@precio INT,
@@ -864,7 +864,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarInvitado
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarInvitado
 	@dni INT,
 	@nombre VARCHAR(30),
 	@apellido VARCHAR(30),
@@ -889,7 +889,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarTurno
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarTurno
 	@id_turno INT,
 	@id_clase INT,
 	@dia TINYINT,
@@ -913,7 +913,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarSocio
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocio
 	@dni INT,
 	@email VARCHAR(50),
 	@telefono INT,
@@ -941,7 +941,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarSocioTutor
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocioTutor
 	@dniTutor INT,
 	@dniMenor INT
 AS
@@ -965,7 +965,7 @@ BEGIN
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarSocioGrupoFamiliar
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocioGrupoFamiliar
 	@dni INT,
 	@dniResponsableGrupoFamiliar INT
 AS
@@ -989,7 +989,7 @@ BEGIN
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.actualizarCuota
+CREATE or ALTER PROCEDURE spActualizacion.ActualizarCuota
 	@dni INT,
 	@id_categoria INT
 AS
@@ -1012,7 +1012,7 @@ BEGIN
 END
 GO 
 
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarActividadExtra
+CREATE OR ALTER PROCEDURE spActualizacion.ActualizarActividadExtra
     @dni_socio INT,
     @dni_invitado INT = NULL,
     @id_actividad_extra INT,
@@ -1048,7 +1048,7 @@ BEGIN
 END;
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarCuentaSocio
+CREATE OR ALTER PROCEDURE spActualizacion.ActualizarCuentaSocio
 	@dni INT,
 	@contrasena VARCHAR(30),
 	@usuario VARCHAR(30),
@@ -1075,7 +1075,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarPago ---REVISAR
+CREATE OR ALTER PROCEDURE spActualizacion.ActualizarPago ---REVISAR
 	@id_medio_pago INT,
 	@id_pago INT
 AS
@@ -1093,7 +1093,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.actualizarAsistenciaClase
+CREATE OR ALTER PROCEDURE spActualizacion.ActualizarAsistenciaClase
 	@id_asistencia INT,
 	@dni INT, 
 	@presente BIT,
@@ -1117,7 +1117,7 @@ GO
 
 --STORE PROCEDURES ELIMINACION 
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarSocio
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarSocio
 	@dni INT
 AS
 BEGIN
@@ -1140,7 +1140,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarSocioTutor
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarSocioTutor
 	@dni INT
 AS
 BEGIN
@@ -1159,7 +1159,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarSocioGrupoFamiliar
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarSocioGrupoFamiliar
 	@dni INT
 AS
 BEGIN
@@ -1178,7 +1178,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarAdministrador
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarAdministrador
 	@dni INT
 AS
 BEGIN
@@ -1197,7 +1197,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarDeporte
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarDeporte
 	@id_deporte INT
 AS
 BEGIN
@@ -1214,7 +1214,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarMedioPago
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarMedioPago
 	@id_medio_pago INT
 AS
 BEGIN
@@ -1231,7 +1231,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarCuentaSocio
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarCuentaSocio
 	@dni INT
 AS
 BEGIN
@@ -1250,7 +1250,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarInvitado
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarInvitado
 	@dni INT
 AS
 BEGIN
@@ -1269,7 +1269,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarTurno
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarTurno
 	@id_turno INT
 AS
 BEGIN
@@ -1285,7 +1285,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarClase
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarClase
 	@id_clase INT
 AS
 BEGIN
@@ -1307,7 +1307,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarCategoria
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarCategoria
 	@id_categoria INT
 AS
 BEGIN
@@ -1324,7 +1324,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarPrestadorSalud
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarPrestadorSalud
 	@id_prestador_salud INT
 AS
 BEGIN
@@ -1341,7 +1341,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarAsistenciaClase
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarAsistenciaClase
     @id_asistencia INT
 AS
 BEGIN
@@ -1357,7 +1357,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.eliminarActividad
+CREATE OR ALTER PROCEDURE spEliminacion.EliminarActividad
 	@dni INT,
 	@id_deporte INT
 AS

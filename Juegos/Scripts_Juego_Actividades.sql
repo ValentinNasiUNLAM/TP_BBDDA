@@ -29,19 +29,19 @@ SELECT * FROM tabla.Actividades WHERE id_deporte = 99999991;
 
 --Eliminacion
 --Test 3.1: Eliminar Actividad
-EXEC spEliminacion.eliminarActividad
+EXEC spEliminacion.EliminarActividad
     @dni = 12345678,
     @id_deporte = 1;
 GO
 
 --Test 3.2: Dni Incorrecto
-EXEC spEliminacion.eliminarActividad
+EXEC spEliminacion.EliminarActividad
     @dni = 99999991,
     @id_deporte = 1;
 GO
 
 --Test 3.3: ID deporte Incorrecto
-EXEC spEliminacion.eliminarActividad
+EXEC spEliminacion.EliminarActividad
     @dni = 12345678,
     @id_deporte = 999999;
 GO

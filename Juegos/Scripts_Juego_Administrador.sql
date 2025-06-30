@@ -71,7 +71,7 @@ GO
 
 --TEST 2.1: Actualizacion de Homero Simpson a Homero Flanders
 SELECT * FROM tabla.Administradores WHERE dni = 44555666
-EXEC spActualizacion.actualizarAdministrador
+EXEC spActualizacion.ActualizarAdministrador
     @dni = 44555666,
     @email = 'hflanders@sol.com',
     @rol = 2
@@ -81,7 +81,7 @@ GO
 
 --TEST 2.2: Activar Socio
 SELECT * FROM tabla.Administradores WHERE dni = 44555666
-EXEC spActualizacion.actualizarAdministrador
+EXEC spActualizacion.ActualizarAdministrador
     @dni = 44555666,
 	@email = 'hsimpson@sol.com',
 	@rol = 2,
@@ -94,7 +94,7 @@ GO
 
 --TEST 3.1: Desactivar Administrador
 SELECT * FROM tabla.Administradores WHERE dni = 44555666
-EXEC spEliminacion.eliminarAdministrador
+EXEC spEliminacion.EliminarAdministrador
     @dni = 44555666
 GO
 SELECT * FROM tabla.Administradores WHERE dni = 44555666
@@ -102,7 +102,7 @@ GO
 
 --TEST 3.2: ERROR DNI INVALIDO
 SELECT * FROM tabla.Administradores
-EXEC spEliminacion.eliminarAdministrador
+EXEC spEliminacion.EliminarAdministrador
     @dni = 99999999
 GO
 SELECT * FROM tabla.Administradores WHERE dni = 44555666

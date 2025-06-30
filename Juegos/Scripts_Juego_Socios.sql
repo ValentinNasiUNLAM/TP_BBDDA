@@ -135,7 +135,7 @@ SELECT * FROM tabla.Socios WHERE dni = 23777227;
 --ACTUALIZACION
 
 --TEST 2.1: Actualizacion Correcta
-EXEC spActualizacion.actualizarSocio
+EXEC spActualizacion.ActualizarSocio
     @dni = 23777222,
     @email = 'BartSimpson@sol.com',
     @telefono = 12345678,
@@ -146,7 +146,7 @@ GO
 SELECT * FROM tabla.Socios WHERE dni = 23777222;
 
 --TEST 2.2: Error DNI
-EXEC spActualizacion.actualizarSocio
+EXEC spActualizacion.ActualizarSocio
     @dni = 99999991,
     @email = 'BartSimpson@sol.com',
     @telefono = 12345678,
@@ -157,7 +157,7 @@ GO
 SELECT * FROM tabla.Socios WHERE dni = 99999991;
 
 --TEST 2.3: Error Mail
-EXEC spActualizacion.actualizarSocio
+EXEC spActualizacion.ActualizarSocio
     @dni = 23777222,
     @email = 'BartSimpsonsol.com',
     @telefono = 12345678,
@@ -170,13 +170,13 @@ SELECT * FROM tabla.Socios WHERE dni = 23777222;
 --ELIMINACION
 
 --TEST 3.1:  Eliminacion Correcta
-EXEC spEliminacion.eliminarSocio
+EXEC spEliminacion.EliminarSocio
     @dni = 23777222
 GO
 SELECT * FROM tabla.Socios WHERE dni = 23777222;
 
 --TEST 3.2: DNI Incorrecto
-EXEC spEliminacion.eliminarSocio
+EXEC spEliminacion.EliminarSocio
     @dni = 99999991
 GO
 SELECT * FROM tabla.Socios WHERE dni = 99999991;

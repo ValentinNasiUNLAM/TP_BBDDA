@@ -51,7 +51,7 @@ GO
 --ACTUALIZACION
 
 --TEST 2.1: Resultado esperado Juvenil, 10, 18, 2000 - Actualizacion de precio mensual
-EXEC spActualizacion.actualizarCategoria --ok
+EXEC spActualizacion.ActualizarCategoria --ok
     @id_categoria = 1,
     @nombre_categoria = 'Juvenil',
     @edad_min = 10,
@@ -62,7 +62,7 @@ SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
 --TEST 2.2: Error Actualizar Edad -- Se verifica que en la Edad Minima no hubo modificaciones 
-EXEC spActualizacion.actualizarCategoria --ok
+EXEC spActualizacion.ActualizarCategoria --ok
     @id_categoria = 1,
     @nombre_categoria = 'Juvenil',
     @edad_min = 20,
@@ -73,7 +73,7 @@ SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
 --TEST 2.3: ERROR PRECIO MENSUAL INVALIDO -- Se verifica que en el Precio Mensual no hubo modificaciones
-EXEC spActualizacion.actualizarCategoria -- ok
+EXEC spActualizacion.ActualizarCategoria -- ok
     @id_categoria = 1,
     @nombre_categoria = 'Juvenil',
     @edad_min = 12,
@@ -84,7 +84,7 @@ SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
 --TEST 2.4: ERROR NOMBRE CATEGORIA VACIO -- Se verifica que nombre de la categoria no tuvo modificaciones
-EXEC spActualizacion.actualizarCategoria
+EXEC spActualizacion.ActualizarCategoria
     @id_categoria = 1,
     @nombre_categoria = '',
     @edad_min = 12,
@@ -95,7 +95,7 @@ SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
 --TEST 2.5: NO EXISTE ID CATEGORIA
-EXEC spActualizacion.actualizarCategoria --ok
+EXEC spActualizacion.ActualizarCategoria --ok
     @id_categoria = 99991,
     @nombre_categoria = 'Juvenil',
     @edad_min = 12,
@@ -107,13 +107,13 @@ GO
 --ELIMINACION
 
 --TEST 3.1: ELIMINACION EXITOSA
-EXEC spEliminacion.eliminarCategoria --ok
+EXEC spEliminacion.EliminarCategoria --ok
     @id_categoria = 1
 GO
 SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 
 --TEST 3.2: ID CATEGORIA NO ENCONTRADO 
-EXEC spEliminacion.eliminarCategoria --ok
+EXEC spEliminacion.EliminarCategoria --ok
     @id_categoria = 99991
 GO
 
