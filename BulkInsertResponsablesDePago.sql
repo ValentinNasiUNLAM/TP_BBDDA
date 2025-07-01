@@ -33,31 +33,39 @@ BEGIN
 	);';
 
 	EXEC (@sql);
-	SELECT * FROM #ResponsablesTemp WHERE email LIKE '%ACCORINTI_%';
 
-	INSERT INTO tabla.PrestadoresSalud (nombre, telefono, nro)
-	SELECT RTRIM(LTRIM(nombre_obra_social)), RTRIM(LTRIM(telefono_obra_social)), RTRIM(LTRIM(nro_socio_obra_social))
-	FROM #ResponsablesTemp;
+	-- Inserto prestadores
+	INSERT INTO tabla.PrestadoresSalud (nombre, telefono)
+	SELECT RTRIM(LTRIM(nombre_obra_social)), RTRIM(LTRIM(telefono_obra_social))
+	FROM #ResponsablesTemp r
+	GROUP BY RTRIM(LTRIM(nombre_obra_social)), RTRIM(LTRIM(telefono_obra_social));
 
-
-	INSERT INTO tabla.Socios (nro_socio, dni, estado, nombre, apellido, email, fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud)
+	WITH DatosLimpios AS(
+		SELECT *, ROW_NUMBER() OVER (PARTITION BY dni ORDER BY (SELECT NULL)) AS rn
+		FROM #ResponsablesTemp
+	)
+	INSERT INTO tabla.Socios (nro_socio, dni, estado, nombre, apellido, email, fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud, nro_socio_os)
 	SELECT
-		TRY_CAST(RTRIM(LTRIM(nro_socio)) AS INT),
-		TRY_CAST(dni AS INT),
-		1,
-		RTRIM(LTRIM(rt.nombre)),
-		RTRIM(LTRIM(apellido)),
-		RTRIM(LTRIM(email)),
-		TRY_CAST(fecha_nacimiento AS DATE),
-		TRY_CAST(telefono_contacto AS INT),
-		TRY_CAST(rt.telefono_emergencia AS INT),
-		ps.id_prestador_salud
-	FROM #ResponsablesTemp rt
+		TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio)), 'SN-','') as INT) as nrosocio,
+		TRY_CAST(dni AS INT) as dni,
+		1 as estado,
+		RTRIM(LTRIM(rt.nombre)) as nombre,
+		RTRIM(LTRIM(apellido)) as apellido,
+		RTRIM(LTRIM(email)) as correo,
+		TRY_CAST(fecha_nacimiento AS DATE) as fnac,
+		TRY_CAST(telefono_contacto AS INT) as telc,
+		TRY_CAST(rt.telefono_emergencia AS INT) as telem,
+		ps.id_prestador_salud as id_prestador,
+		rt.nro_socio_obra_social as nro_socio_obra_social
+	FROM DatosLimpios rt
 	LEFT JOIN tabla.PrestadoresSalud ps
 		ON LTRIM(RTRIM(ps.nombre)) = LTRIM(RTRIM(rt.nombre_obra_social))
-	WHERE NOT EXISTS (
-		SELECT 1 FROM tabla.Socios s WHERE s.nro_socio = TRY_CAST(RTRIM(LTRIM(rt.nro_socio)) AS INT)
+	-- Tomar solamente el primer valor (rn=1) de los dni repetidos
+	WHERE rn = 1 AND NOT EXISTS (
+		SELECT 1 FROM tabla.Socios s 
+		WHERE s.dni = TRY_CAST(rt.dni AS INT)
 	);
 END;
 
-EXEC sp_importar_responsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';
+-- Descomentar para ejecución:
+/* EXEC sp_importar_responsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';*/
