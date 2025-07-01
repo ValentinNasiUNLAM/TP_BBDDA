@@ -1,4 +1,7 @@
-CREATE OR ALTER PROCEDURE sp_importar_responsables
+USE Com2900G07;
+GO
+
+CREATE OR ALTER PROCEDURE spInsercion.ImportarResponsables
 	@ruta_archivo NVARCHAR(500)
 AS
 BEGIN
@@ -44,7 +47,7 @@ BEGIN
 		SELECT *, ROW_NUMBER() OVER (PARTITION BY dni ORDER BY (SELECT NULL)) AS rn
 		FROM #ResponsablesTemp
 	)
-	INSERT INTO tabla.Socios (nro_socio, dni, estado, nombre, apellido, email, fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud, nro_socio_os)
+	INSERT INTO tabla.Socios (nro_socio, dni, estado, nombre, apellido, email, fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud, nro_socio_obra_social)
 	SELECT
 		TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio)), 'SN-','') as INT) as nrosocio,
 		TRY_CAST(dni AS INT) as dni,
@@ -68,4 +71,4 @@ BEGIN
 END;
 
 -- Descomentar para ejecuci�n:
-/* EXEC sp_importar_responsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';*/
+-- EXEC spInsercion.sp_importar_responsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';

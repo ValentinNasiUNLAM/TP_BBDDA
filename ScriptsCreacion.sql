@@ -252,7 +252,7 @@ BEGIN
 		id_tutor INT NULL,
 		id_grupo_familiar INT NULL,
 		--CONSTRAINTS
-		CONSTRAINT chk_dni_socio CHECK (dni > 3000000 AND dni < 99999999),
+		CONSTRAINT chk_dni_socio CHECK (dni > 3000000 AND dni < 999999999),
 		CONSTRAINT chk_email_socio CHECK (
 			CHARINDEX('@', email) > 1 AND 
 			CHARINDEX('.', email, CHARINDEX('@', email)) > CHARINDEX('@', email) + 1),
