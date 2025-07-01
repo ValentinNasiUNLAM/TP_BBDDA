@@ -103,12 +103,10 @@ IF NOT EXISTS (
 BEGIN
 	CREATE TABLE tabla.PrestadoresSalud(
 		id_prestador_salud INT PRIMARY KEY IDENTITY(1,1),
-		nombre VARCHAR(50),
+		nombre VARCHAR(50) UNIQUE,
 		telefono VARCHAR(30),
 		estado BIT DEFAULT(1),
-		nro VARCHAR(30),
 		--CONSTRAINT
-		CONSTRAINT chk_nro_prestador CHECK (LEN(LTRIM(RTRIM(nro))) > 0),
 		CONSTRAINT chk_nombre_prestador CHECK (LEN(LTRIM(RTRIM(nombre))) > 0)
 	)
 END
@@ -239,7 +237,6 @@ BEGIN
 	CREATE TABLE tabla.Socios(
 		id_socio INT PRIMARY KEY IDENTITY(1,1),
 		dni INT UNIQUE,
-		nro_socio INT UNIQUE,
 		nombre VARCHAR(30),
 		apellido VARCHAR(30),
 		email VARCHAR(50) UNIQUE NULL,
@@ -247,6 +244,7 @@ BEGIN
 		telefono INT,
 		telefono_emergencia INT,
 		estado BIT DEFAULT(1),
+		nro_socio_obra_social VARCHAR(30),
 		id_prestador_salud INT NOT NULL,
 		id_tutor INT NULL,
 		id_grupo_familiar INT NULL,
@@ -513,12 +511,11 @@ GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearPrestadorSalud
 	@nombre VARCHAR(50),
-	@telefono VARCHAR(30),
-	@nro VARCHAR(30)
+	@telefono VARCHAR(30)
 AS 
 BEGIN
-	INSERT INTO tabla.PrestadoresSalud(nombre, telefono, nro)
-	VALUES(@nombre, @telefono, @nro)
+	INSERT INTO tabla.PrestadoresSalud(nombre, telefono)
+	VALUES(@nombre, @telefono)
 END;
 GO
 
@@ -591,21 +588,21 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearSocio
     @dni INT,
     @nombre VARCHAR(30),
     @apellido VARCHAR(30),
-	@nro_socio INT,
     @email VARCHAR(50),
     @fecha_nacimiento DATE,
     @telefono INT,
     @telefono_emergencia INT,
+	@nro_socio_obra_social VARCHAR(30),
     @id_prestador_salud INT,
     @id_tutor INT = NULL,
     @id_grupo_familiar INT = NULL
 AS
 BEGIN
-    INSERT INTO tabla.Socios(dni, nombre, apellido,nro_socio, email, fecha_nacimiento, telefono, 
-		telefono_emergencia, id_prestador_salud, id_tutor,
+    INSERT INTO tabla.Socios(dni, nombre, apellido, email, fecha_nacimiento, telefono, 
+		telefono_emergencia, nro_socio_obra_social, id_prestador_salud, id_tutor,
 		id_grupo_familiar)
-    VALUES(@dni, @nombre, @apellido, @nro_socio, @email, @fecha_nacimiento, @telefono,
-        @telefono_emergencia, @id_prestador_salud, @id_tutor,
+    VALUES(@dni, @nombre, @apellido, @email, @fecha_nacimiento, @telefono,
+        @telefono_emergencia, @nro_socio_obra_social, @id_prestador_salud, @id_tutor,
         @id_grupo_familiar);
         END;
 GO
@@ -867,7 +864,6 @@ CREATE or ALTER PROCEDURE spActualizacion.ActualizarPrestadorSalud
 	@id_prestador_salud INT,
 	@nombre VARCHAR(50),
 	@telefono VARCHAR(30),
-	@nro INT,
 	@estado BIT = 1
 AS
 BEGIN
@@ -880,7 +876,7 @@ BEGIN
 		ELSE
 		BEGIN
 			UPDATE tabla.PrestadoresSalud
-			SET nombre = @nombre, telefono = @telefono, estado = @estado, nro = @nro
+			SET nombre = @nombre, telefono = @telefono, estado = @estado
 			WHERE id_prestador_salud = @id_prestador_salud;
 		END
 	END	
@@ -1010,11 +1006,11 @@ GO
 
 CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocio
 	@dni INT,
-	@nro_socio INT,
 	@email VARCHAR(50),
 	@telefono INT,
 	@telefono_emergencia INT,
 	@estado BIT,
+	@nro_socio_obra_social VARCHAR(30),
 	@id_prestador_salud INT
 AS
 BEGIN
@@ -1030,7 +1026,7 @@ BEGIN
 		BEGIN
 			UPDATE tabla.Socios
 			SET email= @email, telefono= @telefono, telefono_emergencia= @telefono_emergencia,
-				estado= @estado, id_prestador_salud= @id_prestador_salud, nro_socio = @nro_socio
+				estado= @estado, id_prestador_salud= @id_prestador_salud, nro_socio_obra_social = @nro_socio_obra_social
 			WHERE id_socio = @id_socio;
 		END
 	END
