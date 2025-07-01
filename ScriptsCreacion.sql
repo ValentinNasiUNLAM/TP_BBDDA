@@ -108,6 +108,7 @@ BEGIN
 		estado BIT DEFAULT(1),
 		nro VARCHAR(30),
 		--CONSTRAINT
+		CONSTRAINT chk_nro_prestador CHECK (LEN(LTRIM(RTRIM(nro))) > 0),
 		CONSTRAINT chk_nombre_prestador CHECK (LEN(LTRIM(RTRIM(nombre))) > 0)
 	)
 END
@@ -1009,6 +1010,7 @@ GO
 
 CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocio
 	@dni INT,
+	@nro_socio INT,
 	@email VARCHAR(50),
 	@telefono INT,
 	@telefono_emergencia INT,
@@ -1028,7 +1030,7 @@ BEGIN
 		BEGIN
 			UPDATE tabla.Socios
 			SET email= @email, telefono= @telefono, telefono_emergencia= @telefono_emergencia,
-				estado= @estado, id_prestador_salud= @id_prestador_salud
+				estado= @estado, id_prestador_salud= @id_prestador_salud, nro_socio = @nro_socio
 			WHERE id_socio = @id_socio;
 		END
 	END

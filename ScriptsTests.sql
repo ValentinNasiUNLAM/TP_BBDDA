@@ -168,8 +168,8 @@ GO
 SELECT * FROM tabla.PrestadoresSalud
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1.1'
 GO
 SELECT * FROM tabla.PrestadoresSalud WHERE nombre = 'Galeno'
 GO
@@ -178,20 +178,17 @@ GO
 SELECT * FROM tabla.PrestadoresSalud
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = '',
-    @tipo = 1,
-    @telefono = 46254016
-GO
-SELECT * FROM tabla.PrestadoresSalud WHERE nombre = ''
+    @telefono = '46254016',
+    @nro = 'TEST_123'
 GO
 
---TEST 1.3: Error tipo (valido entre 1 y 3)
+
+--TEST 1.3: Error nro vacio 
 SELECT * FROM tabla.PrestadoresSalud
 EXEC spInsercion.CrearPrestadorSalud
-    @nombre = 'Galeno_Error_Tipo',
-    @tipo = 4,
-    @telefono = 46254016
-GO
-SELECT * FROM tabla.PrestadoresSalud WHERE nombre = 'Galeno_Error_Tipo'
+    @nombre = 'Galeno_Error_NRO_VACIO',
+    @telefono = '46254016',
+    @nro = ''
 GO
 
 --ACTUALIZACION
@@ -201,8 +198,8 @@ SELECT * FROM tabla.PrestadoresSalud
 EXEC spActualizacion.ActualizarPrestadorSalud
     @id_prestador_salud = 1,
     @nombre = 'IOMA',
-    @tipo = 2,
-    @telefono = 1199998888
+    @telefono = '46254016',
+    @nro = 'TEST_2.1'
 GO
 SELECT * FROM tabla.PrestadoresSalud WHERE id_prestador_salud = 1
 GO
@@ -212,21 +209,17 @@ SELECT * FROM tabla.PrestadoresSalud
 EXEC spActualizacion.ActualizarPrestadorSalud
     @id_prestador_salud = 1,
     @nombre = '',
-    @tipo = 2,
-    @telefono = 1199998888
-GO
-SELECT * FROM tabla.PrestadoresSalud WHERE id_prestador_salud = 1
+    @telefono = '46254016',
+    @nro = 'TEST_2.1'
 GO
 
---TEST 2.3: Error tipo:
+--TEST 2.3: Error nro vacio:
 SELECT * FROM tabla.PrestadoresSalud
 EXEC spActualizacion.ActualizarPrestadorSalud
     @id_prestador_salud = 1,
     @nombre = 'IOMA',
-    @tipo = 5,
-    @telefono = 1199998888
-GO
-SELECT * FROM tabla.PrestadoresSalud WHERE id_prestador_salud = 1
+    @telefono = '46254016',
+    @nro = '.'
 GO
 
 --TEST 2.4: Error no existe ID
@@ -336,7 +329,7 @@ GO
 SELECT * FROM tabla.Administradores WHERE dni = 44555666
 GO
 
---TEST 2.2: Activar Socio
+--TEST 2.2: Activar Administrador
 SELECT * FROM tabla.Administradores WHERE dni = 44555666
 EXEC spActualizacion.ActualizarAdministrador
     @dni = 44555666,
@@ -826,8 +819,8 @@ GO
 --Agregamos un prestador de salud y un socio tutor para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_socio',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -837,6 +830,7 @@ WHERE nombre = 'Galeno_test_socio';
 
 EXEC spInsercion.CrearSocio
     @dni = 12345678,
+    @nro_socio = 9987,
     @nombre = 'Tutor',
     @apellido = 'Prueba',
     @email = 'tutor_prueba@sol.com',
@@ -861,6 +855,7 @@ WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
     @dni = 23777221,
+    @nro_socio = 9986,
     @nombre = 'Bart',
     @apellido = 'Simpson_Prueba',
     @email = 'BSimpson1@sol.com',
@@ -875,6 +870,7 @@ SELECT * FROM tabla.Socios WHERE dni = 23777221;
 -------------ESTE ES PARA TENER EN LOS PROXIMOS TESTS
 EXEC spInsercion.CrearSocio
     @dni = 23777222,
+    @nro_socio = 9985,
     @nombre = 'Bart',
     @apellido = 'Simpson',
     @email = 'BSimpson@sol.com',
@@ -901,6 +897,7 @@ WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
     @dni = 99999999,
+    @nro_socio = 9984,
     @nombre = 'Bart',
     @apellido = 'Simpson',
     @email = 'BSimpson2@sol.com',
@@ -926,6 +923,7 @@ WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
     @dni = 23777223,
+    @nro_socio = 9984,
     @nombre = '',
     @apellido = '',
     @email = 'BSimpson2@sol.com',
@@ -951,6 +949,7 @@ WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
     @dni = 23777224,
+    @nro_socio = 9983,
     @nombre = 'Bart',
     @apellido = 'Simpson',
     @email = 'BSimpsonsol.com',
@@ -976,6 +975,7 @@ WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
     @dni = 23777225,
+    @nro_socio = 9982,
     @nombre = 'Bart',
     @apellido = 'Simpson',
     @email = 'BSimpson2@sol.com',
@@ -996,6 +996,7 @@ WHERE nombre = 'Galeno_test_socio';
 
 EXEC spInsercion.CrearSocio
     @dni = 23777226,
+    @nro_socio = 9981,
     @nombre = 'Bart',
     @apellido = 'Simpson',
     @email = 'BSimpson2@sol.com',
@@ -1021,6 +1022,7 @@ WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
     @dni = 23777227,
+    @nro_socio = 9980,
     @nombre = 'Bart',
     @apellido = 'Simpson',
     @email = 'BSimpson2@sol.com',
@@ -1054,6 +1056,7 @@ SELECT * FROM tabla.Socios WHERE dni = 23777221;
 --TEST 2.2: Error DNI
 EXEC spActualizacion.ActualizarSocio
     @dni = 99999999,
+    @nro_socio = 9981,
     @email = 'BartSimpson@sol.com',
     @telefono = 12345678,
     @telefono_emergencia = 11112222,
@@ -1064,6 +1067,7 @@ GO
 --TEST 2.3: Error Mail
 EXEC spActualizacion.ActualizarSocio
     @dni = 23777221,
+    @nro_socio = 9981,
     @email = 'BartSimpsonsol.com',
     @telefono = 12345678,
     @telefono_emergencia = 11112222,
@@ -1105,8 +1109,8 @@ GO
 --Agregamos un socio y una categoria para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_cuota',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -1116,6 +1120,7 @@ WHERE nombre = 'Galeno_test_cuota';
 
 EXEC spInsercion.CrearSocio
     @dni = 11222333,
+    @nro_socio = 9979,
     @nombre = 'Test',
     @apellido = 'Cuota',
     @email = 'test_couta@sol.com',
@@ -1203,8 +1208,8 @@ GO
 --Agregamos un socio y un deporte para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_actividad',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -1214,6 +1219,7 @@ WHERE nombre = 'Galeno_test_actividad';
 
 EXEC spInsercion.CrearSocio
     @dni = 11222444,
+    @nro_socio = 9978,
     @nombre = 'Test',
     @apellido = 'Actividad',
     @email = 'test_actividad@sol.com',
@@ -1289,8 +1295,8 @@ GO
 --Agregamos un socio y un invitado para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_act_extra',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -1300,6 +1306,7 @@ WHERE nombre = 'Galeno_test_act_extra';
 
 EXEC spInsercion.CrearSocio
     @dni = 44555666,
+    @nro_socio = 9977,
     @nombre = 'Socio',
     @apellido = 'Prueba Act Extra',
     @email = 'socio_prueba_ae@sol.com',
@@ -1465,8 +1472,8 @@ GO
 --Agregamos un socio  para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_factura',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -1476,6 +1483,7 @@ WHERE nombre = 'Galeno_test_factura';
 
 EXEC spInsercion.CrearSocio
     @dni = 22333444,
+    @nro_socio = 9976,
     @nombre = 'Socio',
     @apellido = 'Prueba Factura',
     @email = 'socio_prueba_factura@sol.com',
@@ -1550,8 +1558,8 @@ GO
 --Agregamos un socio, cuota, deporte, actividad extra y factura para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_cargo_socio',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -1561,6 +1569,7 @@ WHERE nombre = 'Galeno_test_cargo_socio';
 
 EXEC spInsercion.CrearSocio
     @dni = 11555999,
+    @nro_socio = 9975,
     @nombre = 'Socio',
     @apellido = 'Prueba Cargo Socio',
     @email = 'socio_prueba_cs@sol.com',
@@ -1806,8 +1815,8 @@ GO
 --Agregamos una factura para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_morosidad',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -1817,6 +1826,7 @@ WHERE nombre = 'Galeno_test_morosidad';
 
 EXEC spInsercion.CrearSocio
     @dni = 33444555,
+    @nro_socio = 9974,
     @nombre = 'Socio',
     @apellido = 'Prueba Morosidad',
     @email = 'socio_prueba_morosidad@sol.com',
@@ -1958,8 +1968,8 @@ GO
 --Agregamos un socio para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_cuenta_cosio',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -1969,6 +1979,7 @@ WHERE nombre = 'Galeno_test_cuenta_cosio';
 
 EXEC spInsercion.CrearSocio
     @dni = 11777888,
+    @nro_socio = 9973,
     @nombre = 'Socio',
     @apellido = 'Prueba Cuenta Socio',
     @email = 'socio_prueba_cuenta@sol.com',
@@ -2138,8 +2149,8 @@ GO
 --Agregamos un usuario, factura y medio de pago para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_pago',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -2149,6 +2160,7 @@ WHERE nombre = 'Galeno_test_pago';
 
 EXEC spInsercion.CrearSocio
     @dni = 11333555,
+    @nro_socio = 9972,
     @nombre = 'Socio',
     @apellido = 'Prueba Pago',
     @email = 'socio_prueba_pago@sol.com',
@@ -2369,8 +2381,8 @@ GO
 --Agregamos un socio, cuenta, factura, medio de pago, pago y administrador para testear
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_reembolso',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -2380,6 +2392,7 @@ WHERE nombre = 'Galeno_test_reembolso';
 
 EXEC spInsercion.CrearSocio
     @dni = 11444666,
+    @nro_socio = 9971,
     @nombre = 'Socio',
     @apellido = 'Prueba Reembolso',
     @email = 'socio_prueba_reembolso@sol.com',
@@ -2795,8 +2808,8 @@ EXEC spInsercion.CrearClase
 
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = 'Galeno_test_asistencia',
-    @tipo = 1,
-    @telefono = 46254016
+    @telefono = '46254016',
+    @nro = 'TEST_1234'
 
 DECLARE @id_prestador_salud_test INT;
 
@@ -2806,6 +2819,7 @@ WHERE nombre = 'Galeno_test_asistencia';
 
 EXEC spInsercion.CrearSocio
     @dni = 55666777,
+    @nro_socio = 9970,
     @nombre = 'Socio',
     @apellido = 'Prueba Asistencia',
     @email = 'socio_prueba_asistencia@sol.com',
