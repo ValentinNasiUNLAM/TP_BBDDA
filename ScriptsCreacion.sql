@@ -129,7 +129,7 @@ BEGIN
 		rol TINYINT,
 		estado BIT DEFAULT(1),
 		--CONSTRAINTS
-		CONSTRAINT chk_dni_admin CHECK (dni > 3000000 AND dni < 99999999),
+		CONSTRAINT chk_dni_admin CHECK (dni > 3000000 AND dni < 999999999),
 		CONSTRAINT chk_email_admin CHECK (
 			CHARINDEX('@', email) > 1 AND 
 			CHARINDEX('.', email, CHARINDEX('@', email)) > CHARINDEX('@', email) + 1
