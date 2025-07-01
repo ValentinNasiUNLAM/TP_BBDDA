@@ -40,7 +40,7 @@ BEGIN
 	FROM #ResponsablesTemp r
 	GROUP BY RTRIM(LTRIM(nombre_obra_social)), RTRIM(LTRIM(telefono_obra_social));
 
-	WITH DatosLimpios AS(
+	WITH ResponsablesSinDNIDuplicado AS(
 		SELECT *, ROW_NUMBER() OVER (PARTITION BY dni ORDER BY (SELECT NULL)) AS rn
 		FROM #ResponsablesTemp
 	)
@@ -57,7 +57,7 @@ BEGIN
 		TRY_CAST(rt.telefono_emergencia AS INT) as telem,
 		ps.id_prestador_salud as id_prestador,
 		rt.nro_socio_obra_social as nro_socio_obra_social
-	FROM DatosLimpios rt
+	FROM ResponsablesSinDNIDuplicado rt
 	LEFT JOIN tabla.PrestadoresSalud ps
 		ON LTRIM(RTRIM(ps.nombre)) = LTRIM(RTRIM(rt.nombre_obra_social))
 	-- Tomar solamente el primer valor (rn=1) de los dni repetidos
@@ -67,5 +67,5 @@ BEGIN
 	);
 END;
 
--- Descomentar para ejecución:
+-- Descomentar para ejecuciï¿½n:
 /* EXEC sp_importar_responsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';*/

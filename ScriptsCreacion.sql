@@ -238,6 +238,7 @@ IF NOT EXISTS (
 BEGIN
 	CREATE TABLE tabla.Socios(
 		id_socio INT PRIMARY KEY IDENTITY(1,1),
+		nro_socio INT UNIQUE,
 		dni INT UNIQUE,
 		nombre VARCHAR(30),
 		apellido VARCHAR(30),
@@ -587,6 +588,7 @@ END;
 GO
 
 CREATE  or ALTER PROCEDURE spInsercion.CrearSocio
+	@nro_socio INT,
     @dni INT,
     @nombre VARCHAR(30),
     @apellido VARCHAR(30),
@@ -600,10 +602,10 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearSocio
     @id_grupo_familiar INT = NULL
 AS
 BEGIN
-    INSERT INTO tabla.Socios(dni, nombre, apellido, email, fecha_nacimiento, telefono, 
+    INSERT INTO tabla.Socios(nro_socio, dni, nombre, apellido, email, fecha_nacimiento, telefono, 
 		telefono_emergencia, nro_socio_obra_social, id_prestador_salud, id_tutor,
 		id_grupo_familiar)
-    VALUES(@dni, @nombre, @apellido, @email, @fecha_nacimiento, @telefono,
+    VALUES(@nro_socio, @dni, @nombre, @apellido, @email, @fecha_nacimiento, @telefono,
         @telefono_emergencia, @nro_socio_obra_social, @id_prestador_salud, @id_tutor,
         @id_grupo_familiar);
         END;
