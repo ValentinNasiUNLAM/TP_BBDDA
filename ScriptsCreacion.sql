@@ -1,30 +1,30 @@
 /*
-Luego de decidirse por un motor de base de datos relacional, llegó el momento de generar la
-base de datos. En esta oportunidad utilizarán SQL Server.
-Deberá instalar el DMBS y documentar el proceso. No incluya capturas de pantalla. Detalle
-las configuraciones aplicadas (ubicación de archivos, memoria asignada, seguridad, puertos,
-etc.) en un documento como el que le entregaría al DBA.
-Cree la base de datos, entidades y relaciones. Incluya restricciones y claves. Deberá entregar
-un archivo .sql con el script completo de creación (debe funcionar si se lo ejecuta “tal cual” es
-entregado en una sola ejecución). Incluya comentarios para indicar qué hace cada módulo
-de código.
-Genere store procedures para manejar la inserción, modificado, borrado (si corresponde,
-también debe decidir si determinadas entidades solo admitirán borrado lógico) de cada tabla.
-Los nombres de los store procedures NO deben comenzar con “SP”.
-Algunas operaciones implicarán store procedures que involucran varias tablas, uso de
+Luego de decidirse por un motor de base de datos relacional, llegï¿½ el momento de generar la
+base de datos. En esta oportunidad utilizarï¿½n SQL Server.
+Deberï¿½ instalar el DMBS y documentar el proceso. No incluya capturas de pantalla. Detalle
+las configuraciones aplicadas (ubicaciï¿½n de archivos, memoria asignada, seguridad, puertos,
+etc.) en un documento como el que le entregarï¿½a al DBA.
+Cree la base de datos, entidades y relaciones. Incluya restricciones y claves. Deberï¿½ entregar
+un archivo .sql con el script completo de creaciï¿½n (debe funcionar si se lo ejecuta ï¿½tal cualï¿½ es
+entregado en una sola ejecuciï¿½n). Incluya comentarios para indicar quï¿½ hace cada mï¿½dulo
+de cï¿½digo.
+Genere store procedures para manejar la inserciï¿½n, modificado, borrado (si corresponde,
+tambiï¿½n debe decidir si determinadas entidades solo admitirï¿½n borrado lï¿½gico) de cada tabla.
+Los nombres de los store procedures NO deben comenzar con ï¿½SPï¿½.
+Algunas operaciones implicarï¿½n store procedures que involucran varias tablas, uso de
 transacciones, etc. Puede que incluso realicen ciertas operaciones mediante varios SPs.
-Asegúrense de que los comentarios que acompañen al código lo expliquen.
-Genere esquemas para organizar de forma lógica los componentes del sistema y aplique esto
-en la creación de objetos. NO use el esquema “dbo”.
-Todos los SP creados deben estar acompañados de juegos de prueba. Se espera que
-realicen validaciones básicas en los SP (p/e cantidad mayor a cero, CUIT válido, etc.) y que
-en los juegos de prueba demuestren la correcta aplicación de las validaciones.
+Asegï¿½rense de que los comentarios que acompaï¿½en al cï¿½digo lo expliquen.
+Genere esquemas para organizar de forma lï¿½gica los componentes del sistema y aplique esto
+en la creaciï¿½n de objetos. NO use el esquema ï¿½dboï¿½.
+Todos los SP creados deben estar acompaï¿½ados de juegos de prueba. Se espera que
+realicen validaciones bï¿½sicas en los SP (p/e cantidad mayor a cero, CUIT vï¿½lido, etc.) y que
+en los juegos de prueba demuestren la correcta aplicaciï¿½n de las validaciones.
 Las pruebas deben realizarse en un script separado, donde con comentarios se indique en
 cada caso el resultado esperado
 El archivo .sql con el script debe incluir comentarios donde consten este enunciado, la fecha
-de entrega, número de grupo, nombre de la materia, nombres y DNI de los alumnos.
+de entrega, nï¿½mero de grupo, nombre de la materia, nombres y DNI de los alumnos.
 Entregar todo en un zip (observar las pautas para nomenclatura antes expuestas) mediante
-la sección de prácticas de MIEL. Solo uno de los miembros del grupo debe hacer la entrega.
+la secciï¿½n de prï¿½cticas de MIEL. Solo uno de los miembros del grupo debe hacer la entrega.
 
 Materia: Bases de datos aplicadas
 Fecha de entrega: 03/06/2025
@@ -129,7 +129,9 @@ BEGIN
 		--CONSTRAINTS
 		CONSTRAINT chk_dni_admin CHECK (dni > 3000000 AND dni < 999999999),
 		CONSTRAINT chk_email_admin CHECK (
+		-- Verificamos que haya un @ y este no se encuentre en la primera posiciÃ³n.
 			CHARINDEX('@', email) > 1 AND 
+		-- Verificamos que haya un "." despuÃ©s de la siguiente letra del arroba (juan@x.com serÃ­a vÃ¡lido, juan@.com no serÃ­a valido).
 			CHARINDEX('.', email, CHARINDEX('@', email)) > CHARINDEX('@', email) + 1
 		),
 		CONSTRAINT chk_nombre_admin CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
