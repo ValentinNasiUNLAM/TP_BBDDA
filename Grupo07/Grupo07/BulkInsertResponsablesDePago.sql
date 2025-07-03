@@ -43,6 +43,17 @@ BEGIN
 	FROM #ResponsablesTemp r
 	GROUP BY RTRIM(LTRIM(nombre_obra_social)), RTRIM(LTRIM(telefono_obra_social));
 
+	--ALTERNATIVA PRESTADORES SALUD
+
+	/*INSERT INTO tabla.PrestadoresSalud (nombre, telefono)
+	SELECT RTRIM(LTRIM(nombre_obra_social)), RTRIM(LTRIM(telefono_obra_social))
+	FROM #ResponsablesTemp r
+	WHERE NOT EXISTS (
+		SELECT 1 
+		FROM tabla.PrestadoresSalud ps
+		WHERE RTRIM(LTRIM(ps.nombre)) = RTRIM(LTRIM(r.nombre_obra_social))
+	);*/
+
 	WITH ResponsablesSinDNIDuplicado AS(
 		SELECT *, ROW_NUMBER() OVER (PARTITION BY dni ORDER BY (SELECT NULL)) AS rn
 		FROM #ResponsablesTemp
@@ -68,6 +79,39 @@ BEGIN
 		SELECT 1 FROM tabla.Socios s 
 		WHERE s.dni = TRY_CAST(rt.dni AS INT)
 	);
+
+	--ALTERNATIVA SOCIOS
+
+	/*WITH ResponsablesSinDNIDuplicado AS (
+		SELECT *, ROW_NUMBER() OVER (PARTITION BY dni ORDER BY (SELECT NULL)) AS rn
+		FROM #ResponsablesTemp
+		WHERE ISNUMERIC(dni) = 1 AND RTRIM(LTRIM(dni)) <> ''
+	)
+	INSERT INTO tabla.Socios (nro_socio, dni, estado, nombre, apellido, email, fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud, nro_socio_obra_social)
+	SELECT
+		TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio)), 'SN-','') as INT) as nrosocio,
+		TRY_CAST(dni AS INT) as dni,
+		1 as estado,
+		RTRIM(LTRIM(rt.nombre)) as nombre,
+		RTRIM(LTRIM(apellido)) as apellido,
+		RTRIM(LTRIM(email)) as correo,
+		TRY_CAST(fecha_nacimiento AS DATE) as fnac,
+		TRY_CAST(telefono_contacto AS INT) as telc,
+		TRY_CAST(rt.telefono_emergencia AS INT) as telem,
+		ps.id_prestador_salud as id_prestador,
+		rt.nro_socio_obra_social as nro_socio_obra_social
+	FROM ResponsablesSinDNIDuplicado rt
+	LEFT JOIN tabla.PrestadoresSalud ps
+		ON LTRIM(RTRIM(ps.nombre)) = LTRIM(RTRIM(rt.nombre_obra_social))
+	WHERE 
+		rn = 1
+		AND TRY_CAST(rt.dni AS INT) IS NOT NULL
+		AND NOT EXISTS (
+			SELECT 1 FROM tabla.Socios s 
+			WHERE s.dni = TRY_CAST(rt.dni AS INT) 
+			OR s.email = rt.email
+			OR s.nro_socio = rt.nro_socio
+		);*/
 END;
 
 -- Descomentar para ejecuci�n:
