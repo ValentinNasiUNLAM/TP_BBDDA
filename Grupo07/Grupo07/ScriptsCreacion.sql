@@ -127,7 +127,7 @@ BEGIN
 		rol TINYINT,
 		estado BIT DEFAULT(1),
 		--CONSTRAINTS
-		CONSTRAINT chk_dni_admin CHECK (dni > 3000000 AND dni < 999999999),
+		CONSTRAINT chk_dni_admin CHECK (dni > 3000000 AND dni < 99999999),
 		CONSTRAINT chk_email_admin CHECK (
 		-- Verificamos que haya un @ y este no se encuentre en la primera posición.
 			CHARINDEX('@', email) > 1 AND 
@@ -252,7 +252,7 @@ BEGIN
 		id_tutor INT NULL,
 		id_grupo_familiar INT NULL,
 		--CONSTRAINTS
-		CONSTRAINT chk_dni_socio CHECK (dni > 3000000 AND dni < 999999999),
+		CONSTRAINT chk_dni_socio CHECK (dni > 3000000 AND dni < 99999999),
 		CONSTRAINT chk_email_socio CHECK (
 			CHARINDEX('@', email) > 1 AND 
 			CHARINDEX('.', email, CHARINDEX('@', email)) > CHARINDEX('@', email) + 1),
@@ -669,16 +669,19 @@ BEGIN
 	ELSE
 	BEGIN
 		DECLARE @id_invitado INT = NULL;
-
-		IF @dni_invitado IS NOT NULL
-		BEGIN
 			SELECT @id_invitado = fnBusqueda.BuscarInvitado(@dni_invitado);
-		END
 
-		INSERT INTO tabla.ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
-			fecha_reserva, monto, monto_invitado, lluvia)
-		VALUES(@id_socio, @id_invitado, @tipo_actividad, @fecha, @fecha_reserva, 
-			@monto, @monto_invitado, @lluvia);
+		IF @dni_invitado IS NOT NULL AND @id_invitado IS NULL
+		BEGIN
+			RAISERROR('Error: No existe un invitado con el DNI (%d)', 16, 1, @dni);
+		END
+		ELSE
+		BEGIN
+			INSERT INTO tabla.ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
+				fecha_reserva, monto, monto_invitado, lluvia)
+			VALUES(@id_socio, @id_invitado, @tipo_actividad, @fecha, @fecha_reserva, 
+				@monto, @monto_invitado, @lluvia);
+		END
 	END
 END;
 GO
@@ -889,7 +892,9 @@ GO
 
 CREATE or ALTER PROCEDURE spActualizacion.ActualizarAdministrador
 	@dni INT,
-	@email VARCHAR(30) ,
+	@email VARCHAR(30),
+	@nombre VARCHAR(30),
+	@apellido VARCHAR(30),
 	@rol TINYINT,
 	@estado BIT = 1
 AS
@@ -906,7 +911,8 @@ BEGIN
 		ELSE
 		BEGIN
 			UPDATE tabla.Administradores
-			SET email = @email, rol = @rol, estado = @estado
+			SET dni = @dni, nombre = @nombre, apellido = @apellido, 
+				email = @email, rol = @rol, estado = @estado
 			WHERE id_admin = @id_admin;
 		END
 	END
@@ -1009,6 +1015,7 @@ END;
 GO
 
 CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocio
+	@nro_socio INT,
 	@dni INT,
 	@email VARCHAR(50),
 	@telefono INT,
@@ -1029,7 +1036,7 @@ BEGIN
 		ELSE
 		BEGIN
 			UPDATE tabla.Socios
-			SET email= @email, telefono= @telefono, telefono_emergencia= @telefono_emergencia,
+			SET nro_socio = @nro_socio, dni = @dni, email= @email, telefono= @telefono, telefono_emergencia= @telefono_emergencia,
 				estado= @estado, id_prestador_salud= @id_prestador_salud, nro_socio_obra_social = @nro_socio_obra_social
 			WHERE id_socio = @id_socio;
 		END

@@ -63,8 +63,7 @@ EXEC spInsercion.CrearCategoria
     @edad_max = 17,
     @precio_mensual = 5000
 GO
-SELECT * FROM tabla.Categorias WHERE nombre_categoria = 'Error_Edad'
-GO
+
 
 --TEST 1.3: Precio Invalido
 EXEC spInsercion.CrearCategoria 
@@ -73,8 +72,6 @@ EXEC spInsercion.CrearCategoria
     @edad_max = 17,
     @precio_mensual = -1000
 GO
-SELECT * FROM tabla.Categorias WHERE nombre_categoria = 'Error_Precio'
-GO
 
 --TEST 1.4: Nombre Categoria Vacio
 EXEC spInsercion.CrearCategoria
@@ -82,8 +79,6 @@ EXEC spInsercion.CrearCategoria
     @edad_min = 12,
     @edad_max = 17,
     @precio_mensual = -1000
-GO
-SELECT * FROM tabla.Categorias WHERE nombre_categoria = ''
 GO
 
 --ACTUALIZACION
@@ -107,8 +102,6 @@ EXEC spActualizacion.ActualizarCategoria
     @edad_max = 18,
     @precio_mensual = 2000
 GO
-SELECT * FROM tabla.Categorias WHERE id_categoria = 1
-GO
 
 --TEST 2.3: ERROR PRECIO MENSUAL INVALIDO 
 EXEC spActualizacion.ActualizarCategoria
@@ -118,8 +111,6 @@ EXEC spActualizacion.ActualizarCategoria
     @edad_max = 18,
     @precio_mensual = -3000
 GO
-SELECT * FROM tabla.Categorias WHERE id_categoria = 1
-GO
 
 --TEST 2.4: ERROR NOMBRE CATEGORIA VACIO 
 EXEC spActualizacion.ActualizarCategoria
@@ -128,8 +119,6 @@ EXEC spActualizacion.ActualizarCategoria
     @edad_min = 12,
     @edad_max = 18,
     @precio_mensual = 2000
-GO
-SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 GO
 
 --TEST 2.5: NO EXISTE ID CATEGORIA
@@ -141,17 +130,16 @@ EXEC spActualizacion.ActualizarCategoria
     @precio_mensual = 2000
 GO
 
-
 --ELIMINACION
 
 --TEST 3.1: ELIMINACION EXITOSA
-EXEC spEliminacion.EliminarCategoria --ok
+EXEC spEliminacion.EliminarCategoria
     @id_categoria = 1
 GO
 SELECT * FROM tabla.Categorias WHERE id_categoria = 1
 
 --TEST 3.2: ID CATEGORIA NO ENCONTRADO 
-EXEC spEliminacion.EliminarCategoria --ok
+EXEC spEliminacion.EliminarCategoria 
     @id_categoria = 99991
 GO
 
@@ -174,17 +162,8 @@ SELECT * FROM tabla.PrestadoresSalud WHERE nombre = 'Galeno'
 GO
 
 -- TEST 1.2: Error nombre vacio
-SELECT * FROM tabla.PrestadoresSalud
 EXEC spInsercion.CrearPrestadorSalud
     @nombre = '',
-    @telefono = '46254016'
-GO
-
-
---TEST 1.3: Error nro vacio 
-SELECT * FROM tabla.PrestadoresSalud
-EXEC spInsercion.CrearPrestadorSalud
-    @nombre = 'Galeno_Error_NRO_VACIO',
     @telefono = '46254016'
 GO
 
@@ -201,25 +180,16 @@ SELECT * FROM tabla.PrestadoresSalud WHERE id_prestador_salud = 1
 GO
 
 --TEST 2.2: Error nombre vacio
-SELECT * FROM tabla.PrestadoresSalud
 EXEC spActualizacion.ActualizarPrestadorSalud
     @id_prestador_salud = 1,
     @nombre = '',
     @telefono = '46254016'
 GO
 
---TEST 2.4: Error no existe ID
-SELECT * FROM tabla.PrestadoresSalud
-EXEC spActualizacion.ActualizarPrestadorSalud
-    @id_prestador_salud = 99991,
-    @nombre = 'IOMA',
-    @telefono = '1199998888'
-GO
-
 --ELIMINACION
 
 --TEST 3.1: Eliminacion Exitosa
-SELECT * FROM tabla.PrestadoresSalud
+SELECT * FROM tabla.PrestadoresSalud WHERE id_prestador_salud = 1
 EXEC spEliminacion.EliminarPrestadorSalud
     @id_prestador_salud = 1
 GO
@@ -231,7 +201,6 @@ SELECT * FROM tabla.PrestadoresSalud
 EXEC spEliminacion.EliminarPrestadorSalud
     @id_prestador_salud = 99991
 GO
-
 
 --Administradores
 
@@ -255,7 +224,6 @@ SELECT * FROM tabla.Administradores WHERE dni = 44555666
 GO
 
 --TEST 1.2: Error nombre y apellido vacio
-SELECT * FROM tabla.Administradores
 EXEC spInsercion.CrearAdministrador
     @nombre = '',
     @apellido = '',
@@ -263,11 +231,8 @@ EXEC spInsercion.CrearAdministrador
     @email = 'hsimpson2@sol.com',
     @rol = 2
 GO
-SELECT * FROM tabla.Administradores WHERE dni = 44555667
-GO
 
 --TEST 1.3: Error email
-SELECT * FROM tabla.Administradores
 EXEC spInsercion.CrearAdministrador
     @nombre = 'Homero',
     @apellido = 'Simpson',
@@ -275,11 +240,8 @@ EXEC spInsercion.CrearAdministrador
     @email = 'hsimpsonsol.com',
     @rol = 2
 GO
-SELECT * FROM tabla.Administradores WHERE dni = 44555666
-GO
 
 --TEST 1.4: DNI invalido
-SELECT * FROM tabla.Administradores
 EXEC spInsercion.CrearAdministrador
     @nombre = 'Homero',
     @apellido = 'Simpson',
@@ -287,19 +249,14 @@ EXEC spInsercion.CrearAdministrador
     @email = 'hsimpson2@sol.com',
     @rol = 2
 GO
-SELECT * FROM tabla.Administradores WHERE dni = 99999999
-GO
 
 --TEST 1.5: DNI duplicado
-SELECT * FROM tabla.Administradores
 EXEC spInsercion.CrearAdministrador
     @nombre = 'Homero',
     @apellido = 'Flanders',
     @dni = 44555666,
     @email = 'hsimpson2@sol.com',
     @rol = 2
-GO
-SELECT * FROM tabla.Administradores WHERE dni = 44555666
 GO
 
 --ACTUALIZACION
@@ -308,6 +265,8 @@ GO
 SELECT * FROM tabla.Administradores WHERE dni = 44555666
 EXEC spActualizacion.ActualizarAdministrador
     @dni = 44555666,
+	@nombre = 'Homero',
+	@apellido = 'Flanders',
     @email = 'hflanders@sol.com',
     @rol = 2
 GO
@@ -336,11 +295,8 @@ SELECT * FROM tabla.Administradores WHERE dni = 44555666
 GO
 
 --TEST 3.2: ERROR DNI INVALIDO
-SELECT * FROM tabla.Administradores
 EXEC spEliminacion.EliminarAdministrador
     @dni = 99999999
-GO
-SELECT * FROM tabla.Administradores WHERE dni = 44555666
 GO
 
 --Medios Pago
@@ -366,19 +322,17 @@ EXEC spInsercion.CrearMedioPago
     @Nombre = '',
     @Descripcion = 'Pago con tarjeta de crédito'
 GO
-SELECT * FROM tabla.MediosPago WHERE Nombre = 'Tarjeta de Crédito'
-GO
 
 -- Actualizacion
 
 --TEST 2.1: Actualizar un medio de pago existente
 SELECT * FROM tabla.MediosPago
 EXEC spActualizacion.ActualizarMedioPago
-    @id_medio_pago = 9898989,
+    @id_medio_pago = 1,
     @Nombre = 'Tarjeta de Débito',
     @Descripcion = 'Pago con tarjeta de débito'
 GO
-SELECT * FROM tabla.MediosPago WHERE id_medio_pago = 9898989
+SELECT * FROM tabla.MediosPago WHERE id_medio_pago = 1
 GO
 
 --TEST 2.2: Error al Actualizar un medio de pago con nombre vacío
@@ -386,8 +340,6 @@ EXEC spActualizacion.ActualizarMedioPago
     @id_medio_pago = 1,
     @Nombre = '',
     @Descripcion = 'Pago con tarjeta de débito'
-GO
-SELECT * FROM tabla.MediosPago WHERE id_medio_pago = 1
 GO
 
 -- Eliminacion
@@ -404,10 +356,9 @@ GO
 EXEC spEliminacion.EliminarMedioPago
     @id_medio_pago = 9999 -- Asumiendo que este ID no existe
 GO
-SELECT * FROM tabla.MediosPago WHERE id_medio_pago = 9999
-GO
 
 --Deportes
+
 --Se crean los TESTS para la insercion, actualizacion y eliminacion de datos en la tabla DEPORTES
 
 USE Com2900G07
@@ -428,14 +379,12 @@ EXEC spInsercion.CrearDeporte
     @nombre = 'Baloncesto',
     @precio = -500
 GO
-SELECT * FROM tabla.Deportes WHERE nombre = 'Baloncesto';
 
 --TEST 1.3: Nombre Vacio
 EXEC spInsercion.CrearDeporte
     @nombre = '',
     @precio = 500
 GO
-SELECT * FROM tabla.Deportes;
 
 --ACTUALIZACION
 
@@ -453,7 +402,6 @@ EXEC spActualizacion.ActualizarDeporte
     @nombre = '',
     @precio = 1200
 GO
-SELECT * FROM tabla.Deportes WHERE id_deporte = 1;
 
 --TEST 2.3: Actualizar un deporte con precio negativo
 EXEC spActualizacion.ActualizarDeporte
@@ -461,7 +409,6 @@ EXEC spActualizacion.ActualizarDeporte
     @nombre = 'Futbol Profesional',
     @precio = -1000
 GO
-SELECT * FROM tabla.Deportes WHERE id_deporte = 1;
 
 --ELIMINACION
 
@@ -475,7 +422,6 @@ SELECT * FROM tabla.Deportes WHERE id_deporte = 1;
 EXEC spEliminacion.EliminarDeporte
     @id_deporte = 9999
 GO
-SELECT * FROM tabla.Deportes WHERE id_deporte = 9999;
 
 -- Invitados
 
@@ -503,8 +449,6 @@ EXEC spInsercion.CrearInvitado
 	@nombre = 'Homero',
 	@apellido = 'Simpson'
 GO
-SELECT * FROM tabla.Invitados WHERE dni = 123456789
-GO
 
 --TEST 1.3: DNI duplicado
 SELECT * FROM tabla.Invitados
@@ -512,8 +456,6 @@ EXEC spInsercion.CrearInvitado
     @dni = 12345678,
 	@nombre = 'Homero',
 	@apellido = 'Simpson'
-GO
-SELECT * FROM tabla.Invitados WHERE dni = 12345678
 GO
 
 --TEST 1.4: Nombre vacio
@@ -523,8 +465,6 @@ EXEC spInsercion.CrearInvitado
 	@nombre = '',
 	@apellido = 'Simpson'
 GO
-SELECT * FROM tabla.Invitados WHERE dni = 12345678
-GO
 
 --TEST 1.5: Apellido vacio
 SELECT * FROM tabla.Invitados
@@ -532,8 +472,6 @@ EXEC spInsercion.CrearInvitado
     @dni = 11222333,
 	@nombre = 'Homero',
 	@apellido = ''
-GO
-SELECT * FROM tabla.Invitados WHERE dni = 12345678
 GO
 
 --ACTUALIZACION
@@ -556,8 +494,6 @@ EXEC spActualizacion.ActualizarInvitado
 	@apellido = 'Azul',
 	@estado = 1
 GO
-SELECT * FROM tabla.Invitados WHERE dni = 12345678
-GO
 
 --ELIMINACION
 
@@ -573,8 +509,6 @@ GO
 SELECT * FROM tabla.Invitados
 EXEC spEliminacion.EliminarInvitado
     @dni = 87654321
-GO
-SELECT * FROM tabla.Invitados WHERE dni = 87654321
 GO
 
 
@@ -606,7 +540,8 @@ SELECT * FROM tabla.Clases WHERE id_deporte = @id_deporte_test
 GO
 
 -- ELIMINACION
--- TEST 3.1: Eliminar un Deporte
+
+-- TEST 3.1: Eliminar una Clase
 DECLARE @id_deporte_test INT;
 
 SELECT @id_deporte_test = id_deporte
@@ -639,7 +574,6 @@ SELECT @id_deporte_test = id_deporte
 FROM tabla.Deportes
 WHERE nombre = 'Futbol_test_clase_turno';
 
-SELECT * FROM tabla.Clases
 EXEC spInsercion.CrearClase
     @id_deporte = @id_deporte_test
 GO
@@ -651,7 +585,7 @@ DECLARE @id_clase_test INT;
 
 SELECT @id_clase_test = id_clase
 FROM tabla.Clases c
-INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_clase
+INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_deporte
 WHERE d.nombre = 'Futbol_test_clase_turno';
 
 SELECT * FROM tabla.Turnos
@@ -680,7 +614,7 @@ EXEC spInsercion.CrearTurno
     @hora_fin = '12:00'
 GO
 
---TEST 1.3: Crear Turno Fallido (Hora Inicio Incorrecta ya existe)
+--TEST 1.3: Crear Turno Fallido (Hora Inicio Incorrecta)
 DECLARE @id_clase_test INT;
 
 SELECT @id_clase_test = id_clase
@@ -704,7 +638,7 @@ DECLARE @id_turno_test INT;
 
 SELECT @id_clase_test = id_clase
 FROM tabla.Clases c
-INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_clase
+INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_deporte
 WHERE d.nombre = 'Futbol_test_clase_turno';
 
 SELECT @id_turno_test = id_turno
@@ -728,7 +662,7 @@ DECLARE @id_turno_test INT;
 
 SELECT @id_clase_test = id_clase
 FROM tabla.Clases c
-INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_clase
+INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_deporte
 WHERE d.nombre = 'Futbol_test_clase_turno';
 
 SELECT @id_turno_test = id_turno
@@ -750,7 +684,7 @@ DECLARE @id_turno_test INT;
 
 SELECT @id_clase_test = id_clase
 FROM tabla.Clases c
-INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_clase
+INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_deporte
 WHERE d.nombre = 'Futbol_test_clase_turno';
 
 SELECT @id_turno_test = id_turno
@@ -774,7 +708,7 @@ DECLARE @id_turno_test INT;
 
 SELECT @id_clase_test = id_clase
 FROM tabla.Clases c
-INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_clase
+INNER JOIN tabla.Deportes d ON d.id_deporte = c.id_deporte
 WHERE d.nombre = 'Futbol_test_clase_turno';
 
 SELECT @id_turno_test = id_turno
@@ -789,13 +723,12 @@ SELECT * FROM tabla.Turnos WHERE id_turno = @id_turno_test
 GO
 
 -- TEST 3.2: Eliminar Turno Fallido (Turno No Existe)
-SELECT * FROM tabla.Turnos
 EXEC spEliminacion.EliminarTurno
     @id_turno = 9999999
 GO
 
-
 -- Socios
+
 -- Se crean los TESTS para la insercion, actualizacion y eliminacion de SOCIOS
 
 USE Com2900G07
@@ -813,6 +746,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_socio';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0001,
     @dni = 12345678,
     @nombre = 'Tutor',
     @apellido = 'Prueba',
@@ -838,6 +772,7 @@ FROM tabla.Socios
 WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0002,
     @dni = 23777221,
     @nombre = 'Bart',
     @apellido = 'Simpson_Prueba',
@@ -853,6 +788,7 @@ SELECT * FROM tabla.Socios WHERE dni = 23777221;
 
 -------------ESTE ES PARA TENER EN LOS PROXIMOS TESTS
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0003,
     @dni = 23777222,
     @nombre = 'Bart',
     @apellido = 'Simpson',
@@ -880,6 +816,7 @@ FROM tabla.Socios
 WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0004,
     @dni = 99999999,
     @nombre = 'Bart',
     @apellido = 'Simpson',
@@ -891,6 +828,7 @@ EXEC spInsercion.CrearSocio
     @id_prestador_salud = @id_prestador_salud_test,
     @id_tutor = @id_tutor_test,
     @id_grupo_familiar = @id_tutor_test
+SELECT * FROM tabla.Socios
 GO
 
 --TEST 1.3: Error nombre y/o apellido vacios
@@ -906,6 +844,7 @@ FROM tabla.Socios
 WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0005,
     @dni = 23777223,
     @nombre = '',
     @apellido = '',
@@ -932,6 +871,7 @@ FROM tabla.Socios
 WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0006,
     @dni = 23777224,
     @nombre = 'Bart',
     @apellido = 'Simpson',
@@ -958,6 +898,7 @@ FROM tabla.Socios
 WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0007,
     @dni = 23777225,
     @nombre = 'Bart',
     @apellido = 'Simpson',
@@ -979,6 +920,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_socio';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0008,
     @dni = 23777226,
     @nombre = 'Bart',
     @apellido = 'Simpson',
@@ -1005,6 +947,7 @@ FROM tabla.Socios
 WHERE dni = 12345678
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0009,
     @dni = 23777227,
     @nombre = 'Bart',
     @apellido = 'Simpson',
@@ -1029,6 +972,7 @@ WHERE nombre = 'Galeno_test_socio';
 
 EXEC spActualizacion.ActualizarSocio
     @dni = 23777221,
+	@nro_socio = 00010,
     @email = 'BartSimpson@sol.com',
     @telefono = 12345678,
     @telefono_emergencia = 11112222,
@@ -1041,6 +985,7 @@ SELECT * FROM tabla.Socios WHERE dni = 23777221;
 --TEST 2.2: Error DNI
 EXEC spActualizacion.ActualizarSocio
     @dni = 99999999,
+	@nro_socio = 00011,
     @email = 'BartSimpson@sol.com',
     @telefono = 12345678,
     @telefono_emergencia = 11112222,
@@ -1052,6 +997,7 @@ GO
 --TEST 2.3: Error Mail
 EXEC spActualizacion.ActualizarSocio
     @dni = 23777221,
+	@nro_socio = 0012,
     @email = 'BartSimpsonsol.com',
     @telefono = 12345678,
     @telefono_emergencia = 11112222,
@@ -1103,6 +1049,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_cuota';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0013,
     @dni = 11222333,
     @nombre = 'Test',
     @apellido = 'Cuota',
@@ -1201,6 +1148,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_actividad';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0014,
     @dni = 11222444,
     @nombre = 'Test',
     @apellido = 'Actividad',
@@ -1287,6 +1235,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_act_extra';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0015,
     @dni = 44555666,
     @nombre = 'Socio',
     @apellido = 'Prueba Act Extra',
@@ -1315,6 +1264,7 @@ EXEC spInsercion.CrearActividadExtra
     @monto = 1000,
     @monto_invitado = 500,
     @lluvia = 0
+SELECT * FROM tabla.ActividadesExtra
 GO
 
 --TEST 1.2: INSERCCION CON DNI INVITADO NO EXISTENTE
@@ -1364,7 +1314,6 @@ EXEC spInsercion.CrearActividadExtra
     @monto_invitado = 500,
     @lluvia = 0
 GO
-
 
 --ACTUALIZACION
 
@@ -1463,6 +1412,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_factura';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0016,
     @dni = 22333444,
     @nombre = 'Socio',
     @apellido = 'Prueba Factura',
@@ -1485,6 +1435,7 @@ EXEC spInsercion.CrearFacturaARCA
     @primer_vencimiento = '2025-10-15',
     @segundo_vencimiento = '2025-10-30',
     @recargo = 5
+SELECT * FROM tabla.FacturasARCA
 GO
 
 --TEST 1.2: INSERCION DE UNA FACTURA CON DNI NO EXISTENTE
@@ -1548,6 +1499,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_cargo_socio';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0017,
     @dni = 11555999,
     @nombre = 'Socio',
     @apellido = 'Prueba Cargo Socio',
@@ -1606,9 +1558,7 @@ EXEC spInsercion.CrearFacturaARCA
     @primer_vencimiento = '2025-10-15',
     @segundo_vencimiento = '2025-10-30',
     @recargo = 5
-
 GO
-
 
 --INSERCION
 
@@ -1633,6 +1583,7 @@ EXEC spInsercion.CrearCargoSocio
 	@id_deporte = NULL,
 	@id_actividad_extra = NULL,
 	@id_cuota = @id_cuota_test
+SELECT * FROM tabla.CargosSocio
 GO
 
 --TEST 1.2: Creacion correcta de un cargo de deporte
@@ -1657,6 +1608,7 @@ EXEC spInsercion.CrearCargoSocio
 	@id_deporte = @id_deporte_test,
 	@id_actividad_extra = NULL,
 	@id_cuota = NULL
+SELECT * FROM tabla.CargosSocio
 GO
 
 --TEST 1.3: Creacion correcta de un cargo de actividad extra
@@ -1680,6 +1632,7 @@ EXEC spInsercion.CrearCargoSocio
 	@id_deporte = NULL,
 	@id_actividad_extra = @id_actividad_extra_test,
 	@id_cuota = NULL
+SELECT * FROM tabla.CargosSocio
 GO
 
 --TEST 1.4: Factura inexistente
@@ -1804,6 +1757,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_morosidad';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0018,
     @dni = 33444555,
     @nombre = 'Socio',
     @apellido = 'Prueba Morosidad',
@@ -1934,6 +1888,9 @@ WHERE numero_factura = @numero_factura_test
 EXEC spEliminacion.EliminarMorosidad
 	@id_morosidad = @id_morosidad_test
 
+SELECT * FROM tabla.Morosidades
+GO
+
 --TEST 3.2: ID morosidad inexistente
 EXEC spEliminacion.EliminarMorosidad
 	@id_morosidad = 99999
@@ -1956,6 +1913,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_cuenta_cosio';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0019,
     @dni = 11777888,
     @nombre = 'Socio',
     @apellido = 'Prueba Cuenta Socio',
@@ -2136,6 +2094,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_pago';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0020,
     @dni = 11333555,
     @nombre = 'Socio',
     @apellido = 'Prueba Pago',
@@ -2367,6 +2326,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_reembolso';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0021,
     @dni = 11444666,
     @nombre = 'Socio',
     @apellido = 'Prueba Reembolso',
@@ -2793,6 +2753,7 @@ FROM tabla.PrestadoresSalud
 WHERE nombre = 'Galeno_test_asistencia';
 
 EXEC spInsercion.CrearSocio
+	@nro_socio = 0022,
     @dni = 55666777,
     @nombre = 'Socio',
     @apellido = 'Prueba Asistencia',
