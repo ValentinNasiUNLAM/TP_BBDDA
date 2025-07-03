@@ -35,7 +35,7 @@ BEGIN
 		TABLOCK
 	);';
 
-	EXEC (@sql);
+	EXEC sp_executesql @sql, N'@Ruta NVARCHAR(500)', @Ruta = @ruta_archivo;
 
 	-- Inserto prestadores
 	INSERT INTO tabla.PrestadoresSalud (nombre, telefono)
