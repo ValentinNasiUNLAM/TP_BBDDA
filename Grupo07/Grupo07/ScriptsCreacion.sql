@@ -47,40 +47,31 @@ GO
 
 --ESQUEMAS
 
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'tabla')
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'socios')
 BEGIN
-    EXEC('CREATE SCHEMA tabla')
+    EXEC('CREATE SCHEMA socios')
 END
 
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'spInsercion')
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'actividades')
 BEGIN
-    EXEC('CREATE SCHEMA spInsercion')
+    EXEC('CREATE SCHEMA actividades')
 END
 
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'spActualizacion')
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'administracion')
 BEGIN
-    EXEC('CREATE SCHEMA spActualizacion')
+    EXEC('CREATE SCHEMA administracion')
 END
 
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'spEliminacion')
-BEGIN
-    EXEC('CREATE SCHEMA spEliminacion')
-END
-
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'fnBusqueda')
-BEGIN
-    EXEC('CREATE SCHEMA fnBusqueda')
-END
 
 --TABLAS
 
 IF NOT EXISTS ( 
     SELECT * FROM sys.tables 
     WHERE name = 'Categorias' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('socios')
 )
 BEGIN
-	CREATE TABLE tabla.Categorias(
+	CREATE TABLE socios.Categorias(
 		id_categoria INT PRIMARY KEY IDENTITY(1,1),
 		nombre_categoria VARCHAR(15),
 		edad_min TINYINT,
@@ -98,10 +89,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'PrestadoresSalud' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('socios')
 )
 BEGIN
-	CREATE TABLE tabla.PrestadoresSalud(
+	CREATE TABLE socios.PrestadoresSalud(
 		id_prestador_salud INT PRIMARY KEY IDENTITY(1,1),
 		nombre VARCHAR(50) UNIQUE,
 		telefono VARCHAR(30),
@@ -115,10 +106,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Administradores' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('administracion')
 )
 BEGIN
-	CREATE TABLE tabla.Administradores(
+	CREATE TABLE administracion.Administradores(
 		id_admin INT PRIMARY KEY IDENTITY(1,1),
 		nombre VARCHAR(30),
 		apellido VARCHAR(30),
@@ -143,10 +134,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'MediosPago' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('administracion')
 )
 BEGIN
-	CREATE TABLE tabla.MediosPago(
+	CREATE TABLE administracion.MediosPago(
 		id_medio_pago INT PRIMARY KEY IDENTITY(1,1),
 		nombre VARCHAR(50),
 		descripcion VARCHAR(50),
@@ -160,10 +151,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Deportes' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('actividades')
 )
 BEGIN
-	CREATE TABLE tabla.Deportes(
+	CREATE TABLE actividades.Deportes(
 		id_deporte INT PRIMARY KEY IDENTITY(1,1),
 		nombre VARCHAR(50),
 		precio INT,
@@ -178,10 +169,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Invitados' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('socios')
 )
 BEGIN
-	CREATE TABLE tabla.Invitados(
+	CREATE TABLE socios.Invitados(
 		id_invitado INT PRIMARY KEY IDENTITY(1,1),
 		dni INT UNIQUE,
 		nombre VARCHAR(30),
@@ -198,14 +189,14 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Clases' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('actividades')
 )
 BEGIN
-	CREATE TABLE tabla.Clases(
+	CREATE TABLE actividades.Clases(
 		id_clase INT PRIMARY KEY IDENTITY(1,1),
 		id_deporte INT NOT NULL,
 		--CONSTRAINTS
-		CONSTRAINT fk_id_deporte_clase FOREIGN KEY (id_deporte) REFERENCES tabla.Deportes(id_deporte)
+		CONSTRAINT fk_id_deporte_clase FOREIGN KEY (id_deporte) REFERENCES actividades.Deportes(id_deporte)
 	)
 END
 GO
@@ -213,17 +204,17 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Turnos' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('actividades')
 )
 BEGIN
-	CREATE TABLE tabla.Turnos(
+	CREATE TABLE actividades.Turnos(
 		id_turno INT PRIMARY KEY IDENTITY(1,1),
 		id_clase INT NOT NULL,
 		dia TINYINT,
 		hora_inicio TIME,
 		hora_fin TIME,
 		--CONSTRAINTS
-		CONSTRAINT fk_id_clase_turno FOREIGN KEY (id_clase) REFERENCES tabla.Clases(id_clase),
+		CONSTRAINT fk_id_clase_turno FOREIGN KEY (id_clase) REFERENCES actividades.Clases(id_clase),
 		CONSTRAINT chk_dia_turno CHECK (dia >= 1 AND dia <=7),
 		CONSTRAINT chk_rango_horas_turno CHECK (hora_fin > hora_inicio)
 	)
@@ -233,10 +224,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Socios' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('socios')
 )
 BEGIN
-	CREATE TABLE tabla.Socios(
+	CREATE TABLE socios.Socios(
 		id_socio INT PRIMARY KEY IDENTITY(1,1),
 		nro_socio INT UNIQUE,
 		dni INT UNIQUE,
@@ -257,9 +248,9 @@ BEGIN
 			CHARINDEX('@', email) > 1 AND 
 			CHARINDEX('.', email, CHARINDEX('@', email)) > CHARINDEX('@', email) + 1),
 		CONSTRAINT chk_fecha_nacimiento_no_futuro_socio CHECK (fecha_nacimiento <= CAST(GETDATE() AS DATE)),
-		CONSTRAINT fk_prestador_socio FOREIGN KEY (id_prestador_salud) REFERENCES tabla.PrestadoresSalud(id_prestador_salud),
-		CONSTRAINT fk_tutor_socio FOREIGN KEY (id_tutor) REFERENCES tabla.Socios(id_socio),
-		CONSTRAINT fk_grupo_familiar_socio FOREIGN KEY (id_grupo_familiar) REFERENCES tabla.Socios(id_socio),
+		CONSTRAINT fk_prestador_socio FOREIGN KEY (id_prestador_salud) REFERENCES socios.PrestadoresSalud(id_prestador_salud),
+		CONSTRAINT fk_tutor_socio FOREIGN KEY (id_tutor) REFERENCES socios.Socios(id_socio),
+		CONSTRAINT fk_grupo_familiar_socio FOREIGN KEY (id_grupo_familiar) REFERENCES socios.Socios(id_socio),
 		CONSTRAINT chk_nombre_socio CHECK (LEN(LTRIM(RTRIM(nombre))) > 0),
 		CONSTRAINT chk_apellido_socio CHECK (LEN(LTRIM(RTRIM(apellido))) > 0)
 	)
@@ -272,13 +263,13 @@ IF NOT EXISTS (
     AND schema_id = SCHEMA_ID('tabla')
 )
 BEGIN
-	CREATE TABLE tabla.Cuotas(
+	CREATE TABLE socios.Cuotas(
 		id_cuota INT PRIMARY KEY IDENTITY(1,1),
 		id_categoria INT NOT NULL,
 		id_socio INT NOT NULL,
 		--CONSTRAINTS
-		CONSTRAINT fk_id_categoria_cuota FOREIGN KEY (id_categoria) REFERENCES tabla.Categorias(id_categoria),
-		CONSTRAINT fk_id_socio_cuota FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio)
+		CONSTRAINT fk_id_categoria_cuota FOREIGN KEY (id_categoria) REFERENCES socios.Categorias(id_categoria),
+		CONSTRAINT fk_id_socio_cuota FOREIGN KEY (id_socio) REFERENCES socios.Socios(id_socio)
 	)
 END
 GO
@@ -286,16 +277,16 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Actividades' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('actividades')
 )
 BEGIN
-	CREATE TABLE tabla.Actividades(
+	CREATE TABLE actividades.Actividades(
 		id_actividad INT PRIMARY KEY IDENTITY(1,1),
 		id_socio INT NOT NULL,
 		id_deporte INT NOT NULL,
 		 --CONSTRAINT
-		CONSTRAINT fk_id_socio_actividad FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
-		CONSTRAINT fk_id_deporte_actividad FOREIGN KEY (id_deporte) REFERENCES tabla.Deportes(id_deporte)
+		CONSTRAINT fk_id_socio_actividad FOREIGN KEY (id_socio) REFERENCES socios.Socios(id_socio),
+		CONSTRAINT fk_id_deporte_actividad FOREIGN KEY (id_deporte) REFERENCES actividades.Deportes(id_deporte)
 	)
 END
 GO
@@ -303,10 +294,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'ActividadesExtra' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('actividades')
 )
 BEGIN
-	CREATE TABLE tabla.ActividadesExtra(
+	CREATE TABLE actividades.ActividadesExtra(
 		id_actividad_extra INT PRIMARY KEY IDENTITY(1,1),
 		id_socio INT NOT NULL,
 		id_invitado INT NULL,
@@ -317,8 +308,8 @@ BEGIN
 		monto_invitado INT NULL,
 		lluvia BIT NULL,
 		 --CONSTRAINTS
-		CONSTRAINT fk_id_socio_actividadextra FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
-		CONSTRAINT fk_id_invitado_actividadextra FOREIGN KEY (id_invitado) REFERENCES tabla.Invitados(id_invitado),
+		CONSTRAINT fk_id_socio_actividadextra FOREIGN KEY (id_socio) REFERENCES socios.Socios(id_socio),
+		CONSTRAINT fk_id_invitado_actividadextra FOREIGN KEY (id_invitado) REFERENCES socios.Invitados(id_invitado),
 		CONSTRAINT chk_tipo_activado_actividadextra CHECK ( tipo_actividad >= 1 AND tipo_actividad <=5),
 		CONSTRAINT chk_monto_actividadextra CHECK (monto > 0),
 		CONSTRAINT chk_fecha_reserva CHECK (fecha_reserva < CAST(GETDATE() AS DATETIME) AND fecha_reserva < fecha)
@@ -329,10 +320,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'FacturasARCA' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('administracion')
 )
 BEGIN
-	CREATE TABLE tabla.FacturasARCA(
+	CREATE TABLE administracion.FacturasARCA(
 		numero_factura INT PRIMARY KEY IDENTITY (1,1),
 		id_socio INT NOT NULL,
 		fecha_creacion DATETIME,
@@ -343,7 +334,7 @@ BEGIN
 		segundo_vencimiento DATE,
 		recargo INT,
 		--CONSTRAINTS
-		CONSTRAINT fk_id_socio_facturaarca FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
+		CONSTRAINT fk_id_socio_facturaarca FOREIGN KEY (id_socio) REFERENCES socios.Socios(id_socio),
 		CONSTRAINT chk_tipo_facturaarca CHECK ( tipo = 'A' OR tipo = 'B' OR tipo = 'C' ),
 		CONSTRAINT chk_monto_facturaarca CHECK (total > 0),
 		CONSTRAINT chk_segundo_vencimiento_facturaarca CHECK ( segundo_vencimiento > primer_vencimiento),
@@ -356,10 +347,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'CargosSocio' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('administracion')
 )
 BEGIN
-	CREATE TABLE tabla.CargosSocio(
+	CREATE TABLE administracion.CargosSocio(
 		id_cargo_socio INT PRIMARY KEY IDENTITY (1,1),
 		numero_factura INT NOT NULL,
 		fecha_creacion DATETIME DEFAULT(GETDATE()),
@@ -378,10 +369,10 @@ BEGIN
 			id_actividad_extra IS NOT NULL OR
 			id_cuota IS NOT NULL
 		),
-		CONSTRAINT fk_id_deporte_cargosocio FOREIGN KEY (id_deporte) REFERENCES tabla.Deportes(id_deporte),
-		CONSTRAINT fk_id_actividadesextra_cargosocio FOREIGN KEY (id_actividad_extra) REFERENCES tabla.ActividadesExtra(id_actividad_extra),
-		CONSTRAINT fk_id_cuota_cargosocio FOREIGN KEY (id_cuota) REFERENCES tabla.Cuotas(id_cuota),
-		CONSTRAINT fk_numero_factura_cargosocio FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura)
+		CONSTRAINT fk_id_deporte_cargosocio FOREIGN KEY (id_deporte) REFERENCES actividades.Deportes(id_deporte),
+		CONSTRAINT fk_id_actividadesextra_cargosocio FOREIGN KEY (id_actividad_extra) REFERENCES actividades.ActividadesExtra(id_actividad_extra),
+		CONSTRAINT fk_id_cuota_cargosocio FOREIGN KEY (id_cuota) REFERENCES socios.Cuotas(id_cuota),
+		CONSTRAINT fk_numero_factura_cargosocio FOREIGN KEY (numero_factura) REFERENCES administracion.FacturasARCA(numero_factura)
 	)
 END
 GO
@@ -389,16 +380,16 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Morosidades' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('administracion')
 )
 BEGIN
-	CREATE TABLE tabla.Morosidades(
+	CREATE TABLE administracion.Morosidades(
 		id_morosidad INT PRIMARY KEY IDENTITY(1,1),
 		numero_factura INT NOT NULL,
 		monto_total INT,
 		fecha_pago DATETIME,
 		--CONSTRAINTS
-		CONSTRAINT fk_numero_factura_morosidad FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura),
+		CONSTRAINT fk_numero_factura_morosidad FOREIGN KEY (numero_factura) REFERENCES administracion.FacturasARCA(numero_factura),
 		CONSTRAINT chk_monto_total_morosidad CHECK (monto_total > 0)
 	)
 END
@@ -407,10 +398,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'CuentasSocios' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('socios')
 )
 BEGIN
-	CREATE TABLE tabla.CuentasSocios(
+	CREATE TABLE socios.CuentasSocios(
 		id_cuenta INT PRIMARY KEY IDENTITY(1,1),
 		id_socio INT NOT NULL UNIQUE,
 		contrasena VARCHAR(30),
@@ -420,7 +411,7 @@ BEGIN
 		fecha_vigencia_contrasena DATETIME,
 		estado_cuenta BIT,
 		--CONSTRAINTS
-		CONSTRAINT fk_id_socio_cuenta_socio FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
+		CONSTRAINT fk_id_socio_cuenta_socio FOREIGN KEY (id_socio) REFERENCES socios.Socios(id_socio),
 		CONSTRAINT chk_rol_cuenta_socio CHECK (rol >=0 AND rol <=5),
 		CONSTRAINT chk_usuario_no_vacio_cuenta_socio CHECK (LEN(usuario) > 0),
 		CONSTRAINT chk_contrasena_no_vacia_cuenta_socio CHECK (LEN(contrasena) > 0),
@@ -432,10 +423,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Pagos' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('administracion')
 )
 BEGIN
-	CREATE TABLE tabla.Pagos(
+	CREATE TABLE administracion.Pagos(
 		id_pago INT PRIMARY KEY IDENTITY(1,1),
 		numero_factura INT UNIQUE NOT NULL,
 		id_medio_pago INT NOT NULL,
@@ -443,8 +434,8 @@ BEGIN
 		total INT,
 		reembolso INT,
 		--CONSTRAINTS
-		CONSTRAINT fk_id_medio_pago_pago FOREIGN KEY (id_medio_pago) REFERENCES tabla.MediosPago(id_medio_pago),
-		CONSTRAINT fk_numero_factura_pago FOREIGN KEY (numero_factura) REFERENCES tabla.FacturasARCA(numero_factura),
+		CONSTRAINT fk_id_medio_pago_pago FOREIGN KEY (id_medio_pago) REFERENCES administracion.MediosPago(id_medio_pago),
+		CONSTRAINT fk_numero_factura_pago FOREIGN KEY (numero_factura) REFERENCES administracion.FacturasARCA(numero_factura),
 		CONSTRAINT chk_fecha_pago CHECK (fecha <= CAST(GETDATE() AS DATETIME)),
 		CONSTRAINT chk_total_pago CHECK (total > 0),
 		CONSTRAINT chk_reembolso_pago CHECK (reembolso >= 0)
@@ -455,10 +446,10 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Reembolsos' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('administracion')
 )
 BEGIN
-	CREATE TABLE tabla.Reembolsos(
+	CREATE TABLE administracion.Reembolsos(
 		id_reembolso INT PRIMARY KEY IDENTITY(1,1),
 		id_pago INT UNIQUE NOT NULL,
 		id_cuenta INT NOT NULL,
@@ -467,9 +458,9 @@ BEGIN
 		fecha DATETIME,
 		monto INT,
 		--CONSTRAINTS
-		CONSTRAINT fk_id_pago_reembolso FOREIGN KEY (id_pago) REFERENCES tabla.Pagos(id_pago),
-		CONSTRAINT fk_id_cuenta_socio_reembolso FOREIGN KEY (id_cuenta) REFERENCES tabla.CuentasSocios(id_cuenta),
-		CONSTRAINT fk_id_admin_reembolso FOREIGN KEY (id_admin) REFERENCES tabla.Administradores(id_admin),
+		CONSTRAINT fk_id_pago_reembolso FOREIGN KEY (id_pago) REFERENCES administracion.Pagos(id_pago),
+		CONSTRAINT fk_id_cuenta_socio_reembolso FOREIGN KEY (id_cuenta) REFERENCES socios.CuentasSocios(id_cuenta),
+		CONSTRAINT fk_id_admin_reembolso FOREIGN KEY (id_admin) REFERENCES administracion.Administradores(id_admin),
 		CONSTRAINT chk_fecha_reembolso CHECK (fecha <= CAST(GETDATE() AS DATETIME)),
 		CONSTRAINT chk_monto_reembolso CHECK (monto > 0)
 	)
@@ -479,18 +470,18 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'AsistenciasClase' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('actividades')
 )
 BEGIN
-	CREATE TABLE tabla.AsistenciasClase(
+	CREATE TABLE actividades.AsistenciasClase(
 		id_asistencia INT PRIMARY KEY IDENTITY(1,1),
 		id_socio INT NOT NULL,
 		id_clase INT NOT NULL,
 		presente BIT,
 		fecha DATETIME,
 		--CONSTRAINTS
-		CONSTRAINT fk_id_socio_asistencia_clase FOREIGN KEY (id_socio) REFERENCES tabla.Socios(id_socio),
-		CONSTRAINT fk_id_clase_asistencia_clase FOREIGN KEY (id_clase) REFERENCES tabla.Clases(id_clase),
+		CONSTRAINT fk_id_socio_asistencia_clase FOREIGN KEY (id_socio) REFERENCES socios.Socios(id_socio),
+		CONSTRAINT fk_id_clase_asistencia_clase FOREIGN KEY (id_clase) REFERENCES actividades.Clases(id_clase),
 		CONSTRAINT chk_fecha_asistencia_clase CHECK (fecha <= CAST(GETDATE() AS DATETIME))
 	)
 END
@@ -500,29 +491,29 @@ GO
 
 --STORED PROCEDURES INSERCION 
 
-CREATE or ALTER PROCEDURE spInsercion.CrearCategoria 
+CREATE or ALTER PROCEDURE socios.CrearCategoria 
 	@nombre_categoria VARCHAR(15),
 	@edad_min TINYINT,
 	@edad_max TINYINT,
 	@precio_mensual INT
 AS
 BEGIN
-	INSERT INTO tabla.Categorias(nombre_categoria, edad_min, edad_max, precio_mensual)
+	INSERT INTO socios.Categorias(nombre_categoria, edad_min, edad_max, precio_mensual)
 	VALUES(@nombre_categoria, @edad_min, @edad_max, @precio_mensual)
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearPrestadorSalud
+CREATE  or ALTER PROCEDURE socios.CrearPrestadorSalud
 	@nombre VARCHAR(50),
 	@telefono VARCHAR(30)
 AS 
 BEGIN
-	INSERT INTO tabla.PrestadoresSalud(nombre, telefono)
+	INSERT INTO socios.PrestadoresSalud(nombre, telefono)
 	VALUES(@nombre, @telefono)
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearAdministrador
+CREATE  or ALTER PROCEDURE administracion.CrearAdministrador
 	@nombre VARCHAR(30),
 	@apellido VARCHAR(30),
 	@dni INT,
@@ -530,64 +521,64 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearAdministrador
 	@rol TINYINT
 AS 
 BEGIN
-	INSERT INTO tabla.Administradores(nombre, apellido, dni, email, rol)
+	INSERT INTO administracion.Administradores(nombre, apellido, dni, email, rol)
 	VALUES(@nombre, @apellido, @dni, @email, @rol)
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearMedioPago
+CREATE  or ALTER PROCEDURE administracion.CrearMedioPago
 	@nombre VARCHAR(50),
 	@descripcion VARCHAR(50)
 AS 
 BEGIN
-	INSERT INTO tabla.MediosPago(nombre, descripcion)
+	INSERT INTO administracion.MediosPago(nombre, descripcion)
 	VALUES(@nombre, @descripcion)
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearDeporte
+CREATE  or ALTER PROCEDURE actividades.CrearDeporte
 	@nombre VARCHAR(50),
 	@precio INT
 AS 
 BEGIN
-	INSERT INTO tabla.Deportes(nombre, precio)
+	INSERT INTO actividades.Deportes(nombre, precio)
 	VALUES(@nombre, @precio)
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearInvitado
+CREATE  or ALTER PROCEDURE socios.CrearInvitado
 	@dni INT ,
 	@nombre VARCHAR(30),
 	@apellido VARCHAR(30)
 AS 
 BEGIN
-	INSERT INTO tabla.Invitados(dni, nombre, apellido)
+	INSERT INTO socios.Invitados(dni, nombre, apellido)
 	VALUES(@dni, @nombre, @apellido)
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearClase
+CREATE  or ALTER PROCEDURE actividades.CrearClase
 	@id_deporte INT
 AS 
 BEGIN
-	INSERT INTO tabla.Clases(id_deporte)
+	INSERT INTO actividades.Clases(id_deporte)
 	VALUES(@id_deporte)
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearTurno
+CREATE  or ALTER PROCEDURE actividades.CrearTurno
 	@id_clase INT,
 	@dia TINYINT,
 	@hora_inicio TIME,
 	@hora_fin TIME
 AS 
 BEGIN
-	INSERT INTO tabla.Turnos(id_clase, dia, hora_inicio, hora_fin)
+	INSERT INTO actividades.Turnos(id_clase, dia, hora_inicio, hora_fin)
 	VALUES(@id_clase, @dia, @hora_inicio, @hora_fin)
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearSocio
+CREATE  or ALTER PROCEDURE socios.CrearSocio
 	@nro_socio INT,
     @dni INT,
     @nombre VARCHAR(30),
@@ -602,7 +593,7 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearSocio
     @id_grupo_familiar INT = NULL
 AS
 BEGIN
-    INSERT INTO tabla.Socios(nro_socio, dni, nombre, apellido, email, fecha_nacimiento, telefono, 
+    INSERT INTO socios.Socios(nro_socio, dni, nombre, apellido, email, fecha_nacimiento, telefono, 
 		telefono_emergencia, nro_socio_obra_social, id_prestador_salud, id_tutor,
 		id_grupo_familiar)
     VALUES(@nro_socio, @dni, @nombre, @apellido, @email, @fecha_nacimiento, @telefono,
@@ -611,45 +602,45 @@ BEGIN
         END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearCuota
+CREATE  or ALTER PROCEDURE socios.CrearCuota
 	@dni INT,
 	@id_categoria INT
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
+	SELECT @id_socio = socios.BuscarSocio(@dni);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
 	END
 	ELSE
 	BEGIN
-		INSERT INTO tabla.Cuotas(id_socio, id_categoria)
+		INSERT INTO socios.Cuotas(id_socio, id_categoria)
 		VALUES(@id_socio, @id_categoria);
 	END
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearActividad
+CREATE  or ALTER PROCEDURE actividades.CrearActividad
 	@dni INT,
 	@id_deporte INT
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
+	SELECT @id_socio = socios.BuscarSocio(@dni);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
 	END
 	ELSE
 	BEGIN
-		INSERT INTO tabla.Actividades(id_socio, id_deporte)
+		INSERT INTO actividades.Actividades(id_socio, id_deporte)
 		VALUES(@id_socio, @id_deporte);
 	END
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearActividadExtra
+CREATE  or ALTER PROCEDURE actividades.CrearActividadExtra
 	@dni INT,
 	@dni_invitado INT,
 	@tipo_actividad TINYINT,
@@ -661,7 +652,7 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearActividadExtra
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
+	SELECT @id_socio = socios.BuscarSocio(@dni);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
@@ -669,7 +660,7 @@ BEGIN
 	ELSE
 	BEGIN
 		DECLARE @id_invitado INT = NULL;
-			SELECT @id_invitado = fnBusqueda.BuscarInvitado(@dni_invitado);
+			SELECT @id_invitado = socios.BuscarInvitado(@dni_invitado);
 
 		IF @dni_invitado IS NOT NULL AND @id_invitado IS NULL
 		BEGIN
@@ -677,7 +668,7 @@ BEGIN
 		END
 		ELSE
 		BEGIN
-			INSERT INTO tabla.ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
+			INSERT INTO actividades.ActividadesExtra(id_socio, id_invitado, tipo_actividad, fecha,
 				fecha_reserva, monto, monto_invitado, lluvia)
 			VALUES(@id_socio, @id_invitado, @tipo_actividad, @fecha, @fecha_reserva, 
 				@monto, @monto_invitado, @lluvia);
@@ -686,7 +677,7 @@ BEGIN
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearFacturaARCA
+CREATE  or ALTER PROCEDURE administracion.CrearFacturaARCA
 	@dni INT,
 	@descripcion VARCHAR(200),
 	@tipo CHAR(1),
@@ -697,20 +688,20 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearFacturaARCA
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
+	SELECT @id_socio = socios.BuscarSocio(@dni);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
 	END
 	ELSE
-    INSERT INTO tabla.FacturasARCA(id_socio, fecha_creacion, descripcion, tipo, total, 
+    INSERT INTO administracion.FacturasARCA(id_socio, fecha_creacion, descripcion, tipo, total, 
 		primer_vencimiento, segundo_vencimiento, recargo)
     VALUES(@id_socio, GETDATE(), @descripcion, @tipo, @total, 
 		@primer_vencimiento, @segundo_vencimiento, @recargo);
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearCargoSocio
+CREATE  or ALTER PROCEDURE administracion.CrearCargoSocio
 	@numero_factura INT,
 	@fecha_creacion DATETIME,
 	@descripcion VARCHAR(200),
@@ -732,25 +723,25 @@ BEGIN
 		RETURN;
 	END;
 
-    INSERT INTO tabla.CargosSocio(numero_factura, fecha_creacion, descripcion, monto_descuento,
+    INSERT INTO administracion.CargosSocio(numero_factura, fecha_creacion, descripcion, monto_descuento,
 		monto_total, id_deporte, id_actividad_extra, id_cuota)
     VALUES(@numero_factura, @fecha_creacion, @descripcion, @monto_descuento,
 		@monto_total, @id_deporte, @id_actividad_extra, @id_cuota);
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearMorosidad
+CREATE  or ALTER PROCEDURE administracion.CrearMorosidad
 	@numero_factura INT,
 	@monto_total INT,
 	@fecha_pago DATETIME
 AS
 BEGIN
-    INSERT INTO tabla.Morosidades(numero_factura, monto_total, fecha_pago)
+    INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago)
     VALUES(@numero_factura, @monto_total, @fecha_pago);
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearCuentaSocio
+CREATE  or ALTER PROCEDURE socios.CrearCuentaSocio
 	@dni INT,
 	@contrasena VARCHAR(30),
 	@usuario VARCHAR(30),
@@ -761,20 +752,20 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearCuentaSocio
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni);
+	SELECT @id_socio = socios.BuscarSocio(@dni);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni);
 	END
 	ELSE
-    INSERT INTO tabla.CuentasSocios(id_socio, contrasena, usuario, rol, saldo, 
+    INSERT INTO socios.CuentasSocios(id_socio, contrasena, usuario, rol, saldo, 
 		fecha_vigencia_contrasena, estado_cuenta)
     VALUES(@id_socio, @contrasena, @usuario, @rol, @saldo, 
 		@fecha_vigencia_contrasena, @estado_cuenta);
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearPago
+CREATE  or ALTER PROCEDURE administracion.CrearPago
 	@numero_factura INT,
 	@id_medio_pago INT,
 	@fecha DATETIME,
@@ -782,12 +773,12 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearPago
 	@reembolso INT
 AS
 BEGIN
-    INSERT INTO tabla.Pagos(numero_factura, id_medio_pago, fecha, total, reembolso)
+    INSERT INTO administracion.Pagos(numero_factura, id_medio_pago, fecha, total, reembolso)
     VALUES(@numero_factura, @id_medio_pago, @fecha, @total, @reembolso);
 END;
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearReembolso
+CREATE  or ALTER PROCEDURE administracion.CrearReembolso
 	@id_pago INT,
 	@dni_socio INT,
 	@dni_admin INT,
@@ -798,7 +789,7 @@ AS
 BEGIN
 	DECLARE @id_cuenta INT;
 
-	SELECT @id_cuenta = fnBusqueda.BuscarCuentaSocio(@dni_socio);
+	SELECT @id_cuenta = socios.BuscarCuentaSocio(@dni_socio);
 	IF @id_cuenta IS NULL
 	BEGIN
 		RAISERROR('Error: No existe una cuenta de socio con el DNI (%d)', 16, 1, @dni_socio);
@@ -806,21 +797,21 @@ BEGIN
 	ELSE
 	BEGIN
 		DECLARE @id_admin INT;
-		SELECT @id_admin = fnBusqueda.BuscarAdministrador(@dni_admin);
+		SELECT @id_admin = administracion.BuscarAdministrador(@dni_admin);
 		IF @id_admin IS NULL
 		BEGIN
 			RAISERROR('Error: No existe un administrador con el DNI (%d)', 16, 1, @dni_admin);
 		END
 		ELSE
 		BEGIN
-			INSERT INTO tabla.Reembolsos(id_pago, id_cuenta, id_admin, motivo, fecha, monto)
+			INSERT INTO administracion.Reembolsos(id_pago, id_cuenta, id_admin, motivo, fecha, monto)
 			VALUES(@id_pago, @id_cuenta, @id_admin, @motivo, @fecha, @monto);
 		END
 	END
 END
 GO
 
-CREATE  or ALTER PROCEDURE spInsercion.CrearAsistenciaClase
+CREATE  or ALTER PROCEDURE actividades.CrearAsistenciaClase
 	@dni_socio INT,
 	@id_clase INT,
 	@presente BIT,
@@ -828,20 +819,20 @@ CREATE  or ALTER PROCEDURE spInsercion.CrearAsistenciaClase
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni_socio);
+	SELECT @id_socio = socios.BuscarSocio(@dni_socio);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni_socio);
 	END
 	ELSE
-    INSERT INTO tabla.AsistenciasClase(id_socio, id_clase, presente, fecha)
+    INSERT INTO actividades.AsistenciasClase(id_socio, id_clase, presente, fecha)
     VALUES(@id_socio, @id_clase, @presente, @fecha);
 END;
 GO
 
 --STORED PROCEDURES ACTUALIZACION
 
-CREATE  or ALTER PROCEDURE spActualizacion.ActualizarCategoria
+CREATE  or ALTER PROCEDURE socios.ActualizarCategoria
     @id_categoria INT,
 	@nombre_categoria VARCHAR(15),
 	@edad_min TINYINT,
@@ -852,13 +843,13 @@ AS
 BEGIN
 	IF @id_categoria IS NOT NULL
 	BEGIN
-		IF NOT EXISTS (SELECT 1 FROM tabla.Categorias WHERE id_categoria = @id_categoria)
+		IF NOT EXISTS (SELECT 1 FROM socios.Categorias WHERE id_categoria = @id_categoria)
 		BEGIN
 			RAISERROR('Error: No existe una categoria con el ID (%d)',16,1,@id_categoria);
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.Categorias
+			UPDATE socios.Categorias
 			SET nombre_categoria = @nombre_categoria, edad_min = @edad_min,
 				edad_max = @edad_max,  precio_mensual = @precio_mensual, estado = @estado
 			WHERE id_categoria = @id_categoria;
@@ -867,7 +858,7 @@ BEGIN
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarPrestadorSalud
+CREATE or ALTER PROCEDURE socios.ActualizarPrestadorSalud
 	@id_prestador_salud INT,
 	@nombre VARCHAR(50),
 	@telefono VARCHAR(30),
@@ -876,13 +867,13 @@ AS
 BEGIN
 	IF @id_prestador_salud IS NOT NULL
 	BEGIN
-		IF NOT EXISTS(SELECT 1 FROM tabla.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
+		IF NOT EXISTS(SELECT 1 FROM socios.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
 		BEGIN
 			RAISERROR('Error: No existe un Prestador de Salud con el ID (%d)',16,1,@id_prestador_salud);
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.PrestadoresSalud
+			UPDATE socios.PrestadoresSalud
 			SET nombre = @nombre, telefono = @telefono, estado = @estado
 			WHERE id_prestador_salud = @id_prestador_salud;
 		END
@@ -890,7 +881,7 @@ BEGIN
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarAdministrador
+CREATE or ALTER PROCEDURE administracion.ActualizarAdministrador
 	@dni INT,
 	@email VARCHAR(30),
 	@nombre VARCHAR(30),
@@ -902,7 +893,7 @@ BEGIN
 	DECLARE @id_admin INT;
 	IF @dni IS NOT NULL
 	BEGIN
-		SELECT @id_admin = id_admin FROM tabla.Administradores WHERE dni = @dni;
+		SELECT @id_admin = id_admin FROM administracion.Administradores WHERE dni = @dni;
 			
 		IF @id_admin IS NULL
 		BEGIN
@@ -910,7 +901,7 @@ BEGIN
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.Administradores
+			UPDATE administracion.Administradores
 			SET dni = @dni, nombre = @nombre, apellido = @apellido, 
 				email = @email, rol = @rol, estado = @estado
 			WHERE id_admin = @id_admin;
@@ -919,7 +910,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarMedioPago
+CREATE or ALTER PROCEDURE administracion.ActualizarMedioPago
 	@id_medio_pago INT,
 	@nombre VARCHAR(50),
 	@descripcion VARCHAR(50),
@@ -928,13 +919,13 @@ AS
 BEGIN
 	IF @id_medio_pago IS NOT NULL
 	BEGIN
-		IF NOT EXISTS(SELECT 1 FROM tabla.MediosPago WHERE id_medio_pago = @id_medio_pago)
+		IF NOT EXISTS(SELECT 1 FROM administracion.MediosPago WHERE id_medio_pago = @id_medio_pago)
 		BEGIN
 			RAISERROR('Error: No existe un Medio de Pago con el ID (%d)',16,1,@id_medio_pago);
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.MediosPago
+			UPDATE administracion.MediosPago
 			SET nombre = @nombre, descripcion = @descripcion, habilitado = @habilitado
 			WHERE id_medio_pago = @id_medio_pago;
 		END
@@ -942,7 +933,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarDeporte
+CREATE or ALTER PROCEDURE actividades.ActualizarDeporte
 	@id_deporte INT,
 	@nombre VARCHAR(50),
 	@precio INT,
@@ -951,13 +942,13 @@ AS
 BEGIN
 	IF @id_deporte IS NOT NULL
 	BEGIN
-		IF NOT EXISTS(SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
+		IF NOT EXISTS(SELECT 1 FROM actividades.Deportes WHERE id_deporte = @id_deporte)
 		BEGIN
 			RAISERROR('Error: No existe un Deporte con el ID (%d)',16,1,@id_deporte);
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.Deportes
+			UPDATE actividades.Deportes
 			SET nombre = @nombre, precio = @precio, estado = @estado
 			WHERE id_deporte = @id_deporte;
 		END
@@ -965,7 +956,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarInvitado
+CREATE or ALTER PROCEDURE socios.ActualizarInvitado
 	@dni INT,
 	@nombre VARCHAR(30),
 	@apellido VARCHAR(30),
@@ -975,14 +966,14 @@ BEGIN
 	DECLARE @id_invitado INT;
 	IF @dni IS NOT NULL
 	BEGIN
-		SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni;
+		SELECT @id_invitado = id_invitado FROM socios.Invitados WHERE dni = @dni;
 		IF @id_invitado IS NULL
 		BEGIN
 			RAISERROR('Error: No existe un Invitado con el DNI (%d)',16,1,@dni);
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.Invitados
+			UPDATE socios.Invitados
 			SET nombre = @nombre, apellido = @apellido, estado = @estado
 			WHERE id_invitado = @id_invitado;
 		END
@@ -990,7 +981,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarTurno
+CREATE or ALTER PROCEDURE actividades.ActualizarTurno
 	@id_turno INT,
 	@id_clase INT,
 	@dia TINYINT,
@@ -1000,13 +991,13 @@ AS
 BEGIN
 	IF @id_turno IS NOT NULL
 	BEGIN
-		IF NOT EXISTS(SELECT 1 FROM tabla.Turnos WHERE id_turno = @id_turno)
+		IF NOT EXISTS(SELECT 1 FROM actividades.Turnos WHERE id_turno = @id_turno)
 		BEGIN
 			RAISERROR('Error: No existe un Turno con el ID (%d)',16,1,@id_turno);
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.Turnos
+			UPDATE actividades.Turnos
 			SET id_clase = @id_clase, dia = @dia, hora_inicio = @hora_inicio, hora_fin = @hora_fin
 			WHERE id_turno = @id_turno;
 		END
@@ -1014,7 +1005,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocio
+CREATE or ALTER PROCEDURE socios.ActualizarSocio
 	@nro_socio INT,
 	@dni INT,
 	@email VARCHAR(50),
@@ -1028,14 +1019,14 @@ BEGIN
 	DECLARE @id_socio INT;
 	IF @dni IS NOT NULL
 	BEGIN
-		SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+		SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
 		IF @id_socio IS NULL
 		BEGIN
 			RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.Socios
+			UPDATE socios.Socios
 			SET nro_socio = @nro_socio, dni = @dni, email= @email, telefono= @telefono, telefono_emergencia= @telefono_emergencia,
 				estado= @estado, id_prestador_salud= @id_prestador_salud, nro_socio_obra_social = @nro_socio_obra_social
 			WHERE id_socio = @id_socio;
@@ -1044,7 +1035,7 @@ BEGIN
 END;
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocioTutor
+CREATE or ALTER PROCEDURE socios.ActualizarSocioTutor
 	@dni_tutor INT,
 	@dni_menor INT
 AS
@@ -1061,14 +1052,14 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.Socios
+		UPDATE socios.Socios
 		SET id_tutor = @id_socio_tutor
 		WHERE id_socio = @id_socio_menor;
 	END
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarSocioGrupoFamiliar
+CREATE or ALTER PROCEDURE socios.ActualizarSocioGrupoFamiliar
 	@dni INT,
 	@dni_responsable_grupo_familiar INT
 AS
@@ -1076,8 +1067,8 @@ BEGIN
 	DECLARE @id_socio INT;
 	DECLARE @id_socio_responsable INT;
 
-	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-	SELECT @id_socio_responsable = id_socio FROM tabla.Socios WHERE dni = @dni_responsable_grupo_familiar;
+	SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
+	SELECT @id_socio_responsable = id_socio FROM socios.Socios WHERE dni = @dni_responsable_grupo_familiar;
 
 	IF @id_socio IS NULL OR @id_socio_responsable IS NULL
 	BEGIN
@@ -1085,14 +1076,14 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.Socios
+		UPDATE socios.Socios
 		SET id_grupo_familiar = @id_socio_responsable
 		WHERE id_socio = @id_socio;
 	END
 END
 GO
 
-CREATE or ALTER PROCEDURE spActualizacion.ActualizarCuota
+CREATE or ALTER PROCEDURE socios.ActualizarCuota
 	@dni INT,
 	@id_categoria INT
 AS
@@ -1100,14 +1091,14 @@ BEGIN
 	DECLARE @id_socio INT;
 	IF @dni IS NOT NULL
 	BEGIN
-		SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+		SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
 		IF @id_socio IS NULL
 		BEGIN
 			RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.Cuotas
+			UPDATE socios.Cuotas
 			SET id_categoria = @id_categoria
 			WHERE id_socio = @id_socio;
 		END
@@ -1115,7 +1106,7 @@ BEGIN
 END
 GO 
 
-CREATE OR ALTER PROCEDURE spActualizacion.ActualizarActividadExtra
+CREATE OR ALTER PROCEDURE actividades.ActualizarActividadExtra
     @id_actividad_extra INT,
     @dni_socio INT,
     @dni_invitado INT = NULL,
@@ -1130,10 +1121,10 @@ BEGIN
 	DECLARE @id_socio INT;
 	DECLARE @id_invitado INT;
 
-	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni_socio;
-	SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni_invitado;
+	SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni_socio;
+	SELECT @id_invitado = id_invitado FROM socios.Invitados WHERE dni = @dni_invitado;
 
-	IF (SELECT 1 FROM tabla.ActividadesExtra WHERE id_actividad_extra = @id_actividad_extra) IS NULL
+	IF (SELECT 1 FROM actividades.ActividadesExtra WHERE id_actividad_extra = @id_actividad_extra) IS NULL
 	BEGIN
 		RAISERROR('Error: No existe una Actividad Extra con el Id (%d)',16,1,@id_actividad_extra);
 	END
@@ -1149,7 +1140,7 @@ BEGIN
 		END
 		ELSE
 		BEGIN
-			UPDATE tabla.ActividadesExtra
+			UPDATE actividades.ActividadesExtra
 			SET id_socio = @id_socio, id_invitado = @id_invitado, tipo_actividad = @tipo_actividad,
 				fecha = @fecha, fecha_reserva = @fecha_reserva, monto = @monto, monto_invitado = @monto_invitado, lluvia = @lluvia
 			WHERE id_actividad_extra = @id_actividad_extra;
@@ -1158,7 +1149,7 @@ BEGIN
 END;
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.ActualizarCuentaSocio
+CREATE OR ALTER PROCEDURE socios.ActualizarCuentaSocio
 	@dni INT,
 	@contrasena VARCHAR(30),
 	@usuario VARCHAR(30),
@@ -1170,14 +1161,14 @@ AS
 BEGIN
     DECLARE @id_socio INT;
 
-    SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+    SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
     IF @id_socio IS NULL
     BEGIN
         RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
     END
 	ELSE
 	BEGIN
-		UPDATE tabla.CuentasSocios
+		UPDATE socios.CuentasSocios
 		SET contrasena = @contrasena, usuario = @usuario, rol = @rol, saldo = @saldo, 
 			fecha_vigencia_contrasena = @fecha_vigencia_contrasena, estado_cuenta = @estado_cuenta
 		WHERE id_socio = @id_socio;
@@ -1185,27 +1176,27 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.ActualizarMorosidad
+CREATE OR ALTER PROCEDURE administracion.ActualizarMorosidad
 	@id_morosidad INT,
 	@numero_factura INT,
 	@monto_total INT,
 	@fecha_pago DATETIME
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.Morosidades WHERE id_morosidad = @id_morosidad)
+	IF NOT EXISTS(SELECT 1 FROM administracion.Morosidades WHERE id_morosidad = @id_morosidad)
 	BEGIN
 		RAISERROR('Error: No existe una Morosidad con el ID (%d)',16,1,@id_morosidad);
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.Morosidades
+		UPDATE administracion.Morosidades
 		SET numero_factura = @numero_factura, monto_total = @monto_total, fecha_pago = @fecha_pago
 		WHERE id_morosidad = @id_morosidad;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.ActualizarReembolso
+CREATE OR ALTER PROCEDURE administracion.ActualizarReembolso
 	@id_reembolso INT,
 	@id_pago INT,
 	@dni_socio INT,
@@ -1216,25 +1207,25 @@ CREATE OR ALTER PROCEDURE spActualizacion.ActualizarReembolso
 AS
 BEGIN
 	DECLARE @id_cuenta INT;
-	SELECT @id_cuenta = fnBusqueda.BuscarCuentaSocio(@dni_socio);
+	SELECT @id_cuenta = socios.BuscarCuentaSocio(@dni_socio);
 	IF @id_cuenta IS NULL
 	BEGIN
 		RAISERROR('Error: No existe una cuenta de socio con el DNI (%d)', 16, 1, @dni_socio);
 	END
 	ELSE
 	DECLARE @id_admin INT;
-	SELECT @id_admin = fnBusqueda.BuscarAdministrador(@dni_admin);
+	SELECT @id_admin = administracion.BuscarAdministrador(@dni_admin);
 	IF @id_admin IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un administrador con el DNI (%d)', 16, 1, @dni_admin);
 	END
-	ELSE IF NOT EXISTS(SELECT 1 FROM tabla.Reembolsos WHERE id_reembolso = @id_reembolso)
+	ELSE IF NOT EXISTS(SELECT 1 FROM administracion.Reembolsos WHERE id_reembolso = @id_reembolso)
 	BEGIN
 		RAISERROR('Error: No existe un Reembolso con el ID (%d)',16,1,@id_reembolso);
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.Reembolsos
+		UPDATE administracion.Reembolsos
 		SET id_pago = @id_pago, id_cuenta = @id_cuenta, id_admin = @id_admin,
 			motivo = @motivo, fecha = @fecha, monto = @monto
 		WHERE id_reembolso = @id_reembolso;
@@ -1242,7 +1233,7 @@ BEGIN
 END;
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.ActualizarPago
+CREATE OR ALTER PROCEDURE administracion.ActualizarPago
 	@numero_factura INT,
 	@id_medio_pago INT,
 	@fecha DATETIME,
@@ -1250,13 +1241,13 @@ CREATE OR ALTER PROCEDURE spActualizacion.ActualizarPago
 	@reembolso INT
 AS
 BEGIN
-    IF NOT EXISTS(SELECT 1 FROM tabla.Pagos WHERE numero_factura = @numero_factura)
+    IF NOT EXISTS(SELECT 1 FROM administracion.Pagos WHERE numero_factura = @numero_factura)
 	BEGIN
 		RAISERROR('Error: No existe un Pago para la factura (%d)',16,1,@numero_factura);
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.Pagos
+		UPDATE administracion.Pagos
 		SET id_medio_pago = @id_medio_pago, numero_factura = @numero_factura, fecha = @fecha,
 			total = @total, reembolso = @reembolso
 		WHERE numero_factura = @numero_factura;
@@ -1264,29 +1255,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.ActualizarAsistenciaClase
-	@id_asistencia INT,
-	@dni INT, 
-	@presente BIT,
-	@fecha DATETIME
-AS
-BEGIN
-    DECLARE @id_socio INT;
-    SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-    IF @id_socio IS NULL
-    BEGIN
-        RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
-    END
-	ELSE
-	BEGIN
-		UPDATE tabla.AsistenciasClase
-		SET presente = @presente, fecha = @fecha
-		WHERE id_socio = @id_socio AND id_asistencia = @id_asistencia;
-	END
-END
-GO
-
-CREATE OR ALTER PROCEDURE spActualizacion.ActualizarCargoSocio
+CREATE OR ALTER PROCEDURE administracion.ActualizarCargoSocio
 	@id_cargo_socio INT,
 	@numero_factura INT,
 	@fecha_creacion DATETIME,
@@ -1298,7 +1267,6 @@ CREATE OR ALTER PROCEDURE spActualizacion.ActualizarCargoSocio
 	@id_cuota INT = NULL
 AS
 BEGIN
-	-- Validar que exactamente uno de los tres campos tenga valor
 	IF (
 		(CASE WHEN @id_deporte IS NOT NULL THEN 1 ELSE 0 END) +
 		(CASE WHEN @id_actividad_extra IS NOT NULL THEN 1 ELSE 0 END) +
@@ -1309,13 +1277,13 @@ BEGIN
 		RETURN;
 	END;
 
-	IF NOT EXISTS(SELECT 1 FROM tabla.CargosSocio WHERE id_cargo_socio = @id_cargo_socio)
+	IF NOT EXISTS(SELECT 1 FROM administracion.CargosSocio WHERE id_cargo_socio = @id_cargo_socio)
 	BEGIN
 		RAISERROR('Error: No existe un Cargo Socio con el ID (%d)',16,1,@id_cargo_socio);
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.CargosSocio
+		UPDATE administracion.CargosSocio
 		SET numero_factura = @numero_factura, fecha_creacion = @fecha_creacion, 
 			descripcion = @descripcion, monto_descuento = @monto_descuento, 
 			monto_total = @monto_total, id_deporte = @id_deporte, 
@@ -1325,7 +1293,7 @@ BEGIN
 END;	
 GO
 
-CREATE OR ALTER PROCEDURE spActualizacion.ActualizarAsistenciaClase
+CREATE OR ALTER PROCEDURE actividades.ActualizarAsistenciaClase
 	@id_asistencia INT,
 	@dni_socio INT,
 	@id_clase INT,
@@ -1334,18 +1302,18 @@ CREATE OR ALTER PROCEDURE spActualizacion.ActualizarAsistenciaClase
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = fnBusqueda.BuscarSocio(@dni_socio);
+	SELECT @id_socio = socios.BuscarSocio(@dni_socio);
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni_socio);
 	END
-	ELSE IF NOT EXISTS(SELECT 1 FROM tabla.AsistenciasClase WHERE id_asistencia = @id_asistencia)
+	ELSE IF NOT EXISTS(SELECT 1 FROM actividades.AsistenciasClase WHERE id_asistencia = @id_asistencia)
 	BEGIN
 		RAISERROR('Error: No existe una asistencia de clase con el ID (%d)',16,1,@id_asistencia);
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.AsistenciasClase
+		UPDATE actividades.AsistenciasClase
 		SET id_socio = @id_socio, id_clase = @id_clase, presente = @presente, fecha = @fecha
 		WHERE id_asistencia = @id_asistencia;
 	END
@@ -1355,195 +1323,195 @@ GO
 
 --STORE PROCEDURES ELIMINACION
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarCargoSocio
+CREATE OR ALTER PROCEDURE administracion.EliminarCargoSocio
 	@id_cargo_socio INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.CargosSocio WHERE id_cargo_socio = @id_cargo_socio)
+	IF NOT EXISTS(SELECT 1 FROM administracion.CargosSocio WHERE id_cargo_socio = @id_cargo_socio)
 	BEGIN
 		RAISERROR('Error: No existe un Cargo Socio con el ID (%d)',16,1,@id_cargo_socio);
 	END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.CargosSocio
+		DELETE FROM administracion.CargosSocio
 		WHERE id_cargo_socio = @id_cargo_socio;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarSocio
+CREATE OR ALTER PROCEDURE socios.EliminarSocio
 	@dni INT
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
     END
 	ELSE
 	BEGIN
-		UPDATE tabla.Socios
+		UPDATE socios.Socios
 		SET estado = 0
 		WHERE id_socio = @id_socio;
 
-		UPDATE tabla.CuentasSocios 
+		UPDATE socios.CuentasSocios 
 		SET estado_cuenta = 0
 		WHERE id_socio = @id_socio;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarSocioTutor
+CREATE OR ALTER PROCEDURE socios.EliminarSocioTutor
 	@dni INT
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
     END
 	ELSE
 	BEGIN
-		UPDATE tabla.Socios
+		UPDATE socios.Socios
 		SET id_tutor = NULL
 		WHERE id_socio = @id_socio;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarSocioGrupoFamiliar
+CREATE OR ALTER PROCEDURE socios.EliminarSocioGrupoFamiliar
 	@dni INT
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
     END
 	ELSE
 	BEGIN
-		UPDATE tabla.Socios
+		UPDATE socios.Socios
 		SET id_grupo_familiar = NULL
 		WHERE id_socio = @id_socio;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarAdministrador
+CREATE OR ALTER PROCEDURE administracion.EliminarAdministrador
 	@dni INT
 AS
 BEGIN
 	DECLARE @id_admin INT;
-	SELECT @id_admin = id_admin FROM tabla.Administradores WHERE dni = @dni;
+	SELECT @id_admin = id_admin FROM administracion.Administradores WHERE dni = @dni;
 	IF @id_admin IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un Administrador con el DNI (%d)',16,1,@dni);
     END
 	ELSE
 	BEGIN
-		UPDATE tabla.Administradores
+		UPDATE administracion.Administradores
 		SET estado = 0
 		WHERE id_admin = @id_admin;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarDeporte
+CREATE OR ALTER PROCEDURE actividades.EliminarDeporte
 	@id_deporte INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.Deportes WHERE id_deporte = @id_deporte)
+	IF NOT EXISTS(SELECT 1 FROM actividades.Deportes WHERE id_deporte = @id_deporte)
 		BEGIN
 			RAISERROR('Error: No existe un Deporte con el ID (%d)',16,1,@id_deporte);
 		END
 	ELSE
 	BEGIN
-		UPDATE tabla.Deportes
+		UPDATE actividades.Deportes
 		SET estado = 0
 		WHERE id_deporte = @id_deporte;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarMedioPago
+CREATE OR ALTER PROCEDURE administracion.EliminarMedioPago
 	@id_medio_pago INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.MediosPago WHERE id_medio_pago = @id_medio_pago)
+	IF NOT EXISTS(SELECT 1 FROM administracion.MediosPago WHERE id_medio_pago = @id_medio_pago)
 		BEGIN
 			RAISERROR('Error: No existe un Medio de pago con el ID (%d)',16,1,@id_medio_pago);
 		END
 	ELSE
 	BEGIN
-		UPDATE tabla.MediosPago
+		UPDATE administracion.MediosPago
 		SET habilitado = 0
 		WHERE id_medio_pago = @id_medio_pago;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarCuentaSocio
+CREATE OR ALTER PROCEDURE socios.EliminarCuentaSocio
 	@dni INT
 AS
 BEGIN
 	DECLARE @id_socio INT;
-	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
+	SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
 	IF @id_socio IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un Socio con el DNI (%d)',16,1,@dni);
     END
 	ELSE
 	BEGIN
-		UPDATE tabla.CuentasSocios
+		UPDATE socios.CuentasSocios
 		SET estado_cuenta = 0
 		WHERE id_socio = @id_socio;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarInvitado
+CREATE OR ALTER PROCEDURE socios.EliminarInvitado
 	@dni INT
 AS
 BEGIN
 	DECLARE @id_invitado INT;
-	SELECT @id_invitado = id_invitado FROM tabla.Invitados WHERE dni = @dni;
+	SELECT @id_invitado = id_invitado FROM socios.Invitados WHERE dni = @dni;
 	IF @id_invitado IS NULL
 	BEGIN
 		RAISERROR('Error: No existe un Invitado con el DNI (%d)',16,1,@dni);
     END
 	ELSE
 	BEGIN
-		UPDATE tabla.Invitados
+		UPDATE socios.Invitados
 		SET estado = 0
 		WHERE @id_invitado = @id_invitado;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarTurno
+CREATE OR ALTER PROCEDURE actividades.EliminarTurno
 	@id_turno INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.Turnos WHERE id_turno = @id_turno)
+	IF NOT EXISTS(SELECT 1 FROM actividades.Turnos WHERE id_turno = @id_turno)
 	BEGIN
 		RAISERROR('Error: No existe un Turno con el ID (%d)',16,1,@id_turno);
 	END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.Turnos
+		DELETE FROM actividades.Turnos
 		WHERE id_turno = @id_turno;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarClase
+CREATE OR ALTER PROCEDURE actividades.EliminarClase
 	@id_deporte INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.Clases WHERE id_deporte = @id_deporte)
+	IF NOT EXISTS(SELECT 1 FROM actividades.Clases WHERE id_deporte = @id_deporte)
 	BEGIN
 		RAISERROR('Error: No existe una Clase con el ID (%d)',16,1,@id_deporte);
 	END
@@ -1551,71 +1519,71 @@ BEGIN
 	BEGIN
 		DECLARE @id_clase INT;
 
-		SELECT @id_clase = id_clase FROM tabla.Clases WHERE id_deporte = @id_deporte
+		SELECT @id_clase = id_clase FROM actividades.Clases WHERE id_deporte = @id_deporte
 
-		DELETE FROM tabla.Turnos
+		DELETE FROM actividades.Turnos
 		WHERE id_clase = @id_clase
 
-		DELETE FROM tabla.AsistenciasClase
+		DELETE FROM actividades.AsistenciasClase
 		WHERE id_clase = @id_clase
 
-		DELETE FROM tabla.Clases
+		DELETE FROM actividades.Clases
 		WHERE id_clase = @id_clase;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarCategoria
+CREATE OR ALTER PROCEDURE socios.EliminarCategoria
 	@id_categoria INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.Categorias WHERE id_categoria = @id_categoria)
+	IF NOT EXISTS(SELECT 1 FROM socios.Categorias WHERE id_categoria = @id_categoria)
 	BEGIN
 		RAISERROR('Error: No existe una Categoria con el ID (%d)',16,1,@id_categoria);
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.Categorias
+		UPDATE socios.Categorias
 		SET estado = 0
 		WHERE id_categoria = @id_categoria;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarPrestadorSalud
+CREATE OR ALTER PROCEDURE socios.EliminarPrestadorSalud
 	@id_prestador_salud INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
+	IF NOT EXISTS(SELECT 1 FROM socios.PrestadoresSalud WHERE id_prestador_salud = @id_prestador_salud)
 	BEGIN
 		RAISERROR('Error: No existe un Prastador de Salud con el ID (%d)',16,1,@id_prestador_salud);
 	END
 	ELSE
 	BEGIN
-		UPDATE tabla.PrestadoresSalud
+		UPDATE socios.PrestadoresSalud
 		SET estado = 0
 		WHERE id_prestador_salud = @id_prestador_salud;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarAsistenciaClase
+CREATE OR ALTER PROCEDURE actividades.EliminarAsistenciaClase
     @id_asistencia INT
 AS
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM tabla.AsistenciasClase WHERE id_asistencia = @id_asistencia)
+    IF NOT EXISTS (SELECT 1 FROM actividades.AsistenciasClase WHERE id_asistencia = @id_asistencia)
     BEGIN
         RAISERROR('Error: No existe una Asistencia con el ID (%d)', 16, 1, @id_asistencia);
     END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.AsistenciasClase
+		DELETE FROM actividades.AsistenciasClase
 		WHERE id_asistencia = @id_asistencia;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarActividad
+CREATE OR ALTER PROCEDURE actividades.EliminarActividad
 	@dni INT,
 	@id_deporte INT
 AS
@@ -1623,8 +1591,8 @@ BEGIN
 	DECLARE @id_socio INT;
 	DECLARE @id_deporte_existe INT
 
-	SELECT @id_socio = id_socio FROM tabla.Socios WHERE dni = @dni;
-	SELECT @id_deporte_existe = id_deporte FROM tabla.Deportes WHERE id_deporte = @id_deporte
+	SELECT @id_socio = id_socio FROM socios.Socios WHERE dni = @dni;
+	SELECT @id_deporte_existe = id_deporte FROM actividades.Deportes WHERE id_deporte = @id_deporte
 
 	IF @id_socio IS NULL 
 	BEGIN
@@ -1636,63 +1604,47 @@ BEGIN
     END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.Actividades
+		DELETE FROM actividades.Actividades
 		WHERE id_socio = @id_socio AND id_deporte = @id_deporte;
 	END
 END
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarMorosidad
+CREATE OR ALTER PROCEDURE administracion.EliminarMorosidad
 	@id_morosidad INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.Morosidades WHERE id_morosidad = @id_morosidad)
+	IF NOT EXISTS(SELECT 1 FROM administracion.Morosidades WHERE id_morosidad = @id_morosidad)
 	BEGIN
 		RAISERROR('Error: No existe una Morosidad con el ID (%d)',16,1,@id_morosidad);
 	END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.Morosidades
+		DELETE FROM administracion.Morosidades
 		WHERE id_morosidad = @id_morosidad;
 	END
 END;
 GO
 
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarReembolso
+CREATE OR ALTER PROCEDURE administracion.EliminarReembolso
 	@id_reembolso INT
 AS
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.Reembolsos WHERE id_reembolso = @id_reembolso)
+	IF NOT EXISTS(SELECT 1 FROM administracion.Reembolsos WHERE id_reembolso = @id_reembolso)
 	BEGIN
 		RAISERROR('Error: No existe un Reembolso con el ID (%d)',16,1,@id_reembolso);
 	END
 	ELSE
 	BEGIN
-		DELETE FROM tabla.Reembolsos
+		DELETE FROM administracion.Reembolsos
 		WHERE id_reembolso = @id_reembolso;
-	END
-END;
-GO
-
-CREATE OR ALTER PROCEDURE spEliminacion.EliminarAsistenciaClase
-	@id_asistencia INT
-AS
-BEGIN
-	IF NOT EXISTS(SELECT 1 FROM tabla.AsistenciasClase WHERE id_asistencia = @id_asistencia)
-	BEGIN
-		RAISERROR('Error: No existe una Asistencia con el ID (%d)',16,1,@id_asistencia);
-	END
-	ELSE
-	BEGIN
-		DELETE FROM tabla.AsistenciasClase
-		WHERE id_asistencia = @id_asistencia;
 	END
 END;
 GO
 
 ------FUNCIONES
 
-CREATE OR ALTER FUNCTION fnBusqueda.BuscarSocio (
+CREATE OR ALTER FUNCTION socios.BuscarSocio (
     @dni INT
 )
 RETURNS INT
@@ -1701,14 +1653,14 @@ BEGIN
     DECLARE @id_socio INT;
 
     SELECT @id_socio = id_socio
-    FROM tabla.Socios
+    FROM socios.Socios
     WHERE dni = @dni;
 
     RETURN @id_socio;
 END;
 GO
 
-CREATE OR ALTER FUNCTION fnBusqueda.BuscarInvitado(
+CREATE OR ALTER FUNCTION socios.BuscarInvitado(
     @dni INT
 )
 RETURNS INT
@@ -1717,14 +1669,14 @@ BEGIN
     DECLARE @id_invitado INT;
 
     SELECT @id_invitado = id_invitado
-    FROM tabla.Invitados
+    FROM socios.Invitados
     WHERE dni = @dni;
 
     RETURN @id_invitado;
 END;
 GO
 
-CREATE OR ALTER FUNCTION fnBusqueda.BuscarCuentaSocio(
+CREATE OR ALTER FUNCTION socios.BuscarCuentaSocio(
     @dni INT
 )
 RETURNS INT
@@ -1734,18 +1686,18 @@ BEGIN
 	DECLARE @id_cuenta INT;
 
     SELECT @id_socio = id_socio
-	FROM tabla.Socios
+	FROM socios.Socios
 	WHERE dni = @dni
 
 	SELECT @id_cuenta = id_cuenta
-    FROM tabla.CuentasSocios
+    FROM socios.CuentasSocios
     WHERE id_socio = @id_socio;
 
     RETURN @id_cuenta;
 END;
 GO
 
-CREATE OR ALTER FUNCTION fnBusqueda.BuscarAdministrador(
+CREATE OR ALTER FUNCTION administracion.BuscarAdministrador(
     @dni INT
 )
 RETURNS INT
@@ -1754,7 +1706,7 @@ BEGIN
     DECLARE @id_admin INT;
 
     SELECT @id_admin = id_admin
-	FROM tabla.Administradores
+	FROM administracion.Administradores
 	WHERE dni = @dni
 
     RETURN @id_admin;
