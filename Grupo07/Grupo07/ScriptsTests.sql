@@ -2780,8 +2780,9 @@ SELECT * FROM actividades.AsistenciasClase
 EXEC actividades.CrearAsistenciaClase
 	@dni_socio = 55666777,
 	@id_clase = @id_clase_test,
-	@presente = 1,
-	@fecha = '2025-06-10 17:00:00'
+	@presente = 'A',
+	@fecha = '2025-06-10 17:00:00',
+    @profesor = 'Jirafales'
 SELECT * FROM actividades.AsistenciasClase
 GO
 
@@ -2800,8 +2801,9 @@ WHERE id_deporte = @id_deporte_test
 EXEC actividades.CrearAsistenciaClase
 	@dni_socio = 99999999,
 	@id_clase = @id_clase_test,
-	@presente = 1,
-	@fecha = '2025-06-10 17:00:00'
+	@presente = 'A',
+	@fecha = '2025-06-10 17:00:00',
+    @profesor = 'Jirafales'
 GO
 
 --TEST 1.3: ID clase invalido
@@ -2819,8 +2821,9 @@ WHERE id_deporte = @id_deporte_test
 EXEC actividades.CrearAsistenciaClase
 	@dni_socio = 55666777,
 	@id_clase = 99999,
-	@presente = 1,
-	@fecha = '2025-06-10 17:00:00'
+	@presente = 'A',
+	@fecha = '2025-06-10 17:00:00',
+    @profesor = 'Jirafales'
 GO
 
 --TEST 1.4: Fecha invalida
@@ -2838,8 +2841,9 @@ WHERE id_deporte = @id_deporte_test
 EXEC actividades.CrearAsistenciaClase
 	@dni_socio = 55666777,
 	@id_clase = @id_clase_test,
-	@presente = 1,
-	@fecha = '2026-06-10 17:00:00'
+	@presente = 'A',
+	@fecha = '2026-06-10 17:00:00',
+    @profesor = 'Jirafales'
 GO
 
 --ACTUALIZACION
@@ -2866,8 +2870,9 @@ EXEC actividades.ActualizarAsistenciaClase
 	@id_asistencia = @id_asistencia_test,
 	@dni_socio = 55666777,
 	@id_clase = @id_clase_test,
-	@presente = 0,
-	@fecha = '2025-06-10 17:00:00'
+	@presente = 'P',
+	@fecha = '2025-06-10 17:00:00',
+    @profesor = 'Jirafales'
 SELECT * FROM actividades.AsistenciasClase WHERE id_asistencia = @id_asistencia_test
 GO
 
@@ -2892,8 +2897,9 @@ EXEC actividades.ActualizarAsistenciaClase
 	@id_asistencia = 99999,
 	@dni_socio = 55666777,
 	@id_clase = @id_clase_test,
-	@presente = 0,
-	@fecha = '2025-06-10 17:00:00'
+	@presente = 'P',
+	@fecha = '2025-06-10 17:00:00',
+    @profesor = 'Jirafales'
 GO
 
 --TEST 2.3: DNI socio invalido
@@ -2917,8 +2923,9 @@ EXEC actividades.ActualizarAsistenciaClase
 	@id_asistencia = @id_asistencia_test,
 	@dni_socio = 99999999,
 	@id_clase = @id_clase_test,
-	@presente = 0,
-	@fecha = '2025-06-10 17:00:00'
+	@presente = 'P',
+	@fecha = '2025-06-10 17:00:00',
+    @profesor = 'Jirafales'
 GO
 
 --TEST 2.4: ID clase invalido
@@ -2942,8 +2949,9 @@ EXEC actividades.ActualizarAsistenciaClase
 	@id_asistencia = @id_asistencia_test,
 	@dni_socio = 55666777,
 	@id_clase = 99999,
-	@presente = 0,
-	@fecha = '2025-06-10 17:00:00'
+	@presente = 'P',
+	@fecha = '2025-06-10 17:00:00',
+    @profesor = 'Jirafales'
 GO
 
 --TEST 2.5: Fecha invalida
@@ -2967,8 +2975,9 @@ EXEC actividades.ActualizarAsistenciaClase
 	@id_asistencia = @id_asistencia_test,
 	@dni_socio = 55666777,
 	@id_clase = @id_clase_test,
-	@presente = 0,
-	@fecha = '2026-06-10 17:00:00'
+	@presente = 'P',
+	@fecha = '2026-06-10 17:00:00',
+    @profesor = 'Jirafales'
 GO
 
 --ELIMINACION

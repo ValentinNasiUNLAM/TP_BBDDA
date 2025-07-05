@@ -461,7 +461,7 @@ BEGIN
 		CONSTRAINT fk_id_pago_reembolso FOREIGN KEY (id_pago) REFERENCES administracion.Pagos(id_pago),
 		CONSTRAINT fk_id_cuenta_socio_reembolso FOREIGN KEY (id_cuenta) REFERENCES socios.CuentasSocios(id_cuenta),
 		CONSTRAINT fk_id_admin_reembolso FOREIGN KEY (id_admin) REFERENCES administracion.Administradores(id_admin),
-		CONSTRAINT chk_fecha_reembolso CHECK (fecha <= CAST(GETDATE() AS DATETIME)),
+		CONSTRAINT chk_fecha_reembolso CHECK (fecha <= CAST(GETDATE() AS DATETIME)),id_clase
 		CONSTRAINT chk_monto_reembolso CHECK (monto > 0)
 	)
 END
@@ -477,8 +477,9 @@ BEGIN
 		id_asistencia INT PRIMARY KEY IDENTITY(1,1),
 		id_socio INT NOT NULL,
 		id_clase INT NOT NULL,
-		presente BIT,
+		presente CHAR(1),
 		fecha DATETIME,
+		profesor VARCHAR(100),
 		--CONSTRAINTS
 		CONSTRAINT fk_id_socio_asistencia_clase FOREIGN KEY (id_socio) REFERENCES socios.Socios(id_socio),
 		CONSTRAINT fk_id_clase_asistencia_clase FOREIGN KEY (id_clase) REFERENCES actividades.Clases(id_clase),
@@ -814,8 +815,9 @@ GO
 CREATE  or ALTER PROCEDURE actividades.CrearAsistenciaClase
 	@dni_socio INT,
 	@id_clase INT,
-	@presente BIT,
-	@fecha DATETIME
+	@presente CHAR(1),
+	@fecha DATETIME,
+	@profesor VARCHAR(100)
 AS
 BEGIN
 	DECLARE @id_socio INT;
@@ -825,8 +827,8 @@ BEGIN
 		RAISERROR('Error: No existe un socio con el DNI (%d)', 16, 1, @dni_socio);
 	END
 	ELSE
-    INSERT INTO actividades.AsistenciasClase(id_socio, id_clase, presente, fecha)
-    VALUES(@id_socio, @id_clase, @presente, @fecha);
+    INSERT INTO actividades.AsistenciasClase(id_socio, id_clase, presente, fecha, profesor)
+    VALUES(@id_socio, @id_clase, @presente, @fecha, @profesor);
 END;
 GO
 
@@ -1297,7 +1299,7 @@ CREATE OR ALTER PROCEDURE actividades.ActualizarAsistenciaClase
 	@id_asistencia INT,
 	@dni_socio INT,
 	@id_clase INT,
-	@presente BIT,
+	@presente CHAR(1),
 	@fecha DATETIME
 AS
 BEGIN
@@ -1314,7 +1316,7 @@ BEGIN
 	ELSE
 	BEGIN
 		UPDATE actividades.AsistenciasClase
-		SET id_socio = @id_socio, id_clase = @id_clase, presente = @presente, fecha = @fecha
+		SET id_socio = @id_socio, id_clase = @id_clase, presente = @presente, fecha = @fecha, profesor = @profesor
 		WHERE id_asistencia = @id_asistencia;
 	END
 END;
