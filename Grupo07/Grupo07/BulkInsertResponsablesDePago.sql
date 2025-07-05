@@ -1,7 +1,7 @@
 USE Com2900G07;
 GO
 
-CREATE OR ALTER PROCEDURE spInsercion.ImportarResponsables
+CREATE OR ALTER PROCEDURE socios.ImportarResponsables
 	@ruta_archivo NVARCHAR(500)
 AS
 BEGIN
@@ -49,14 +49,14 @@ BEGIN
 	        ) AS rn
 	    FROM #ResponsablesTemp
 	)
-	INSERT INTO tabla.PrestadoresSalud (nombre, telefono)
+	INSERT INTO socios.PrestadoresSalud (nombre, telefono)
 	SELECT nombre, telefono
 	FROM PrestadoresSinDuplicados pssd
 	-- Tomar solamente el primer valor (rn=1) de los dni repetidos
 	WHERE rn = 1
 	  AND NOT EXISTS (
 	    SELECT 1 
-	    FROM tabla.PrestadoresSalud ps
+	    FROM socios.PrestadoresSalud ps
 	    WHERE RTRIM(LTRIM(ps.nombre)) = pssd.nombre
 	);
 
@@ -66,7 +66,7 @@ BEGIN
 		FROM #ResponsablesTemp
 		WHERE ISNUMERIC(dni) = 1 AND RTRIM(LTRIM(dni)) <> ''
 	)
-	INSERT INTO tabla.Socios (nro_socio, dni, estado, nombre, apellido, email, fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud, nro_socio_obra_social)
+	INSERT INTO socios.Socios (nro_socio, dni, estado, nombre, apellido, email, fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud, nro_socio_obra_social)
 	SELECT
 		TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio)), 'SN-','') as INT) as nrosocio,
 		TRY_CAST(dni AS INT) as dni,
@@ -80,13 +80,13 @@ BEGIN
 		ps.id_prestador_salud as id_prestador,
 		rt.nro_socio_obra_social as nro_socio_obra_social
 	FROM ResponsablesSinDNIDuplicado rt
-	LEFT JOIN tabla.PrestadoresSalud ps
+	LEFT JOIN socios.PrestadoresSalud ps
 		ON LTRIM(RTRIM(ps.nombre)) = LTRIM(RTRIM(rt.nombre_obra_social))
 	WHERE 
 		rn = 1
 		AND TRY_CAST(rt.dni AS INT) IS NOT NULL
 		AND NOT EXISTS (
-			SELECT 1 FROM tabla.Socios s 
+			SELECT 1 FROM socios.Socios s 
 			WHERE s.dni = TRY_CAST(rt.dni AS INT) 
 			OR s.email = rt.email
 			OR s.nro_socio = rt.nro_socio
