@@ -5,8 +5,9 @@ CREATE OR ALTER PROCEDURE spInsercion.ImportarResponsables
 	@ruta_archivo NVARCHAR(500)
 AS
 BEGIN
-
+	-- Configuraciones
 	SET NOCOUNT ON;
+	SET DATEFORMAT dmy;
 
 	CREATE TABLE #ResponsablesTemp(
 		nro_socio VARCHAR(20),
@@ -93,4 +94,5 @@ BEGIN
 END;
 
 -- Descomentar para ejecuci�n:
---EXEC spInsercion.ImportarResponsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';
+-- EXEC spInsercion.ImportarResponsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';
+
