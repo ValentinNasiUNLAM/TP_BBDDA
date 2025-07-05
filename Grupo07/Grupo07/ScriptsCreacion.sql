@@ -428,6 +428,7 @@ IF NOT EXISTS (
 BEGIN
 	CREATE TABLE administracion.Pagos(
 		id_pago INT PRIMARY KEY IDENTITY(1,1),
+		nro_pago BIGINT NOT NULL UNIQUE,
 		numero_factura INT UNIQUE NOT NULL,
 		id_medio_pago INT NOT NULL,
 		fecha DATETIME,
