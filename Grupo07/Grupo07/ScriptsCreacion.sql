@@ -1301,7 +1301,7 @@ CREATE OR ALTER PROCEDURE actividades.ActualizarAsistenciaClase
 	@dni_socio INT,
 	@id_clase INT,
 	@presente CHAR(1),
-	@fecha DATETIME
+	@fecha DATETIME,
 	@profesor VARCHAR(100)
 AS
 BEGIN
