@@ -258,6 +258,18 @@ END
 GO
 
 IF NOT EXISTS (
+	SELECT 1
+	FROM sys.indexes
+	WHERE name = 'idx_email_unico'
+	AND object_id = OBJECT_ID('socios.Socios')
+)
+BEGIN
+	CREATE UNIQUE NONCLUSTERED INDEX idx_email_unico
+	ON socios.Socios(email)
+	WHERE email IS NOT NULL;
+END
+
+IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Cuotas' 
     AND schema_id = SCHEMA_ID('socios')
