@@ -233,7 +233,7 @@ BEGIN
 		dni INT UNIQUE,
 		nombre VARCHAR(30),
 		apellido VARCHAR(30),
-		email VARCHAR(50) UNIQUE NULL,
+		email VARCHAR(50) NULL,
 		fecha_nacimiento DATE,
 		telefono INT,
 		telefono_emergencia INT,

@@ -1,7 +1,7 @@
 USE Com2900G07;
 GO
 
-CREATE OR ALTER PROCEDURE spInsercion.ImportarGrupoFamiliar
+CREATE OR ALTER PROCEDURE socios.ImportarGrupoFamiliar
 	@ruta_archivo NVARCHAR(500)
 AS
 BEGIN
@@ -83,24 +83,27 @@ BEGIN
 		TRY_CAST(telefono_contacto AS INT) as telc,
 		TRY_CAST(sgf.telefono_emergencia AS INT) as telem,
 		ps.id_prestador_salud as id_prestador,
-		sgf.nro_socio_obra_social as nro_socio_obra_social,
-		socios.BuscarSocioPorNumero(sgf.nro_socio_responsable) as id_tutor
+		RTRIM(LTRIM(sgf.nro_socio_obra_social)) as nro_socio_obra_social,
+		socios.BuscarSocioPorNumero(TRY_CAST(REPLACE(RTRIM(LTRIM(sgf.nro_socio_responsable)),'SN-','') AS INT)) as id_tutor
 	FROM SGFSinDNIDuplicado sgf
 	LEFT JOIN socios.PrestadoresSalud ps ON LTRIM(RTRIM(ps.nombre)) = LTRIM(RTRIM(sgf.nombre_obra_social))
 	WHERE
 		rn = 1
-		AND TRY_CAST(sgf.dni AS INT) IS NOT NULL
+		AND sgf.dni IS NOT NULL
+		-- AND sgf.email IS NOT NULL
+		AND sgf.nro_socio IS NOT NULL
+		AND socios.BuscarSocioPorNumero(TRY_CAST(REPLACE(RTRIM(LTRIM(sgf.nro_socio_responsable)),'SN-','') AS INT) IS NOT NULL
 		AND NOT EXISTS (
 			SELECT 1 FROM socios.Socios s 
 			WHERE s.dni = TRY_CAST(sgf.dni AS INT) 
 			OR s.email = sgf.email
-			OR s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio)),'SN-','') as int)
-		)
+			OR s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(sgf.nro_socio)),'SN-','') AS INT)
+		);/*
 		AND EXISTS (
 			SELECT 1 FROM socios.Socios s
 			WHERE s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio_responsable)),'SN-','') as int)
-		);
-
+		);*/
+/*
 	-- Buscar ID de Socio tutor para actualizar campo id_tutor de Socio perteneciente a Grupo Familiar
 	WITH SGFSinDNIDuplicado AS (
 		SELECT *, ROW_NUMBER() OVER (PARTITION BY dni ORDER BY (SELECT NULL)) AS rn
@@ -110,20 +113,30 @@ BEGIN
 	UPDATE s_act
 	SET s_act.id_tutor = s_res.id_socio
 	FROM SGFSinDNIDuplicado sgf
-	LEFT JOIN tabla.Socios s_res
+	LEFT JOIN socios.Socios s_res
 	ON TRY_CAST(REPLACE(RTRIM(LTRIM(sgf.nro_socio_responsable)),'SN-','') AS INT) = s_res.nro_socio
-	INNER JOIN tabla.Socios s_act
+	INNER JOIN socios.Socios s_act
 	ON s_act.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(sgf.nro_socio)),'SN-','') AS INT)
-	WHERE s_act.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(sgf.nro_socio)),'SN-','') AS INT);
+	WHERE s_act.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(sgf.nro_socio)),'SN-','') AS INT);*/
 		
 	/*
-	LEFT JOIN tabla.Socios s_responsable 
+	LEFT JOIN socios.Socios s_responsable 
 		ON s_responsable.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(sgf.nro_socio_responsable)),'SN-','') AS INT)*/
 END;
 
 -- Descomentar para ejecuci�n:
-EXEC spInsercion.ImportarGrupoFamiliar @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\grupo_familiar.csv';
+EXEC socios.ImportarGrupoFamiliar @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\grupo_familiar.csv';
 
 SELECT * 
-FROM tabla.Socios
+FROM socios.Socios
 WHERE id_tutor IS NOT NULL
+
+CREATE UNIQUE NONCLUSTERED INDEX idx_email_unico
+ON socios.Socios(email)
+WHERE email IS NOT NULL;
+
+ALTER TABLE socios.Socios
+DROP CONSTRAINT UQ__Socios__AB6E6164CAFB3343;
+
+
+DELETE FROM socios.Socios
