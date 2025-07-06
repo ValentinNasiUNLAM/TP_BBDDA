@@ -260,7 +260,7 @@ GO
 IF NOT EXISTS (
     SELECT * FROM sys.tables 
     WHERE name = 'Cuotas' 
-    AND schema_id = SCHEMA_ID('tabla')
+    AND schema_id = SCHEMA_ID('socios')
 )
 BEGIN
 	CREATE TABLE socios.Cuotas(
@@ -462,7 +462,7 @@ BEGIN
 		CONSTRAINT fk_id_pago_reembolso FOREIGN KEY (id_pago) REFERENCES administracion.Pagos(id_pago),
 		CONSTRAINT fk_id_cuenta_socio_reembolso FOREIGN KEY (id_cuenta) REFERENCES socios.CuentasSocios(id_cuenta),
 		CONSTRAINT fk_id_admin_reembolso FOREIGN KEY (id_admin) REFERENCES administracion.Administradores(id_admin),
-		CONSTRAINT chk_fecha_reembolso CHECK (fecha <= CAST(GETDATE() AS DATETIME)),id_clase
+		CONSTRAINT chk_fecha_reembolso CHECK (fecha <= CAST(GETDATE() AS DATETIME)),
 		CONSTRAINT chk_monto_reembolso CHECK (monto > 0)
 	)
 END
@@ -1046,8 +1046,8 @@ BEGIN
 	DECLARE @id_socio_tutor INT;
 	DECLARE @id_socio_menor INT;
 
-	SELECT @id_socio_tutor = id_socio FROM tabla.Socios WHERE dni = @dni_tutor;
-	SELECT @id_socio_menor = id_socio FROM tabla.Socios WHERE dni = @dni_menor;
+	SELECT @id_socio_tutor = id_socio FROM socios.Socios WHERE dni = @dni_tutor;
+	SELECT @id_socio_menor = id_socio FROM socios.Socios WHERE dni = @dni_menor;
 
 	IF @id_socio_tutor IS NULL OR @id_socio_menor IS NULL
 	BEGIN
@@ -1302,6 +1302,7 @@ CREATE OR ALTER PROCEDURE actividades.ActualizarAsistenciaClase
 	@id_clase INT,
 	@presente CHAR(1),
 	@fecha DATETIME
+	@profesor VARCHAR(100)
 AS
 BEGIN
 	DECLARE @id_socio INT;
