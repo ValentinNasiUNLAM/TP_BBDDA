@@ -51,14 +51,14 @@ BEGIN
 	        ) AS rn
 	    FROM #SGFTemp
 	)
-	INSERT INTO tabla.PrestadoresSalud (nombre, telefono)
+	INSERT INTO socios.PrestadoresSalud (nombre, telefono)
 	SELECT nombre, telefono
 	FROM PrestadoresSinDuplicados pssd
 	-- Tomar solamente el primer valor (rn=1) de los dni repetidos
 	WHERE rn = 1
 	  AND NOT EXISTS (
 	    SELECT 1 
-	    FROM tabla.PrestadoresSalud ps
+	    FROM socios.PrestadoresSalud ps
 	    WHERE pssd.nombre IS NULL
 		OR RTRIM(LTRIM(ps.nombre)) = pssd.nombre
 	);
@@ -70,7 +70,9 @@ BEGIN
 		WHERE ISNUMERIC(dni) = 1 AND RTRIM(LTRIM(dni)) <> ''
 		AND nombre_obra_social IS NOT NULL
 	)
-	INSERT INTO tabla.Socios (nro_socio, dni, estado, nombre, apellido, email, fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud, nro_socio_obra_social)
+	INSERT INTO socios.Socios (nro_socio, dni, estado, nombre, apellido, email,
+		fecha_nacimiento, telefono, telefono_emergencia, id_prestador_salud,
+		nro_socio_obra_social, id_tutor)
 	SELECT TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio)),'SN-','') as int) as nro_socio,
 		TRY_CAST(dni AS INT) as dni,
 		1 as estado,
@@ -81,17 +83,22 @@ BEGIN
 		TRY_CAST(telefono_contacto AS INT) as telc,
 		TRY_CAST(sgf.telefono_emergencia AS INT) as telem,
 		ps.id_prestador_salud as id_prestador,
-		sgf.nro_socio_obra_social as nro_socio_obra_social
+		sgf.nro_socio_obra_social as nro_socio_obra_social,
+		socios.BuscarSocioPorNumero(sgf.nro_socio_responsable) as id_tutor
 	FROM SGFSinDNIDuplicado sgf
-	LEFT JOIN tabla.PrestadoresSalud ps ON LTRIM(RTRIM(ps.nombre)) = LTRIM(RTRIM(sgf.nombre_obra_social))
+	LEFT JOIN socios.PrestadoresSalud ps ON LTRIM(RTRIM(ps.nombre)) = LTRIM(RTRIM(sgf.nombre_obra_social))
 	WHERE
 		rn = 1
 		AND TRY_CAST(sgf.dni AS INT) IS NOT NULL
 		AND NOT EXISTS (
-			SELECT 1 FROM tabla.Socios s 
+			SELECT 1 FROM socios.Socios s 
 			WHERE s.dni = TRY_CAST(sgf.dni AS INT) 
 			OR s.email = sgf.email
 			OR s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio)),'SN-','') as int)
+		)
+		AND EXISTS (
+			SELECT 1 FROM socios.Socios s
+			WHERE s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio_responsable)),'SN-','') as int)
 		);
 
 	-- Buscar ID de Socio tutor para actualizar campo id_tutor de Socio perteneciente a Grupo Familiar

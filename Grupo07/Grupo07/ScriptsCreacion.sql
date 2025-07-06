@@ -1715,3 +1715,19 @@ BEGIN
     RETURN @id_admin;
 END;
 GO
+
+CREATE OR ALTER FUNCTION socios.BuscarSocioPorNumero(
+    @nro_socio INT
+)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @id_socio INT;
+
+    SELECT @id_socio = id_socio
+	FROM socios.Socios
+	WHERE nro_socio = @nro_socio
+
+    RETURN @id_socio;
+END;
+GO
