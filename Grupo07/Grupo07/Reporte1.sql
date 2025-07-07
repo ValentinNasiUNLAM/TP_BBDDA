@@ -28,7 +28,7 @@ EXEC administracion.CrearFacturaARCA 44111222, 'Cuota junio', 'B', 10000, '2025-
 EXEC administracion.CrearFacturaARCA 44222333, 'Cuota abril', 'B', 10000, '2025-04-10', '2025-04-20', 500;
 EXEC administracion.CrearFacturaARCA 44222333, 'Cuota junio', 'B', 10000, '2025-06-10', '2025-06-20', 500;
 
--- Luis tiene 3 facturas, 2 morosas y 1 pagada
+-- Luis tiene 3 facturas, 2 morosas
 EXEC administracion.CrearFacturaARCA 44333444, 'Cuota enero', 'B', 10000, '2025-01-10', '2025-01-20', 500;
 EXEC administracion.CrearFacturaARCA 44333444, 'Cuota febrero', 'B', 10000, '2025-02-10', '2025-02-20', 500;
 EXEC administracion.CrearFacturaARCA 44333444, 'Cuota marzo', 'B', 10000, '2025-03-10', '2025-03-20', 500;
@@ -77,7 +77,7 @@ INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) 
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
 WHERE id_socio = socios.BuscarSocio(44333444) AND descripcion = 'Cuota febrero'
-INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (8, 10500, '2025-03-01'); -- pagada
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (8, 10500, NULL);
 
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
@@ -85,6 +85,8 @@ WHERE id_socio = socios.BuscarSocio(44333444) AND descripcion = 'Cuota marzo'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (9, 10500, NULL);
 
 GO
+
+DELETE FROM administracion.Morosidades
 
 --Creamos el SP para el reporte 1
 
