@@ -5,7 +5,6 @@ GO
 
 -- Prestadores
 EXEC socios.CrearPrestadorSalud 'OSDE R1', '011-5555-1111';
-EXEC socios.CrearPrestadorSalud 'Swiss Medical R1', '011-5555-2222';
 
 -- Socios
 DECLARE @id_osde INT
