@@ -1,7 +1,7 @@
 USE Com2900G07;
 GO
 
---Agregamos los datos necesarios para poder generar y visualizar el reporte 2
+--Agregamos los datos necesarios para poder generar y visualizar el reporte 3
 
 -- Prestadores
 EXEC socios.CrearPrestadorSalud 'OSDE R3', '011-5555-1111';
@@ -13,7 +13,7 @@ SELECT @id_osde = id_prestador_salud FROM socios.PrestadoresSalud WHERE nombre =
 
 EXEC socios.CrearSocio 3001, 44333111, 'Juan', 'Perez', 'juan3@mail.com', '1990-05-20', 1122334455, 1133445566, 'OSDE-3123', @id_osde;
 EXEC socios.CrearSocio 3002, 44333222, 'Ana', 'Gomez', 'ana3@mail.com', '1985-08-15', 1122334466, 1133445577, 'OSDE-3456', @id_osde;
-EXEC socios.CrearSocio 3003, 44333333, 'Jose', 'Lopez', 'jose3@mail.com', '1985-08-15', 1122334466, 1133445577, 'OSDE-3789', @id_osde;
+EXEC socios.CrearSocio 3003, 44333333, 'Jose', 'Lopez', 'jose3@mail.com', '2011-08-15', 1122334466, 1133445577, 'OSDE-3789', @id_osde;
 
 -- Crear Categorías
 EXEC socios.CrearCategoria 'Menores R3', 0, 17, 5000;
@@ -70,22 +70,8 @@ FROM actividades.Deportes
 WHERE nombre = 'Tenis R3'
 EXEC actividades.CrearClase @id_deporte; 
 
--- Clases (turnos)
+-- Asistencias
 DECLARE @id_clase INT
-
-SELECT @id_clase = c.id_clase
-FROM actividades.Clases c
-INNER JOIN actividades.Deportes d ON d.id_deporte = c.id_deporte
-WHERE d.nombre = 'Futbol R3'
-EXEC actividades.CrearTurno 1, 1, '10:00', '11:00'; 
-
-SELECT @id_clase = c.id_clase
-FROM actividades.Clases c
-INNER JOIN actividades.Deportes d ON d.id_deporte = c.id_deporte
-WHERE d.nombre = 'Tenis R3'
-EXEC actividades.CrearTurno 2, 2, '11:00', '12:00'; 
-
--- Asistencias - algunas inasistencias (presente = 'N')
 
 SELECT @id_clase = c.id_clase
 FROM actividades.Clases c
