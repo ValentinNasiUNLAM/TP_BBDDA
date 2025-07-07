@@ -11,26 +11,26 @@ DECLARE @id_osde INT
 
 SELECT @id_osde = id_prestador_salud FROM socios.PrestadoresSalud WHERE nombre = 'OSDE R1';
 
-EXEC socios.CrearSocio 1001, 44111222, 'Juan', 'Pérez', 'juan@mail.com', '1990-05-20', 1122334455, 1133445566, 'OSDE-123', @id_osde;
-EXEC socios.CrearSocio 1002, 44222333, 'Ana', 'Gómez', 'ana@mail.com', '1985-08-15', 1122334466, 1133445577, 'SWISS-456', @id_osde;
-EXEC socios.CrearSocio 1003, 44333444, 'Luis', 'Fernández', 'luis@mail.com', '1995-02-10', 1122334477, 1133445588, 'OSDE-789', @id_osde;
+EXEC socios.CrearSocio 1001, 44111111, 'Juan', 'Perez', 'juan@mail.com', '1990-05-20', 1122334455, 1133445566, 'OSDE-1123', @id_osde;
+EXEC socios.CrearSocio 1002, 44111222, 'Ana', 'Gomez', 'ana@mail.com', '1985-08-15', 1122334466, 1133445577, 'OSDE-1456', @id_osde;
+EXEC socios.CrearSocio 1003, 44111333, 'Luis', 'Fernandez', 'luis@mail.com', '1995-02-10', 1122334477, 1133445588, 'OSDE-1789', @id_osde;
 
 -- Facturas (enero a junio 2025)
 
 -- Juan tiene 4 facturas morosas
-EXEC administracion.CrearFacturaARCA 44111222, 'Cuota enero', 'B', 10000, '2025-01-10', '2025-01-20', 500;
-EXEC administracion.CrearFacturaARCA 44111222, 'Cuota marzo', 'B', 10000, '2025-03-10', '2025-03-20', 500;
-EXEC administracion.CrearFacturaARCA 44111222, 'Cuota mayo', 'B', 10000, '2025-05-10', '2025-05-20', 500;
-EXEC administracion.CrearFacturaARCA 44111222, 'Cuota junio', 'B', 10000, '2025-06-10', '2025-06-20', 500;
+EXEC administracion.CrearFacturaARCA 44111111, 'Cuota enero', 'B', 10000, '2025-01-10', '2025-01-20', 500;
+EXEC administracion.CrearFacturaARCA 44111111, 'Cuota marzo', 'B', 10000, '2025-03-10', '2025-03-20', 500;
+EXEC administracion.CrearFacturaARCA 44111111, 'Cuota mayo', 'B', 10000, '2025-05-10', '2025-05-20', 500;
+EXEC administracion.CrearFacturaARCA 44111111, 'Cuota junio', 'B', 10000, '2025-06-10', '2025-06-20', 500;
 
 -- Ana tiene 2 facturas morosas (no debe salir en el reporte)
-EXEC administracion.CrearFacturaARCA 44222333, 'Cuota abril', 'B', 10000, '2025-04-10', '2025-04-20', 500;
-EXEC administracion.CrearFacturaARCA 44222333, 'Cuota junio', 'B', 10000, '2025-06-10', '2025-06-20', 500;
+EXEC administracion.CrearFacturaARCA 44111222, 'Cuota abril', 'B', 10000, '2025-04-10', '2025-04-20', 500;
+EXEC administracion.CrearFacturaARCA 44111222, 'Cuota junio', 'B', 10000, '2025-06-10', '2025-06-20', 500;
 
 -- Luis tiene 3 facturas, 2 morosas
-EXEC administracion.CrearFacturaARCA 44333444, 'Cuota enero', 'B', 10000, '2025-01-10', '2025-01-20', 500;
-EXEC administracion.CrearFacturaARCA 44333444, 'Cuota febrero', 'B', 10000, '2025-02-10', '2025-02-20', 500;
-EXEC administracion.CrearFacturaARCA 44333444, 'Cuota marzo', 'B', 10000, '2025-03-10', '2025-03-20', 500;
+EXEC administracion.CrearFacturaARCA 44111333, 'Cuota enero', 'B', 10000, '2025-01-10', '2025-01-20', 500;
+EXEC administracion.CrearFacturaARCA 44111333, 'Cuota febrero', 'B', 10000, '2025-02-10', '2025-02-20', 500;
+EXEC administracion.CrearFacturaARCA 44111333, 'Cuota marzo', 'B', 10000, '2025-03-10', '2025-03-20', 500;
 
 -- Morosidades (fecha_pago NULL => deuda activa)
 DECLARE @numero_factura INT
@@ -38,54 +38,53 @@ DECLARE @numero_factura INT
 -- Juan
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota enero'
+WHERE id_socio = socios.BuscarSocio(44111111) AND descripcion = 'Cuota enero'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (@numero_factura, 10500, NULL);
 
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota marzo'
+WHERE id_socio = socios.BuscarSocio(44111111) AND descripcion = 'Cuota marzo'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (@numero_factura, 10500, NULL);
 
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota mayo'
+WHERE id_socio = socios.BuscarSocio(44111111) AND descripcion = 'Cuota mayo'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (@numero_factura, 10500, NULL);
 
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota junio'
+WHERE id_socio = socios.BuscarSocio(44111111) AND descripcion = 'Cuota junio'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (@numero_factura, 10500, NULL);
 
 -- Ana
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44222333) AND descripcion = 'Cuota abril'
+WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota abril'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (5, 10500, NULL);
 
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44222333) AND descripcion = 'Cuota junio'
+WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota junio'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (6, 10500, NULL);
 
 -- Luis
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44333444) AND descripcion = 'Cuota enero'
+WHERE id_socio = socios.BuscarSocio(44111333) AND descripcion = 'Cuota enero'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (7, 10500, NULL);
 
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44333444) AND descripcion = 'Cuota febrero'
+WHERE id_socio = socios.BuscarSocio(44111333) AND descripcion = 'Cuota febrero'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (8, 10500, NULL);
 
 SELECT @numero_factura = numero_factura
 FROM administracion.FacturasARCA
-WHERE id_socio = socios.BuscarSocio(44333444) AND descripcion = 'Cuota marzo'
+WHERE id_socio = socios.BuscarSocio(44111333) AND descripcion = 'Cuota marzo'
 INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (9, 10500, NULL);
 
 GO
 
-DELETE FROM administracion.Morosidades
 
 --Creamos el SP para el reporte 1
 
@@ -146,5 +145,7 @@ BEGIN
 	FROM FinalReporte
 	ORDER BY ranking, nro_socio, mes_incumplido;
 END
+GO
 
 EXEC administracion.ReporteMorososRecurrentes @desde = '2025-01-01', @hasta = '2025-07-01'
+GO

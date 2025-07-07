@@ -55,6 +55,12 @@
           <AssociatedConnUserName />
           <FullPath>Reporte2.sql</FullPath>
         </FileNode>
+        <FileNode Name="Reporte3.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>Reporte3.sql</FullPath>
+        </FileNode>
         <FileNode Name="ScriptsCreacion.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
