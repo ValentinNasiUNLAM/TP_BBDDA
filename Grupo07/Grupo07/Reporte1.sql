@@ -1,0 +1,149 @@
+USE Com2900G07;
+GO
+
+--Agregamos los datos necesarios para poder generar y visualizar el reporte 1
+
+-- Prestadores
+EXEC socios.CrearPrestadorSalud 'OSDE R1', '011-5555-1111';
+EXEC socios.CrearPrestadorSalud 'Swiss Medical R1', '011-5555-2222';
+
+-- Socios
+DECLARE @id_osde INT
+
+SELECT @id_osde = id_prestador_salud FROM socios.PrestadoresSalud WHERE nombre = 'OSDE R1';
+
+EXEC socios.CrearSocio 1001, 44111222, 'Juan', 'Pérez', 'juan@mail.com', '1990-05-20', 1122334455, 1133445566, 'OSDE-123', @id_osde;
+EXEC socios.CrearSocio 1002, 44222333, 'Ana', 'Gómez', 'ana@mail.com', '1985-08-15', 1122334466, 1133445577, 'SWISS-456', @id_osde;
+EXEC socios.CrearSocio 1003, 44333444, 'Luis', 'Fernández', 'luis@mail.com', '1995-02-10', 1122334477, 1133445588, 'OSDE-789', @id_osde;
+
+-- Facturas (enero a junio 2025)
+
+-- Juan tiene 4 facturas morosas
+EXEC administracion.CrearFacturaARCA 44111222, 'Cuota enero', 'B', 10000, '2025-01-10', '2025-01-20', 500;
+EXEC administracion.CrearFacturaARCA 44111222, 'Cuota marzo', 'B', 10000, '2025-03-10', '2025-03-20', 500;
+EXEC administracion.CrearFacturaARCA 44111222, 'Cuota mayo', 'B', 10000, '2025-05-10', '2025-05-20', 500;
+EXEC administracion.CrearFacturaARCA 44111222, 'Cuota junio', 'B', 10000, '2025-06-10', '2025-06-20', 500;
+
+-- Ana tiene 2 facturas morosas (no debe salir en el reporte)
+EXEC administracion.CrearFacturaARCA 44222333, 'Cuota abril', 'B', 10000, '2025-04-10', '2025-04-20', 500;
+EXEC administracion.CrearFacturaARCA 44222333, 'Cuota junio', 'B', 10000, '2025-06-10', '2025-06-20', 500;
+
+-- Luis tiene 3 facturas, 2 morosas y 1 pagada
+EXEC administracion.CrearFacturaARCA 44333444, 'Cuota enero', 'B', 10000, '2025-01-10', '2025-01-20', 500;
+EXEC administracion.CrearFacturaARCA 44333444, 'Cuota febrero', 'B', 10000, '2025-02-10', '2025-02-20', 500;
+EXEC administracion.CrearFacturaARCA 44333444, 'Cuota marzo', 'B', 10000, '2025-03-10', '2025-03-20', 500;
+
+-- Morosidades (fecha_pago NULL => deuda activa)
+DECLARE @numero_factura INT
+
+-- Juan
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota enero'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (@numero_factura, 10500, NULL);
+
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota marzo'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (@numero_factura, 10500, NULL);
+
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota mayo'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (@numero_factura, 10500, NULL);
+
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44111222) AND descripcion = 'Cuota junio'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (@numero_factura, 10500, NULL);
+
+-- Ana
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44222333) AND descripcion = 'Cuota abril'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (5, 10500, NULL);
+
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44222333) AND descripcion = 'Cuota junio'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (6, 10500, NULL);
+
+-- Luis
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44333444) AND descripcion = 'Cuota enero'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (7, 10500, NULL);
+
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44333444) AND descripcion = 'Cuota febrero'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (8, 10500, '2025-03-01'); -- pagada
+
+SELECT @numero_factura = numero_factura
+FROM administracion.FacturasARCA
+WHERE id_socio = socios.BuscarSocio(44333444) AND descripcion = 'Cuota marzo'
+INSERT INTO administracion.Morosidades(numero_factura, monto_total, fecha_pago) VALUES (9, 10500, NULL);
+
+GO
+
+--Creamos el SP para el reporte 1
+
+CREATE OR ALTER PROCEDURE administracion.ReporteMorososRecurrentes
+	@desde DATE,
+	@hasta DATE
+AS
+BEGIN
+
+	WITH MorosidadesSinPagar AS (
+    SELECT
+        s.nro_socio,
+        s.nombre + ' ' + s.apellido AS nombre_apellido,
+        FORMAT(f.primer_vencimiento, 'yyyy-MM') AS mes_incumplido,
+        f.primer_vencimiento,
+        s.id_socio
+    FROM administracion.Morosidades m
+    INNER JOIN administracion.FacturasARCA f ON m.numero_factura = f.numero_factura
+    INNER JOIN socios.Socios s ON f.id_socio = s.id_socio
+    WHERE m.fecha_pago IS NULL
+      AND f.primer_vencimiento BETWEEN @desde AND @hasta
+	),
+	ConteoMorosos AS (
+		SELECT 
+			id_socio,
+			nro_socio,
+			nombre_apellido,
+			COUNT(*) AS cantidad_morosidades
+		FROM MorosidadesSinPagar
+		GROUP BY id_socio, nro_socio, nombre_apellido
+		HAVING COUNT(*) > 2
+	),
+	RankingMorosos AS (
+		SELECT *,
+			   RANK() OVER (ORDER BY cantidad_morosidades DESC) AS ranking
+		FROM ConteoMorosos
+	),
+	FinalReporte AS (
+		SELECT
+			rm.ranking,
+			rm.nro_socio,
+			rm.nombre_apellido,
+			msp.mes_incumplido,
+			rm.cantidad_morosidades
+		FROM RankingMorosos rm
+		INNER JOIN MorosidadesSinPagar msp ON rm.id_socio = msp.id_socio
+	)
+
+	SELECT
+		'Morosos Recurrentes' AS [Nombre del Reporte],
+		@desde AS [Desde],
+		@hasta AS [Hasta],
+		nro_socio,
+		nombre_apellido AS [Nombre y Apellido],
+		mes_incumplido AS [Mes Incumplido],
+		cantidad_morosidades AS [Cantidad de Morosidades],
+		ranking AS [Ranking de Morosidad]
+	FROM FinalReporte
+	ORDER BY ranking, nro_socio, mes_incumplido;
+END
+
+EXEC administracion.ReporteMorososRecurrentes @desde = '2025-01-01', @hasta = '2025-07-01'

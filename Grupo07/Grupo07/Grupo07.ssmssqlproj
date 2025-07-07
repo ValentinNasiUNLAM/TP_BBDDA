@@ -19,11 +19,35 @@
     </LogicalFolder>
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
-        <FileNode Name="BulkInsertResponsablesDePago.sql">
+        <FileNode Name="BIGrupoFamiliar.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>BulkInsertResponsablesDePago.sql</FullPath>
+          <FullPath>BIGrupoFamiliar.sql</FullPath>
+        </FileNode>
+        <FileNode Name="BIRespDePago.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>BIRespDePago.sql</FullPath>
+        </FileNode>
+        <FileNode Name="BulkInsertPagos.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>BulkInsertPagos.sql</FullPath>
+        </FileNode>
+        <FileNode Name="BulkInsertPresente.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>BulkInsertPresente.sql</FullPath>
+        </FileNode>
+        <FileNode Name="Reporte1.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>Reporte1.sql</FullPath>
         </FileNode>
         <FileNode Name="ScriptsCreacion.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
