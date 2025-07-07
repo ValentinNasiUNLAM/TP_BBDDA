@@ -443,7 +443,7 @@ BEGIN
 		nro_pago BIGINT NOT NULL UNIQUE,
 		numero_factura INT UNIQUE NOT NULL,
 		id_medio_pago INT NOT NULL,
-		fecha DATETIME,
+		fecha DATE,
 		total INT,
 		reembolso INT,
 		--CONSTRAINTS
@@ -1744,3 +1744,18 @@ BEGIN
     RETURN @id_socio;
 END;
 GO
+
+CREATE OR ALTER FUNCTION administracion.BuscarIDPago(
+  @nombre_pago VARCHAR(50)
+)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @id_medio_pago INT;
+
+    SELECT @id_medio_pago = id_medio_pago
+  FROM administracion.MediosPago
+  WHERE nombre = @nombre_pago
+
+    RETURN @id_medio_pago;
+END;

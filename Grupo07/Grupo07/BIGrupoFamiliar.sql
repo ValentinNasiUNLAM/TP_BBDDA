@@ -129,4 +129,4 @@ BEGIN
 END;
 
 -- Descomentar para ejecuci�n:
--- EXEC socios.ImportarGrupoFamiliar @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\grupo_familiar.csv';
+--EXEC socios.ImportarGrupoFamiliar @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\grupo_familiar.csv';

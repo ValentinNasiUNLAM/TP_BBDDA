@@ -94,5 +94,4 @@ BEGIN
 END;
 
 -- Descomentar para ejecuci�n:
-EXEC socios.ImportarResponsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';
-SELECT * FROM socios.Socios;
+--EXEC socios.ImportarResponsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';
