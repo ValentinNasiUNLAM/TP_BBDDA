@@ -1,3 +1,18 @@
+/*
+Reporte 4
+Reporte que contenga a los socios que no han asistido a alguna clase de la actividad que
+realizan. El reporte debe contener: Nombre, Apellido, edad, categoría y la actividad
+
+Materia: Bases de datos aplicadas
+Fecha de entrega: 08/07/2025
+Grupo: 07
+Alumnos: 
+	Nasi Valentin 44851378
+	Traversa Franco 44510896
+	Arias Kevin 41246810
+*/
+
+
 USE Com2900G07;
 GO
 
@@ -11,9 +26,9 @@ DECLARE @id_osde INT
 
 SELECT @id_osde = id_prestador_salud FROM socios.PrestadoresSalud WHERE nombre = 'OSDE R4';
 
-EXEC socios.CrearSocio 4001, 44444111, 'Juan', 'Perez', 'juan4@mail.com', '1990-05-20', 1122334455, 1133445566, 'OSDE-4123', @id_osde;
-EXEC socios.CrearSocio 4002, 44444222, 'Ana', 'Gomez', 'ana4@mail.com', '1985-08-15', 1122334466, 1133445577, 'OSDE-4456', @id_osde;
-EXEC socios.CrearSocio 4003, 44444333, 'Jose', 'Lopez', 'jose4@mail.com', '2011-08-15', 1122334466, 1133445577, 'OSDE-4789', @id_osde;
+EXEC socios.CrearSocio 1041, 44444111, 'Juan', 'Perez', 'juan4@mail.com', '1990-05-20', 1122334455, 1133445566, 'OSDE-4123', @id_osde;
+EXEC socios.CrearSocio 1042, 44444222, 'Ana', 'Gomez', 'ana4@mail.com', '1985-08-15', 1122334466, 1133445577, 'OSDE-4456', @id_osde;
+EXEC socios.CrearSocio 1043, 44444333, 'Jose', 'Lopez', 'jose4@mail.com', '2011-08-15', 1122334466, 1133445577, 'OSDE-4789', @id_osde;
 
 -- Crear Categorías
 EXEC socios.CrearCategoria 'Menores R4', 0, 17, 5000;

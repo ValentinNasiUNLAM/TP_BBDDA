@@ -1,3 +1,24 @@
+/*
+Reporte 1
+Reporte de los socios morosos, que hayan incumplido en más de dos oportunidades dado un
+rango de fechas a ingresar. El reporte debe contener los siguientes datos:
+Nombre del reporte: Morosos Recurrentes
+Período: rango de fechas
+Nro de socio
+Nombre y apellido.
+Mes incumplido
+Ordenados de Mayor a menor por ranking de morosidad
+El mismo debe ser desarrollado utilizando Windows Function.
+
+Materia: Bases de datos aplicadas
+Fecha de entrega: 08/07/2025
+Grupo: 07
+Alumnos: 
+	Nasi Valentin 44851378
+	Traversa Franco 44510896
+	Arias Kevin 41246810
+*/
+
 USE Com2900G07;
 GO
 

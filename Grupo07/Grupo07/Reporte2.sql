@@ -1,3 +1,17 @@
+/*
+Reporte 2
+Reporte acumulado mensual de ingresos por actividad deportiva al momento en que se saca
+el reporte tomando como inicio enero.
+
+Materia: Bases de datos aplicadas
+Fecha de entrega: 08/07/2025
+Grupo: 07
+Alumnos: 
+	Nasi Valentin 44851378
+	Traversa Franco 44510896
+	Arias Kevin 41246810
+*/
+
 USE Com2900G07;
 GO
 

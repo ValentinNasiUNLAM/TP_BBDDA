@@ -496,7 +496,8 @@ BEGIN
 		--CONSTRAINTS
 		CONSTRAINT fk_id_socio_asistencia_clase FOREIGN KEY (id_socio) REFERENCES socios.Socios(id_socio),
 		CONSTRAINT fk_id_clase_asistencia_clase FOREIGN KEY (id_clase) REFERENCES actividades.Clases(id_clase),
-		CONSTRAINT chk_fecha_asistencia_clase CHECK (fecha <= CAST(GETDATE() AS DATETIME))
+		CONSTRAINT chk_fecha_asistencia_clase CHECK (fecha <= CAST(GETDATE() AS DATETIME)),
+		CONSTRAINT chk_tipo_asistencia CHECK ( presente = 'P' OR presente = 'A' OR presente = 'J' )
 	)
 END
 GO

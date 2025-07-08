@@ -1,16 +1,58 @@
+/*
+Archivos indicados en Miel.
+Se requiere que importe toda la información antes mencionada a la base de datos:
+• Genere los objetos necesarios (store procedures, funciones, etc.) para importar los
+archivos antes mencionados. Tenga en cuenta que cada mes se recibirán archivos de
+novedades con la misma estructura, pero datos nuevos para agregar a cada maestro.
+• Considere este comportamiento al generar el código. Debe admitir la importación de
+novedades periódicamente sin eliminar los datos ya cargados y sin generar
+duplicados.
+• Cada maestro debe importarse con un SP distinto. No se aceptarán scripts que
+realicen tareas por fuera de un SP.
+• La estructura/esquema de las tablas a generar será decisión suya. Puede que deba
+realizar procesos de transformación sobre los maestros recibidos para adaptarlos a la
+estructura requerida. Estas adaptaciones deberán hacerla en la DB y no en los
+archivos provistos.
+• Los archivos CSV/JSON no deben modificarse. En caso de que haya datos mal
+cargados, incompletos, erróneos, etc., deberá contemplarlo y realizar las correcciones
+en el fuente SQL. (Sería una excepción si el archivo está malformado y no es posible
+interpretarlo como JSON o CSV, pero los hemos verificado cuidadosamente).
+• Tener en cuenta que para la ampliación del software no existen datos; se deben
+preparar los datos de prueba necesarios para cumplimentar los requisitos planteados.
+• El código fuente no debe incluir referencias hardcodeadas a nombres o ubicaciones
+de archivo. Esto debe permitirse ser provisto por parámetro en la invocación. En el
+código de ejemplo el grupo decidirá dónde se ubicarían los archivos. Esto debe
+aparecer en comentarios del módulo.
+• El uso de SQL dinámico no está exigido en forma explícita… pero puede que
+encuentre que es la única forma de resolver algunos puntos. No abuse del SQL
+dinámico, deberá justificar su uso siempre.
+• Respecto a los informes XML: no se espera que produzcan un archivo nuevo en el
+filesystem, basta con que el resultado de la consulta sea XML.
+
+Materia: Bases de datos aplicadas
+Fecha de entrega: 08/07/2025
+Grupo: 07
+Alumnos: 
+	Nasi Valentin 44851378
+	Traversa Franco 44510896
+	Arias Kevin 41246810
+*/
+
 USE Com2900G07;
 GO
 
 -- Primero se crea para que funcione todo correctamente.
 -- Medios de pago
-/*INSERT INTO administracion.MediosPago (nombre, descripcion)
+INSERT INTO administracion.MediosPago (nombre, descripcion)
 VALUES
 ('efectivo',        'Pago en recepción'),
 ('Débito',          'Tarjeta de débito / débito automático'),
 ('Crédito',         'Tarjeta de crédito 1 cuota'),
 ('Transferencia',   'Transferencia o depósito bancario'),
 ('Mercado Pago',    'QR o enlace de Mercado Pago'),
-('PayPal',          'Pago en USD vía PayPal');*/
+('PayPal',          'Pago en USD vía PayPal');
+
+GO
 
 CREATE OR ALTER PROCEDURE administracion.ImportarPagos
     @ruta_archivo_pagos NVARCHAR(500) 
@@ -73,79 +115,6 @@ BEGIN
                                       DATENAME(MONTH,c.fecha_mes),' ',YEAR(c.fecha_mes))
     );
     
-        
-    /*INSERT INTO administracion.Pagos (nro_pago, numero_factura, id_medio_pago, fecha, total)
-    SELECT TRY_CAST(t.id_pago AS BIGINT) AS nro_pago,
-           f.numero_factura,
-           administracion.BuscarIDPago(t.mediopago) as  id_medio_pago,
-           TRY_CAST(t.fecha AS DATE) AS fecha,
-           t.valor
-    FROM #PagosTemp t
-    INNER JOIN socios.Socios s
-          ON s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(t.nro_socio)),'SN-','') AS INT)
-    OUTER APPLY (
-        SELECT TOP 1 fa.numero_factura
-        FROM  administracion.FacturasARCA fa
-        WHERE  fa.id_socio = s.id_socio
-        AND NOT EXISTS (
-           SELECT 1 FROM administracion.Pagos pa
-           WHERE pa.numero_factura = fa.numero_factura
-        )
-        ORDER  BY fa.fecha_creacion ASC  
-    ) f
-    WHERE NOT EXISTS (
-        SELECT 1 FROM administracion.Pagos p
-        WHERE p.nro_pago = t.id_pago
-    );*/
-
-    /*WITH PagosValidos AS (
-       SELECT
-        t.id_pago,
-        TRY_CAST(REPLACE(RTRIM(LTRIM(t.nro_socio)), 'SN-', '') AS INT) AS nro_socio,
-        t.mediopago,
-        TRY_CAST(t.fecha AS DATE) AS fecha,
-        t.valor
-      FROM #PagosTemp t
-    ),
-    FacturasSinPago AS (
-      SELECT 
-        f.numero_factura,
-        f.id_socio
-      FROM administracion.FacturasARCA f
-      WHERE NOT EXISTS (
-        SELECT 1 
-        FROM administracion.Pagos p
-        WHERE p.numero_factura = f.numero_factura
-      )
-    ),
-    PagosConFactura AS (
-      SELECT
-        pv.id_pago,
-        pv.nro_socio,
-        fsp.numero_factura,
-        pv.mediopago,
-        pv.fecha,
-        pv.valor,
-        ROW_NUMBER() OVER (PARTITION BY pv.nro_socio ORDER BY fa.fecha_creacion) AS rn
-      FROM PagosValidos pv
-      JOIN socios.Socios s ON s.nro_socio = pv.nro_socio
-      JOIN FacturasSinPago fsp ON fsp.id_socio = s.id_socio
-      JOIN administracion.FacturasARCA fa ON fa.numero_factura = fsp.numero_factura
-    )
-    INSERT INTO administracion.Pagos
-      (nro_pago, numero_factura, id_medio_pago, fecha, total, reembolso)
-    SELECT
-      TRY_CAST(pcf.id_pago AS BIGINT),
-      pcf.numero_factura,
-      administracion.BuscarIDPago(pcf.mediopago),
-      pcf.fecha,
-      pcf.valor,
-      0
-    FROM PagosConFactura pcf
-    WHERE pcf.rn = 1
-    AND NOT EXISTS (
-      SELECT 1 FROM administracion.Pagos p WHERE p.nro_pago = pcf.id_pago
-    );*/
 	WITH PagosValidos AS (
 		SELECT
 			t.id_pago,

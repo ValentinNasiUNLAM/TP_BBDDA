@@ -1,3 +1,19 @@
+/*
+Reporte 3
+Reporte de la cantidad de socios que han realizado alguna actividad de forma alternada
+(inasistencias) por categoría de socios y actividad, ordenado según cantidad de inasistencias
+ordenadas de mayor a menor.
+
+Materia: Bases de datos aplicadas
+Fecha de entrega: 08/07/2025
+Grupo: 07
+Alumnos: 
+	Nasi Valentin 44851378
+	Traversa Franco 44510896
+	Arias Kevin 41246810
+*/
+
+
 USE Com2900G07;
 GO
 
