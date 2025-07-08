@@ -19,65 +19,95 @@
     </LogicalFolder>
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
-        <FileNode Name="BIGrupoFamiliar.sql">
+        <FileNode Name="00_Creacion_Tablas_SP.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>BIGrupoFamiliar.sql</FullPath>
+          <FullPath>00_Creacion_Tablas_SP.sql</FullPath>
         </FileNode>
-        <FileNode Name="BIRespDePago.sql">
+        <FileNode Name="01_Test_Tablas_SP.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>01_Test_Tablas_SP.sql</FullPath>
+        </FileNode>
+        <FileNode Name="02_Creacion_SP_Importar_Responsables_Pago.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>02_Creacion_SP_Importar_Responsables_Pago.sql</FullPath>
+        </FileNode>
+        <FileNode Name="03_Creacion_SP_Importar_Grupos_Familiares.sql">
           <AssociatedConnectionMoniker />
           <AssociatedConnSrvName />
           <AssociatedConnUserName />
-          <FullPath>BIRespDePago.sql</FullPath>
+          <FullPath>03_Creacion_SP_Importar_Grupos_Familiares.sql</FullPath>
         </FileNode>
-        <FileNode Name="BulkInsertPagos.sql">
+        <FileNode Name="04_Test_Importar_Responsables_Pago.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>04_Test_Importar_Responsables_Pago.sql</FullPath>
+        </FileNode>
+        <FileNode Name="05_Creacion_SP_Importar_Pagos.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>05_Creacion_SP_Importar_Pagos.sql</FullPath>
+        </FileNode>
+        <FileNode Name="06_Creacion_SP_Importar_Asistencias.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>06_Creacion_SP_Importar_Asistencias.sql</FullPath>
+        </FileNode>
+        <FileNode Name="07_Creacion_Tarifas.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>07_Creacion_Tarifas.sql</FullPath>
+        </FileNode>
+        <FileNode Name="08_Test_Importar_Asistencias.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>08_Test_Importar_Asistencias.sql</FullPath>
+        </FileNode>
+        <FileNode Name="09_Test_Importar_Pagos.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>09_Test_Importar_Pagos.sql</FullPath>
+        </FileNode>
+        <FileNode Name="10_Creacion_SP_Reporte1.sql">
           <AssociatedConnectionMoniker />
           <AssociatedConnSrvName />
           <AssociatedConnUserName />
-          <FullPath>BulkInsertPagos.sql</FullPath>
+          <FullPath>10_Creacion_SP_Reporte1.sql</FullPath>
         </FileNode>
-        <FileNode Name="BulkInsertPresente.sql">
+        <FileNode Name="11_Creacion_SP_Reporte2.sql">
           <AssociatedConnectionMoniker />
           <AssociatedConnSrvName />
           <AssociatedConnUserName />
-          <FullPath>BulkInsertPresente.sql</FullPath>
+          <FullPath>11_Creacion_SP_Reporte2.sql</FullPath>
         </FileNode>
-        <FileNode Name="Reporte1.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+        <FileNode Name="12_Creacion_SP_Reporte3.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
           <AssociatedConnUserName />
-          <FullPath>Reporte1.sql</FullPath>
+          <FullPath>12_Creacion_SP_Reporte3.sql</FullPath>
         </FileNode>
-        <FileNode Name="Reporte2.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+        <FileNode Name="13_Creacion_SP_Reporte4.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
           <AssociatedConnUserName />
-          <FullPath>Reporte2.sql</FullPath>
+          <FullPath>13_Creacion_SP_Reporte4.sql</FullPath>
         </FileNode>
-        <FileNode Name="Reporte3.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
+        <FileNode Name="14_Creacion_Roles.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
           <AssociatedConnUserName />
-          <FullPath>Reporte3.sql</FullPath>
-        </FileNode>
-        <FileNode Name="Reporte4.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>Reporte4.sql</FullPath>
-        </FileNode>
-        <FileNode Name="ScriptsCreacion.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>ScriptsCreacion.sql</FullPath>
-        </FileNode>
-        <FileNode Name="ScriptsTests.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-C5TN9T7:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>DESKTOP-C5TN9T7</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>ScriptsTests.sql</FullPath>
+          <FullPath>14_Creacion_Roles.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

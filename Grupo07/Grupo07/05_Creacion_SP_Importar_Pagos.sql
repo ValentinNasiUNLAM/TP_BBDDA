@@ -41,19 +41,6 @@ Alumnos:
 USE Com2900G07;
 GO
 
--- Primero se crea para que funcione todo correctamente.
--- Medios de pago
-INSERT INTO administracion.MediosPago (nombre, descripcion)
-VALUES
-('efectivo',        'Pago en recepción'),
-('Débito',          'Tarjeta de débito / débito automático'),
-('Crédito',         'Tarjeta de crédito 1 cuota'),
-('Transferencia',   'Transferencia o depósito bancario'),
-('Mercado Pago',    'QR o enlace de Mercado Pago'),
-('PayPal',          'Pago en USD vía PayPal');
-
-GO
-
 CREATE OR ALTER PROCEDURE administracion.ImportarPagos
     @ruta_archivo_pagos NVARCHAR(500) 
 AS
@@ -157,12 +144,3 @@ BEGIN
 	JOIN FacturasNumeradas f
 		ON p.nro_socio = f.nro_socio AND p.rn = f.rn; 
 END;
-
--- Descomentar para ejecuci�n:
--- EXEC administracion.ImportarPagos @ruta_archivo_pagos=N'C:\Users\kevin\TP_BBDDA\CSV\pago_cuotas.csv'; 
-
--- Tabla formato pago_cuotas.csv
-/*SELECT p.nro_pago as IdDePago, p.fecha as Fecha, s.nro_socio as ResponsablePago, p.total as valor FROM administracion.Pagos p
-INNER JOIN administracion.FacturasARCA f
-ON p.numero_factura = f.numero_factura
-LEFT JOIN socios.Socios s ON s.id_socio = f.id_socio*/

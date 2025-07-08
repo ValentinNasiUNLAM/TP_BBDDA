@@ -153,7 +153,6 @@ GO
 --INSERCION
 
 --TEST 1.1: Resultado esperado, ID, 1, Galeno, 46254016
-SELECT * FROM socios.PrestadoresSalud
 EXEC socios.CrearPrestadorSalud
     @nombre = 'Galeno',
     @telefono = '46254016'
@@ -176,7 +175,7 @@ EXEC socios.ActualizarPrestadorSalud
     @nombre = 'IOMA',
     @telefono = '46254016'
 GO
-SELECT * FROM socios.PrestadoresSalud WHERE id_prestador_salud = 1
+SELECT * FROM socios.PrestadoresSalud
 GO
 
 --TEST 2.2: Error nombre vacio
@@ -810,7 +809,7 @@ WHERE nombre = 'Galeno_test_socio';
 
 SELECT @id_tutor_test = id_socio
 FROM socios.Socios
-WHERE dni = 12345678
+WHERE dni = 123456789
 
 EXEC socios.CrearSocio
 	@nro_socio = 0004,
@@ -825,7 +824,6 @@ EXEC socios.CrearSocio
     @id_prestador_salud = @id_prestador_salud_test,
     @id_tutor = @id_tutor_test,
     @id_grupo_familiar = @id_tutor_test
-SELECT * FROM socios.Socios
 GO
 
 --TEST 1.3: Error nombre y/o apellido vacios

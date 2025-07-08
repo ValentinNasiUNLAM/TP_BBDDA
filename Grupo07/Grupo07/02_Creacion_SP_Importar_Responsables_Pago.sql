@@ -132,6 +132,3 @@ BEGIN
 			OR s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(nro_socio)), 'SN-','') as INT)
 		);
 END;
-
--- Descomentar para ejecuci�n:
---EXEC socios.ImportarResponsables @ruta_archivo=N'C:\Users\kevin\TP_BBDDA\CSV\responsables_pago.csv';

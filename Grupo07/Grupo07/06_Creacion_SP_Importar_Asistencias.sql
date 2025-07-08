@@ -41,41 +41,6 @@ Alumnos:
 USE Com2900G07;
 GO
 
--- Agregar Clases antes de ejecutar el SP.
-DECLARE @id_deporte INT
-
-SELECT @id_deporte = d.id_deporte 
-FROM actividades.Deportes d
-WHERE d.nombre = 'Futsal';
-EXEC actividades.CrearClase @id_deporte
-
-SELECT @id_deporte = d.id_deporte 
-FROM actividades.Deportes d
-WHERE d.nombre = 'Vóley';
-EXEC actividades.CrearClase @id_deporte
-
-SELECT @id_deporte = d.id_deporte 
-FROM actividades.Deportes d
-WHERE d.nombre = 'Taekwondo';
-EXEC actividades.CrearClase @id_deporte
-
-SELECT @id_deporte = d.id_deporte 
-FROM actividades.Deportes d
-WHERE d.nombre = 'Baile artístico';
-EXEC actividades.CrearClase @id_deporte
-
-SELECT @id_deporte = d.id_deporte 
-FROM actividades.Deportes d
-WHERE d.nombre = 'Natación';
-EXEC actividades.CrearClase @id_deporte
-
-SELECT @id_deporte = d.id_deporte 
-FROM actividades.Deportes d
-WHERE d.nombre = 'Ajedrez';
-EXEC actividades.CrearClase @id_deporte
-
-GO
-
 CREATE OR ALTER PROCEDURE actividades.ImportarPresentismo
 	@ruta_archivo_presentismo NVARCHAR(500)
 AS
@@ -126,7 +91,3 @@ BEGIN
 	WHERE t.asistencia = 'P' OR t.asistencia = 'A' OR t.asistencia = 'J';
 END;
 GO
-
--- Descomentar para ejecuci�n:
---EXEC actividades.ImportarPresentismo @ruta_archivo_presentismo=N'C:\Users\kevin\TP_BBDDA\CSV\presentismo_actividades.csv';
---GO
