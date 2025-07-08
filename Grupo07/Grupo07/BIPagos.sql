@@ -24,7 +24,7 @@ BEGIN
         id_pago     VARCHAR(20),
         fecha       VARCHAR(10),
         nro_socio   VARCHAR(20),
-        Valor       INT,
+        valor       INT,
         mediopago   VARCHAR(50)
     );
 
@@ -42,15 +42,13 @@ BEGIN
     );';
 
 	EXEC sp_executesql @sql, N'@Ruta NVARCHAR(500)', @Ruta = @ruta_archivo_pagos;
-
-    -- Crear facturas
     
     WITH Cuotas AS (
         SELECT DISTINCT
                s.id_socio,
                DATEFROMPARTS(YEAR(TRY_CAST(pt.fecha AS DATE)),
                              MONTH(TRY_CAST(pt.fecha AS DATE)),1) AS fecha_mes,
-               pt.Valor
+               pt.valor
         FROM #PagosTemp                pt
         JOIN socios.Socios             s
               ON s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(pt.nro_socio)),'SN-','') AS INT)
@@ -62,9 +60,9 @@ BEGIN
             c.fecha_mes,
             CONCAT('Cuota Mensual ', DATENAME(MONTH,c.fecha_mes),' ',YEAR(c.fecha_mes)),
             'C',
-            c.Valor,
-            DATEADD(DAY,  9, c.fecha_mes),        -- 10 del mes
-            DATEADD(DAY, 19, c.fecha_mes),        -- 20 del mes
+            c.valor,
+            DATEADD(DAY,  9, c.fecha_mes),
+            DATEADD(DAY, 19, c.fecha_mes),
             0
     FROM Cuotas c
     WHERE NOT EXISTS (
@@ -75,15 +73,13 @@ BEGIN
                                       DATENAME(MONTH,c.fecha_mes),' ',YEAR(c.fecha_mes))
     );
     
-    
-    /*--- 4 · Insertar pagos y vincularlos a la factura más antigua impaga ---*/
-    
+        
     /*INSERT INTO administracion.Pagos (nro_pago, numero_factura, id_medio_pago, fecha, total)
     SELECT TRY_CAST(t.id_pago AS BIGINT) AS nro_pago,
            f.numero_factura,
            administracion.BuscarIDPago(t.mediopago) as  id_medio_pago,
            TRY_CAST(t.fecha AS DATE) AS fecha,
-           t.Valor
+           t.valor
     FROM #PagosTemp t
     INNER JOIN socios.Socios s
           ON s.nro_socio = TRY_CAST(REPLACE(RTRIM(LTRIM(t.nro_socio)),'SN-','') AS INT)
@@ -108,7 +104,7 @@ BEGIN
         TRY_CAST(REPLACE(RTRIM(LTRIM(t.nro_socio)), 'SN-', '') AS INT) AS nro_socio,
         t.mediopago,
         TRY_CAST(t.fecha AS DATE) AS fecha,
-        t.Valor
+        t.valor
       FROM #PagosTemp t
     ),
     FacturasSinPago AS (
@@ -129,7 +125,7 @@ BEGIN
         fsp.numero_factura,
         pv.mediopago,
         pv.fecha,
-        pv.Valor,
+        pv.valor,
         ROW_NUMBER() OVER (PARTITION BY pv.nro_socio ORDER BY fa.fecha_creacion) AS rn
       FROM PagosValidos pv
       JOIN socios.Socios s ON s.nro_socio = pv.nro_socio
@@ -143,62 +139,61 @@ BEGIN
       pcf.numero_factura,
       administracion.BuscarIDPago(pcf.mediopago),
       pcf.fecha,
-      pcf.Valor,
+      pcf.valor,
       0
     FROM PagosConFactura pcf
     WHERE pcf.rn = 1
     AND NOT EXISTS (
       SELECT 1 FROM administracion.Pagos p WHERE p.nro_pago = pcf.id_pago
     );*/
-WITH PagosValidos AS (
-    SELECT
-        t.id_pago,
-        TRY_CAST(REPLACE(RTRIM(LTRIM(t.nro_socio)), 'SN-', '') AS INT) AS nro_socio,
-        t.mediopago,
-        TRY_CAST(t.fecha AS DATE) AS fecha,
-        t.Valor
-    FROM #PagosTemp t
-    WHERE NOT EXISTS (
-        SELECT 1 FROM administracion.Pagos p WHERE p.nro_pago = t.id_pago
-    )
-),
-PagosNumerados AS (
-    SELECT *,
-           ROW_NUMBER() OVER (PARTITION BY nro_socio ORDER BY fecha) AS rn
-    FROM PagosValidos
-),
-FacturasNumeradas AS (
-    SELECT
-        f.numero_factura,
-        s.nro_socio,
-        f.fecha_creacion,
-        ROW_NUMBER() OVER (PARTITION BY s.nro_socio ORDER BY f.fecha_creacion) AS rn
-    FROM administracion.FacturasARCA f
-    JOIN socios.Socios s ON f.id_socio = s.id_socio
-    WHERE NOT EXISTS (
-        SELECT 1 FROM administracion.Pagos p WHERE p.numero_factura = f.numero_factura
-    )
-)
-INSERT INTO administracion.Pagos
-    (nro_pago, numero_factura, id_medio_pago, fecha, total, reembolso)
-SELECT
-    TRY_CAST(p.id_pago AS BIGINT),
-    f.numero_factura,
-    administracion.BuscarIDPago(p.mediopago),
-    p.fecha,
-    p.Valor,
-    0
-FROM PagosNumerados p
-JOIN FacturasNumeradas f
-    ON p.nro_socio = f.nro_socio AND p.rn = f.rn;
-    
-    END;
+	WITH PagosValidos AS (
+		SELECT
+			t.id_pago,
+			TRY_CAST(REPLACE(RTRIM(LTRIM(t.nro_socio)), 'SN-', '') AS INT) AS nro_socio,
+			t.mediopago,
+			TRY_CAST(t.fecha AS DATE) AS fecha,
+			t.valor
+		FROM #PagosTemp t
+		WHERE NOT EXISTS (
+			SELECT 1 FROM administracion.Pagos p WHERE p.nro_pago = t.id_pago
+		)
+	),
+	PagosNumerados AS (
+		SELECT *,
+			   ROW_NUMBER() OVER (PARTITION BY nro_socio ORDER BY fecha) AS rn
+		FROM PagosValidos
+	),
+	FacturasNumeradas AS (
+		SELECT
+			f.numero_factura,
+			s.nro_socio,
+			f.fecha_creacion,
+			ROW_NUMBER() OVER (PARTITION BY s.nro_socio ORDER BY f.fecha_creacion) AS rn
+		FROM administracion.FacturasARCA f
+		JOIN socios.Socios s ON f.id_socio = s.id_socio
+		WHERE NOT EXISTS (
+			SELECT 1 FROM administracion.Pagos p WHERE p.numero_factura = f.numero_factura
+		)
+	)
+	INSERT INTO administracion.Pagos
+		(nro_pago, numero_factura, id_medio_pago, fecha, total, reembolso)
+	SELECT
+		TRY_CAST(p.id_pago AS BIGINT),
+		f.numero_factura,
+		administracion.BuscarIDPago(p.mediopago),
+		p.fecha,
+		p.valor,
+		0
+	FROM PagosNumerados p
+	JOIN FacturasNumeradas f
+		ON p.nro_socio = f.nro_socio AND p.rn = f.rn; 
+END;
 
 -- Descomentar para ejecuci�n:
 -- EXEC administracion.ImportarPagos @ruta_archivo_pagos=N'C:\Users\kevin\TP_BBDDA\CSV\pago_cuotas.csv'; 
 
 -- Tabla formato pago_cuotas.csv
-/*SELECT p.nro_pago as IdDePago, p.fecha as Fecha, s.nro_socio as ResponsablePago, p.total as Valor FROM administracion.Pagos p
+/*SELECT p.nro_pago as IdDePago, p.fecha as Fecha, s.nro_socio as ResponsablePago, p.total as valor FROM administracion.Pagos p
 INNER JOIN administracion.FacturasARCA f
 ON p.numero_factura = f.numero_factura
 LEFT JOIN socios.Socios s ON s.id_socio = f.id_socio*/
