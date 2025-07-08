@@ -143,7 +143,7 @@ BEGIN
 		INNER JOIN socios.Categorias c ON q.id_categoria = c.id_categoria
 		INNER JOIN actividades.Clases cl ON a.id_clase = cl.id_clase
 		INNER JOIN actividades.Deportes d ON cl.id_deporte = d.id_deporte
-		WHERE a.presente = 'P'
+		WHERE a.presente = 'A'
 	)
 	SELECT DISTINCT
 		'Socios con inasistencias en su actividad' AS [Nombre del Reporte],

@@ -121,31 +121,30 @@ EXEC actividades.CrearAsistenciaClase 44333222, @id_clase, 'A', '2025-05-02 11:0
 
 GO
 
---Creamos el SP para el reporte 3
 
+
+--Creamos el SP para el reporte 3
 CREATE OR ALTER PROCEDURE administracion.ReporteInasistenciasPorDeporte
 AS
 BEGIN
-
 	WITH Inasistencias AS (
 		SELECT
 			s.id_socio,
 			c.nombre_categoria,
-			d.nombre AS deporte,
-			a.presente
+			d.nombre AS deporte
 		FROM actividades.AsistenciasClase a
 		INNER JOIN socios.Socios s ON a.id_socio = s.id_socio
 		INNER JOIN socios.Cuotas q ON q.id_socio = s.id_socio
 		INNER JOIN socios.Categorias c ON c.id_categoria = q.id_categoria
 		INNER JOIN actividades.Clases cl ON a.id_clase = cl.id_clase
 		INNER JOIN actividades.Deportes d ON cl.id_deporte = d.id_deporte
-		WHERE a.presente = 'P'
+		WHERE LTRIM(RTRIM(a.presente)) = 'A'
 	),
 	Conteo AS (
 		SELECT
 			nombre_categoria,
 			deporte,
-			COUNT(*) AS cantidad_inasistencias
+			COUNT(DISTINCT id_socio) AS cantidad_socios_ausentes
 		FROM Inasistencias
 		GROUP BY nombre_categoria, deporte
 	)
@@ -153,9 +152,9 @@ BEGIN
 		'Reporte de Inasistencias por Categoría y Deporte' AS [Nombre del Reporte],
 		nombre_categoria AS [Categoría],
 		deporte AS [Deporte],
-		cantidad_inasistencias AS [Cantidad de Inasistencias]
+		cantidad_socios_ausentes AS [Cantidad de Socios que Inasistieron]
 	FROM Conteo
-	ORDER BY cantidad_inasistencias DESC, nombre_categoria, deporte;
+	ORDER BY cantidad_socios_ausentes DESC, nombre_categoria, deporte;
 
 END
 GO

@@ -98,12 +98,12 @@ BEGIN
     SELECT 
         cs.id_deporte,
         d.nombre AS deporte,
+		MONTH(cs.fecha_creacion) AS Mes, 
         SUM(cs.monto_total) AS ingreso_mensual
     FROM administracion.CargosSocio cs
     INNER JOIN actividades.Deportes d ON cs.id_deporte = d.id_deporte
-    WHERE 
-        YEAR(cs.fecha_creacion) = YEAR(GETDATE())
-    GROUP BY cs.id_deporte, d.nombre
+    WHERE YEAR(cs.fecha_creacion) = YEAR(GETDATE())
+    GROUP BY cs.id_deporte, d.nombre, cs.fecha_creacion
 	),
 	AcumuladoFinal AS (
 		SELECT 
@@ -117,7 +117,6 @@ BEGIN
 		ingresos_acumulados AS [Ingresos Acumulados]
 	FROM AcumuladoFinal
 	ORDER BY ingresos_acumulados DESC;
-
 END
 GO
 

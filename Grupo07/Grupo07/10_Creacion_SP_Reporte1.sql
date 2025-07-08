@@ -162,7 +162,7 @@ BEGIN
 		nombre_apellido AS [Nombre y Apellido],
 		mes_incumplido AS [Mes Incumplido],
 		cantidad_morosidades AS [Cantidad de Morosidades],
-		ranking AS [Ranking de Morosidad]
+		ranking AS [Ranking de Morosidad] -- Juan Perez es el mas mooroso de todos (Ranking 1) 
 	FROM FinalReporte
 	ORDER BY ranking, nro_socio, mes_incumplido;
 END
