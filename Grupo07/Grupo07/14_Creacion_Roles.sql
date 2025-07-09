@@ -65,6 +65,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON administracion.Pagos TO TesoreriaAdminis
 GRANT SELECT, INSERT, UPDATE, DELETE ON administracion.FacturasARCA TO TesoreriaAdministrativoDeFacturacion;
 GRANT SELECT, INSERT, UPDATE, DELETE ON administracion.CargosSocio TO TesoreriaAdministrativoDeFacturacion;
 GRANT SELECT ON actividades.ActividadesExtra TO TesoreriaAdministrativoDeFacturacion;
+GRANT SELECT ON socios.Socios TO TesoreriaAdministrativoDeFacturacion;
 GRANT SELECT ON socios.Cuotas TO TesoreriaAdministrativoDeFacturacion;
 GRANT SELECT ON actividades.Deportes TO TesoreriaAdministrativoDeFacturacion;
 
@@ -85,16 +86,73 @@ GRANT SELECT ON administracion.Pagos TO SociosWeb;
 GRANT SELECT ON SCHEMA::socios TO AutoridadesPresidente;
 GRANT SELECT ON SCHEMA::actividades TO AutoridadesPresidente;
 GRANT SELECT ON SCHEMA::administracion TO AutoridadesPresidente;
+GRANT SELECT, UPDATE, INSERT, DELETE ON administracion.Administradores TO AutoridadesPresidente;
 
 GRANT SELECT ON SCHEMA::socios TO AutoridadesVicepresidente;
 GRANT SELECT ON SCHEMA::actividades TO AutoridadesVicepresidente;
 GRANT SELECT ON SCHEMA::administracion TO AutoridadesVicepresidente;
+GRANT SELECT, UPDATE, INSERT, DELETE ON administracion.Administradores TO AutoridadesVicepresidente;
 
 GRANT SELECT ON SCHEMA::socios TO AutoridadesSecretario;
 GRANT SELECT ON SCHEMA::actividades TO AutoridadesSecretario;
 GRANT SELECT ON SCHEMA::administracion TO AutoridadesSecretario;
+GRANT SELECT, UPDATE, INSERT, DELETE ON administracion.Administradores TO AutoridadesSecretario;
 
 GRANT SELECT ON SCHEMA::socios TO AutoridadesVocales;
 GRANT SELECT ON SCHEMA::actividades TO AutoridadesVocales;
 GRANT SELECT ON SCHEMA::administracion TO AutoridadesVocales;
+GRANT SELECT, UPDATE, INSERT, DELETE ON administracion.Administradores TO AutoridadesVocales;
+
+GO
+
+
+-- Jefe Tesorero
+CREATE LOGIN JefeTesorero WITH PASSWORD = 'Tesorero12345';
+CREATE USER JefeTesorero FOR LOGIN JefeTesorero;
+ALTER ROLE TesoreriaJefeDeTesoreria ADD MEMBER JefeTesorero;
+
+-- Administrativo Facturas
+CREATE LOGIN AdministrativoFacturas WITH PASSWORD = 'AdministrativoFacturas12345';
+CREATE USER AdministrativoFacturas FOR LOGIN AdministrativoFacturas;
+ALTER ROLE TesoreriaAdministrativoDeFacturacion ADD MEMBER AdministrativoFacturas;
+
+-- Administrativo Cobranzas
+CREATE LOGIN AdministrativoCobranzas WITH PASSWORD = 'AdministrativoCobranzas12345';
+CREATE USER AdministrativoCobranzas FOR LOGIN AdministrativoCobranzas;
+ALTER ROLE TesoreriaAdministrativoDeCobranza ADD MEMBER AdministrativoCobranzas;
+
+-- Administrativo Moorosidad
+CREATE LOGIN AdministrativoMorosidad WITH PASSWORD = 'AdministrativoMorosidad12345';
+CREATE USER AdministrativoMorosidad FOR LOGIN AdministrativoMorosidad;
+ALTER ROLE TesoreriaAdministrativoDeMorosidad ADD MEMBER AdministrativoMorosidad;
+
+-- Administrativo Socios
+CREATE LOGIN AdministrativoSocios WITH PASSWORD = 'AdministrativoSocios12345';
+CREATE USER AdministrativoSocios FOR LOGIN AdministrativoSocios;
+ALTER ROLE SociosAdministrativoSocio ADD MEMBER AdministrativoSocios;
+
+-- Administrativo Socios Web
+CREATE LOGIN AdministrativoSociosWeb WITH PASSWORD = 'AdministrativoSociosWeb12345';
+CREATE USER AdministrativoSociosWeb FOR LOGIN AdministrativoSociosWeb;
+ALTER ROLE SociosWeb ADD MEMBER AdministrativoSocios;
+
+-- Presidente
+CREATE LOGIN Presidente WITH PASSWORD = 'Presidente12345';
+CREATE USER Presidente FOR LOGIN Presidente;
+ALTER ROLE AutoridadesPresidente ADD MEMBER Presidente;
+
+-- Vicepresidente
+CREATE LOGIN Vicepresidente WITH PASSWORD = 'Vicepresidente12345';
+CREATE USER Vicepresidente FOR LOGIN Vicepresidente;
+ALTER ROLE AutoridadesVicepresidente ADD MEMBER Vicepresidente;
+
+-- Secretario
+CREATE LOGIN Secretario WITH PASSWORD = 'Secretario12345';
+CREATE USER Secretario FOR LOGIN Secretario;
+ALTER ROLE AutoridadesSecretario ADD MEMBER Secretario;
+
+-- Vocales
+CREATE LOGIN Vocales WITH PASSWORD = 'Vocales12345';
+CREATE USER Vocales FOR LOGIN Vocales;
+ALTER ROLE AutoridadesVocales ADD MEMBER Vocales;
 GO
